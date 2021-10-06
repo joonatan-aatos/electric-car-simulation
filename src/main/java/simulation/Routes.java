@@ -9,7 +9,10 @@ public class Routes {
 
     public static void generateRoutes() {
         ArrayList<ChargingStation> chargingStationsHeLa = new ArrayList<>();
-        chargingStationsHeLa.add(new ChargingStation(4, new ArrayList<Integer>(Arrays.asList(20, 30, 40))));
+        chargingStationsHeLa.add(new ChargingStation(
+                4,
+                new ArrayList<Integer>(Arrays.asList(20, 30, 40)))
+        );
         routes.put(
                 "HeLa",
                 new Route(

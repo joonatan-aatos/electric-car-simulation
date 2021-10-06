@@ -6,7 +6,7 @@ import java.util.Collections;
 public class ChargingStation {
 
     private class Charger implements Comparable {
-        private int power;
+        private final int power;
         private boolean inUse;
 
         public Charger(int power_) {
@@ -45,8 +45,8 @@ public class ChargingStation {
         }
     }
 
-    private double distance;
-    private ArrayList<Charger> chargers;
+    private final double distance;
+    private final ArrayList<Charger> chargers;
 
     public ChargingStation(double distance_, ArrayList<Integer> powers) {
         distance = distance_;

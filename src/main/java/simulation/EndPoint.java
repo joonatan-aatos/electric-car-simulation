@@ -2,28 +2,28 @@ package simulation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public enum EndPoint {
-    Helsinki    (new ArrayList<Integer>(List.of(0))),
-    Lahti       (new ArrayList<Integer>(Arrays.asList(0,1))),
-    Jyvaskyla   (new ArrayList<Integer>(Arrays.asList(1,2))),
-    Oulu        (new ArrayList<Integer>(Arrays.asList(2,3))),
-    Rovaniemi   (new ArrayList<Integer>(List.of(3)));
+    Helsinki(new ArrayList<String>(Arrays.asList("HeLa"))),
+    Lahti(new ArrayList<String>(Arrays.asList("HeLa", "LaJy"))),
+    Jyvaskyla(new ArrayList<String>(Arrays.asList("LaJy", "JyOu"))),
+    Oulu(new ArrayList<String>(Arrays.asList("JyOu", "OuRo"))),
+    Rovaniemi(new ArrayList<String>(Arrays.asList("OuRo")));
 
-
-    private ArrayList<Route> connectedRoutes = new ArrayList<>();
-    private ArrayList<Integer> connectedRouteIndexes = new ArrayList<>();
+    private final ArrayList<Route> connectedRoutes;
+    private final ArrayList<String> connectedRouteIDs;
 
     public ArrayList<Route> getConnectedRoutes() {
         if (connectedRoutes.size() == 0) {
-            for (int i : connectedRouteIndexes) {
-                connectedRoutes.add(Routes.routes.get(i));
+            for (String id : connectedRouteIDs) {
+                connectedRoutes.add(Routes.routes.get(id));
             }
         }
         return connectedRoutes;
     }
-    EndPoint(ArrayList<Integer> routeIndexes){
-        connectedRouteIndexes = routeIndexes;
+
+    EndPoint(ArrayList<String> routeIndexes) {
+        connectedRouteIDs = routeIndexes;
+        connectedRoutes = new ArrayList<>();
     }
 }

@@ -1,6 +1,8 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Route {
     private final double length;
@@ -9,6 +11,8 @@ public class Route {
 
     private final EndPoint startPoint;
     private final EndPoint endPoint;
+
+    private static final Random random = new Random();
 
     public Route(double length_, ArrayList<ChargingStation> chargingStations_, EndPoint startPoint_, EndPoint endPoint_) {
         length = length_;
@@ -53,6 +57,19 @@ public class Route {
 
         length = sumOfLengths;
         endPoint = previousEndPoint;
+    }
+
+    public static Route generateRandomRoute() {
+        ArrayList<EndPoint> endPoints = new ArrayList<>(List.of(EndPoint.values()));
+        EndPoint startPoint = endPoints.get(random.nextInt(endPoints.size()));
+        endPoints.remove(startPoint);
+        EndPoint endPoint = endPoints.get(random.nextInt(endPoints.size()));
+        return generateShortestRoute(startPoint, endPoint);
+    }
+
+    public static Route generateShortestRoute(EndPoint startPoint, EndPoint endPoint) {
+        // TODO: Implement this
+        return null;
     }
 
     public double getLength() {

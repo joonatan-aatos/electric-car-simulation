@@ -46,10 +46,12 @@ public class ChargingStation {
     }
 
     private final double distance;
+    private final double distanceFromHighway;
     private final ArrayList<Charger> chargers;
 
-    public ChargingStation(double distance_, ArrayList<Integer> powers) {
+    public ChargingStation(double distance_, double distanceFromHighway_, ArrayList<Integer> powers) {
         distance = distance_;
+        distanceFromHighway = distanceFromHighway_;
         chargers = new ArrayList<>();
         for (int power : powers) {
             chargers.add(new Charger(power));
@@ -67,6 +69,10 @@ public class ChargingStation {
 
     public double getDistance() {
         return distance;
+    }
+
+    public double getDistanceFromHighway() {
+        return distanceFromHighway;
     }
 
     public ArrayList<Charger> getChargers() {

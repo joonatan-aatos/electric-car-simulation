@@ -11,6 +11,7 @@ public class Routes {
         ArrayList<ChargingStation> chargingStationsHeLa = new ArrayList<>();
         chargingStationsHeLa.add(new ChargingStation(
                 4,
+                1,
                 new ArrayList<Integer>(Arrays.asList(20, 30, 40)))
         );
         routes.put(

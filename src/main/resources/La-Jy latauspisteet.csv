@@ -1,0 +1,35 @@
+Etäisyys;164;;;;;;;
+;;;;;;;;
+Latauspiste;Liittymä etäis.;Liittymästä;Teho (kW);Laturien lkm;Tyyppi;Kauppa;Ruoka;Asiakkaille
+Neste K Karisto;1.3;0.7;350;2;CCS;1;1;0
+K-Citymarket Lahti Karisma;1.3;0.7;50;2;CCS;1;1;0
+K-Citymarket Lahti Karisma;1.3;0.7;50;2;CHAdeMO;1;1;0
+K-Citymarket Lahti Karisma;1.3;0.7;22;4;Type2;1;1;0
+Matkakeidas Vierumäki;20.1;0.7;125;8;SuperCharger;1;1;0
+Matkakeidas Vierumäki;20.1;0.7;22;2;Type2;1;1;0
+Heinolan Kauppahallit;25.5;1.4;22;1;Type2;0;1;0
+K-Citymarket Heinola;29.8;1.5;150;2;CSS;1;1;0
+K-Citymarket Heinola;29.8;1.5;50;1;CHAdeMO;1;1;0
+K-Citymarket Heinola;29.8;1.5;11;1;Type2;1;1;0
+Jari-Pekka Hartola;76.7;0.2;50;2;CCS;1;1;0
+Jari-Pekka Hartola;76.7;0.2;50;2;CHAdeMO;1;1;0
+Jari-Pekka Hartola;76.7;0.2;22;1;Type2;1;1;0
+OP Järvi-häme Hartola;76.7;0.8;11;2;Type2;0;0;0
+Teboil Huttula;96.3;0.2;22;1;Type2;0;1;1
+Teboil Leivonmäki;115;0.2;22;1;Type2;0;1;1
+K-Supermarket Vaajakoski;158;0.1;50;1;CCS;1;0;0
+K-Supermarket Vaajakoski;158;0.1;50;1;CHAdeMO;1;0;0
+K-Supermarket Vaajakoski;158;0.1;22;2;Type2;1;0;0
+Eco Car Center – Biltec Oy;158;1.7;11;1;Type2;0;0;1
+Hotel GreenStar Jyväskylä;164;0.8;22;1;SuperCharger;0;1;1
+Hotel GreenStar Jyväskylä;164;0.8;22;2;Type2;0;1;1
+Scandic Jyväskylä Station;164;1.2;11;4;Type2;0;1;0
+Kauppakeskus Kolmikulma / P-Kolmikulma;164;1.2;22;4;Type2;1;1;0
+Botique Hotel Yöpuu;164;1.4;22;2;Type2;0;1;1
+Jyväskylä P-Sokos;164;1.4;22;2;Type2;1;1;0
+Jyväskylän kaupungintalo;164;1.9;11;1;Type2;1;1;0
+Hotelli Verso;164;1.6;9;2;Type2;0;1;1
+;;;;;;;;
+;;;;;;;;
+;;;;;;;;
+;;;;;;;;,mnnbvn

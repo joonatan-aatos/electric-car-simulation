@@ -1,0 +1,32 @@
+Pituus:;115.5;;;;;;;
+;;;;;;;;
+Latauspiste;Etäisyys;Etäisyys tiestä;Teho (kW);Laturien lkm;Tyyppi;Kauppa;Ruoka;Asiakkaille
+Kemin Seudun Osuuspankki;0;1.6;22;2;Type2;0;0;0
+Hotelli Merihovi;0;1.5;22;1;Type2;0;1;1
+Hotelli Merihovi;0;1.5;11;2;Työmaapistoke;0;1;1
+Neste Tupasvilla;6.9;1.1;300;2;CCS (HPC);1;1;0
+Neste Tupasvilla;6.9;1.1;50;1;CCS;1;1;0
+Neste Tupasvilla;6.9;1.1;50;1;CHAdeMO;1;1;0
+Neste Tupasvilla;6.9;1.1;22;1;Type2;1;1;0
+Pohjanportti - Kylpylähotelli Pohjanranta;12.8;0;11;3;Type2;0;1;1
+Motelli Tervakuksa - Neste Oil Tervola;42.4;0;225;2;CCS (HPC);0;1;1
+ST1 Peura;60.5;0;22;2;Type2;0;1;0
+Hotelli Metsähirvas;97.1;0.4;11;1;Työmaapistoke;0;0;0
+Neste K Reissumies Rovaniemi;111.3;0.2;22;2;Type2;0;1;0
+Motonet Rovaniemi;111.3;0.6;11;2;Type2;0;0;0
+Lapin koulutuskeskus REDU;111.3;1.9;50;1;CCS;0;0;0
+Lapin koulutuskeskus REDU;111.3;1.9;50;1;CHAdeMO;0;0;0
+Teollisuustie-Lautatie;113;0.8;150;2;CCS (HPC);1;1;0
+Napapiirin Energia ja Vesi Lautatie;113;1;150;2;CCS (HPC);1;1;0
+Napapiirin Energia ja Vesi Lautatie;113;1;22;1;Type2;1;1;0
+Domus Arctica -säätiö (DAS) Kelo;113;1.7;22;2;Type2;0;0;0
+Lapin AMK Jokiväylä;113;1.7;22;2;Type2;0;1;0
+Minimani Rovaniemi;114;0.9;50;2;CCS;1;1;0
+Minimani Rovaniemi;114;0.9;50;2;CHAdeMO;1;1;0
+Minimani Rovaniemi;114;0.9;22;4;Type2;1;1;0
+Kauppakeskus Revontuli;114.4;1;50;1;CCS;1;1;1
+Kauppakeskus Revontuli;114.4;1;50;1;CHAdeMO;1;1;1
+Kauppakeskus Rinteenkulma;114.9;0.1;50;3;CCS;1;1;0
+Kauppakeskus Rinteenkulma;114.9;0.1;50;3;CHAdeMO;1;1;0
+Kauppakeskus Rinteenkulma;114.9;0.1;22;3;Type2;1;1;0
+Kauppakeskus Rinteenkulma;114.9;0.1;11;1;Työmaapistoke;1;1;0

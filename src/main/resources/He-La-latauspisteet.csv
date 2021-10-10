@@ -1,0 +1,70 @@
+Pituus:;97.7;;;;;;;
+;;;;;;;;
+Latauspiste;Etäisyys;Etäisyys tiestä;Teho (kW);Laturien lkm;Tyyppi;Kauppa;Ruoka;Asiakkaille
+Prisma Viikki;2.2;0.9;25;3;CCS;1;1;0
+Prisma Viikki;2.2;0.9;25;1;CHAdeMO;1;1;0
+Prisma Viikki;2.2;0.9;9;4;Type2;1;1;0
+Prisma Viikki;2.2;0.9;22;4;Type2;1;1;0
+HY kampus;2.2;0.7;22;4;Type2;0;1;1
+K-Supermarket Viikki;2.2;1.6;150;2;CCS (HPC);1;1;0
+McDonalds Kivikko;4.4;1.4;50;1;CCS;0;1;0
+McDonalds Kivikko;4.4;1.4;50;1;CHAdeMO;0;1;0
+McDonalds Kivikko;4.4;1.4;22;1;Type2;0;1;0
+Kivikon liikuntapuisto;4.4;2.3;22;4;Type2;0;0;0
+Malmin jäähalli;4.4;2.6;22;4;Type2;0;0;0
+Villa Jokivarsi;17.4;0.5;11;1;Type2;0;0;1
+Lidl Vantaa-Korso;17.4;1;50;1;CCS;1;0;1
+Lidl Vantaa-Korso;17.4;1;50;1;CHAdeMO;1;0;1
+Lidl Vantaa-Korso;17.4;1;22;1;Type2;1;0;1
+Motonet Kerava;22.3;1.4;11;2;Type2;1;0;0
+Teboil Kannisto;22.3;2.5;22;2;Type2;0;1;0
+Lidl Kerava;22.3;2.1;50;1;CCS;1;0;1
+Lidl Kerava;22.3;2.1;50;1;CHAdeMO;1;0;1
+Lidl Kerava;22.3;2.1;22;1;Type2;1;0;1
+Keuda Sarviniitynkatu;22.3;2.2;22;2;Type2;0;0;0
+K-Citymarket Kerava;22.3;2.6;50;2;CCS;1;1;0
+K-Citymarket Kerava;22.3;2.6;50;2;CHAdeMO;1;1;0
+K-Citymarket Kerava;22.3;2.6;22;4;Type2;1;1;0
+Prisma Kerava;22.3;2.7;25;3;CCS;1;1;1
+Prisma Kerava;22.3;2.7;25;1;CHAdeMO;1;1;1
+Prisma Kerava;22.3;2.7;22;6;Type2;1;1;1
+Kauppakeskus karuselli;22.3;2.6;4;6;Type2;1;1;1
+Asemanaukio;22.3;3;22;2;Type2;0;1;0
+Keuda Keskikatu;22.3;3.1;22;2;Type2;0;0;0
+Keravan energia pääkonttori;22.3;4.2;11;2;Type2;0;0;0
+Lidl Jakelukeskus Järvenpää;29.8;1;50;1;CCS;0;1;1
+Lidl Jakelukeskus Järvenpää;29.8;1;50;1;CHAdeMO;0;1;1
+Lidl Jakelukeskus Järvenpää;29.8;1;22;3;Type2;0;1;1
+Power Järvenpää;29.8;2.3;22;2;Type2;0;0;0
+Lidl Järvenpää;29.8;2.8;50;1;CCS;1;0;1
+Lidl Järvenpää;29.8;2.8;50;1;CHAdeMO;1;0;1
+Lidl Järvenpää;29.8;2.8;22;1;Type2;1;0;1
+K-Citymarket Järvenpää;29.8;3.8;50;2;CCS;1;1;0
+K-Citymarket Järvenpää;29.8;3.8;50;2;CHAdeMO;1;1;0
+K-Citymarket Järvenpää;29.8;3.8;22;4;Type2;1;1;0
+Keuda Sibeliuksenväylä;29.8;2.9;22;2;Type2;0;0;0
+Neste K Mäntsälä Tuuliruusu;48.7;0.4;22;2;Type2;1;1;0
+Carpojat Mäntsälä;51.6;1;11;1;Type2;0;0;1
+Tokmanni Group Pääkonttori;51.6;1.7;22;2;Type2;0;0;1
+Mäntsälä Huvitie;51.6;2.3;50;1;CCS;1;0;0
+Mäntsälä Huvitie;51.6;2.3;50;1;CHAdeMO;1;0;0
+Mäntsälä Huvitie;51.6;2.3;22;2;Type2;1;0;0
+Mäntsälän jäähalli;51.6;2.6;22;4;Type2;0;0;0
+Keuda Lukkarinpolku;51.6;2.8;22;2;Type2;0;0;0
+Keskuskatu 2;51.6;2.3;22;2;Type2;0;0;0
+Mäntsälän osuuspankki;51.6;2.5;22;2;Type2;0;0;0
+K-Citymarket Mäntsälä;51.6;2.8;50;2;CCS;1;1;0
+K-Citymarket Mäntsälä;51.6;2.8;50;2;CHAdeMO;1;1;0
+K-Citymarket Mäntsälä;51.6;2.8;22;4;Type2;1;1;0
+Mäntsälän asema;51.6;4.4;22;2;Type2;0;0;0
+Juustoportti Mäntsälä;57.8;0.8;50;1;CCS;0;1;0
+Neste K Orimattila Tuuliharja;78;0.1;22;2;Type2;0;1;0
+ABC Renkomäki Lahti;91.1;1;150;2;CCS (HPC);1;1;0
+ABC Renkomäki Lahti;91.1;1;22;2;Type2;1;1;0
+Motonet Lahti;91.1;2;11;2;Type2;0;0;0
+Kärkkäinen Lahti;91.1;1.2;60;2;CCS;1;1;0
+Kärkkäinen Lahti;91.1;1.2;60;2;CHAdeMO;1;1;0
+Kärkkäinen Lahti;91.1;1.2;22;5;Type2;1;1;0
+K-Caara Lahti;91.1;2.2;50;1;CCS;0;1;1
+K-Caara Lahti;91.1;2.2;22;6;Type2;0;1;1
+LemShop Lem-Kem oy;91.1;4.3;22;1;Type2;0;0;0

@@ -1,0 +1,29 @@
+Pituus:;451km;;;;;;;
+;;;;;;;;
+Latauspiste;Etäisyys;Etäisyys tiestä;Teho (kW);Laturien lkm;Tyyppi;Kauppa;Ruoka;Asiakkaille
+Scandic Rovaniemi City;0;0.5;22;3;Type2;0;1;0
+Santa’s Hotel Santa Claus;0;0.5;22;2;Type2;0;1;0
+Arctic Light Hotel;0;0.9;22;1;SuperCharger;0;1;1
+Arctic Light Hotel;0;0.9;22;1;Type2;0;1;1
+Original Sokos Hotel Vaakuna Rovaniemi;0;0.7;11;4;Type2;0;1;1
+Napapiirin Energia ja Vesi Palkisentie;0;1.2;22;1;Type2;0;0;0
+Napapiirin Energia ja Vesi Palkisentie;0;2.6;22;1;Type2;0;0;0
+Lapland Hotels Sky Ounasvaara;0;3.6;22;2;Type2;0;1;0
+K-Citymarket Rovaniemi;1.7;0.7;50;2;CSS;1;1;0
+K-Citymarket Rovaniemi;1.7;0.7;50;2;CHAdeMO;1;1;0
+K-Citymarket Rovaniemi;1.7;0.7;22;4;Type2;1;1;0
+Rovaniemen Lentoasema (RVN);6;2;22;2;Type2;0;0;0
+Neste Napapiiri;6;3.6;11;1;Työmaapistoke;0;0;0
+Käyrämön Keidas - Panda YZF;67.8;0.1;22;2;Type2;1;1;0
+SEO Seomäki Sodankylä;127;0;60;3;CCS;0;1;1
+SEO Seomäki Sodankylä;127;0;50;1;CHAdeMO;0;1;1
+Sodankylän kunta - Hyvinvointikeskus Sopukka;127;1.2;22;4;Type2;0;0;0
+Northern Light Village;256;0.1;11;1;Työmaapistoke;0;1;1
+Holiday Club Saariselkä;257;1.2;22;4;Type2;0;1;0
+Holiday Club Saariselkä;257;1.2;22;2;SuperCharger;0;1;0
+Lapland Hotels Riekonlinna;257;1.2;17;2;Type2;0;1;0
+Ivalon Lentoasema (IVL);280;2.9;22;4;Type2;0;0;0
+Hotelli Kultahippu;287;0.1;11;1;Työmaapistoke;0;1;1
+Ukonjärven Holiday Village;297;1.4;22;1;Type2;0;0;0
+Hotel Inari;326;0.1;22;2;Type2;0;1;0
+Holiday Village Utsjoki;451;2.4;11;3;Type2;0;1;0

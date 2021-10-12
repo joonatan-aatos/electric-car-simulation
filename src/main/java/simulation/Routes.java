@@ -8,32 +8,67 @@ public class Routes {
     public static HashMap<String, Route> routes = new HashMap<>();
 
     public static void generateRoutes() {
-        ArrayList<ChargingStation> chargingStationsHeLa = new ArrayList<>();
-        chargingStationsHeLa.add(new ChargingStation(
-                4,
-                1,
-                new ArrayList<Integer>(Arrays.asList(20, 30, 40)))
-        );
+        System.out.println("Generating routes...");
+        RoadData heLa = RoadData.readChargingStations("/He-La-latauspisteet.csv");
         routes.put(
                 "HeLa",
                 new Route(
-                    10,
-                    new ArrayList<ChargingStation>(chargingStationsHeLa),
+                    heLa.getLength(),
+                    heLa.getChargingStations(),
                     EndPoint.Helsinki,
                     EndPoint.Lahti
                 )
         );
+        RoadData laJy = RoadData.readChargingStations("/La-Jy-latauspisteet.csv");
         routes.put(
                 "LaJy",
-                null
+                new Route(
+                        laJy.getLength(),
+                        laJy.getChargingStations(),
+                        EndPoint.Lahti,
+                        EndPoint.Jyvaskyla
+                )
         );
+        RoadData jyOu = RoadData.readChargingStations("/Jy-Ou-latauspisteet.csv");
         routes.put(
                 "JyOu",
-                null
+                new Route(
+                        jyOu.getLength(),
+                        jyOu.getChargingStations(),
+                        EndPoint.Jyvaskyla,
+                        EndPoint.Oulu
+                )
         );
+        RoadData ouKe = RoadData.readChargingStations("/Ou-Ke-latauspisteet.csv");
         routes.put(
-                "OuRo",
-                null
+                "OuKe",
+                new Route(
+                        ouKe.getLength(),
+                        ouKe.getChargingStations(),
+                        EndPoint.Oulu,
+                        EndPoint.Kemi
+                )
         );
+        RoadData keRo = RoadData.readChargingStations("/Ke-Ro-latauspisteet.csv");
+        routes.put(
+                "KeRo",
+                new Route(
+                        keRo.getLength(),
+                        keRo.getChargingStations(),
+                        EndPoint.Kemi,
+                        EndPoint.Rovaniemi
+                )
+        );
+        RoadData roUt = RoadData.readChargingStations("/Ro-Ut-latauspisteet.csv");
+        routes.put(
+                "RoUt",
+                new Route(
+                        roUt.getLength(),
+                        roUt.getChargingStations(),
+                        EndPoint.Rovaniemi,
+                        EndPoint.Utsjoki
+                )
+        );
+
     }
 }

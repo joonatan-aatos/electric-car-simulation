@@ -8,10 +8,12 @@ public class ChargingStation {
     private class Charger implements Comparable {
         private final int power;
         private boolean inUse;
+        private ChargerType type;
 
-        public Charger(int power_) {
+        public Charger(int power_, ChargerType type_) {
             power = power_;
             inUse = false;
+            type = type_;
         }
 
         public int getPower() {
@@ -25,6 +27,8 @@ public class ChargingStation {
         public void setInUse(boolean inUse_) {
             inUse = inUse_;
         }
+
+        public ChargerType getType() { return type; }
 
         @Override
         public int compareTo(Object o) {
@@ -48,15 +52,23 @@ public class ChargingStation {
     private final double distance;
     private final double distanceFromHighway;
     private final ArrayList<Charger> chargers;
+    private final boolean customerExclusive, hasShop, hasFood;
 
-    public ChargingStation(double distance_, double distanceFromHighway_, ArrayList<Integer> powers) {
+    public ChargingStation(double distance_, double distanceFromHighway_, ArrayList<Integer> powers, ArrayList<ChargerType> types, boolean[] info) {
         distance = distance_;
         distanceFromHighway = distanceFromHighway_;
         chargers = new ArrayList<>();
-        for (int power : powers) {
-            chargers.add(new Charger(power));
+        customerExclusive = info[0];
+        hasShop = info[1];
+        hasFood = info[2];
+        for (int i = 0; i < powers.size(); i++) {
+            chargers.add(new Charger(powers.get(i), types.get(i)));
         }
         Collections.sort(chargers);
+    }
+
+    public void addCharger(int power, ChargerType type) {
+        chargers.add(new Charger(power, type));
     }
 
     public Charger getAvailableCharger() {

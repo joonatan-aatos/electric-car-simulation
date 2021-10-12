@@ -7,8 +7,10 @@ public enum EndPoint {
     Helsinki(new ArrayList<String>(Arrays.asList("HeLa"))),
     Lahti(new ArrayList<String>(Arrays.asList("HeLa", "LaJy"))),
     Jyvaskyla(new ArrayList<String>(Arrays.asList("LaJy", "JyOu"))),
-    Oulu(new ArrayList<String>(Arrays.asList("JyOu", "OuRo"))),
-    Rovaniemi(new ArrayList<String>(Arrays.asList("OuRo")));
+    Oulu(new ArrayList<String>(Arrays.asList("JyOu", "OuKe"))),
+    Kemi(new ArrayList<String>(Arrays.asList("OuKe","KeRo"))),
+    Rovaniemi(new ArrayList<String>(Arrays.asList("KeRo", "RoUt"))),
+    Utsjoki(new ArrayList<String>(Arrays.asList("RoUt")));
 
     private final ArrayList<Route> connectedRoutes;
     private final ArrayList<String> connectedRouteIDs;

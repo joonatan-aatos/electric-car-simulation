@@ -8,13 +8,15 @@ public class Route {
     private final double length;
     private final ArrayList<ChargingStation> chargingStations;
     private final ArrayList<Double> chargingStationDistances;
+    private final String name;
 
     private final EndPoint startPoint;
     private final EndPoint endPoint;
 
     private static final Random random = new Random();
 
-    public Route(double length_, ArrayList<ChargingStation> chargingStations_, EndPoint startPoint_, EndPoint endPoint_) {
+    public Route(String name_, double length_, ArrayList<ChargingStation> chargingStations_, EndPoint startPoint_, EndPoint endPoint_) {
+        name = name_;
         length = length_;
         startPoint = startPoint_;
         endPoint = endPoint_;
@@ -27,6 +29,9 @@ public class Route {
     }
 
     public Route(ArrayList<Route> rootRoutes, EndPoint startPoint_) {
+        if (rootRoutes.size() < 1)
+            throw new IllegalArgumentException("No root routes were provided");
+        name = rootRoutes.get(0).getName() + " - " + rootRoutes.get(rootRoutes.size() - 1).getName();
         startPoint = startPoint_;
         chargingStations = new ArrayList<>();
         chargingStationDistances = new ArrayList<>();
@@ -88,9 +93,14 @@ public class Route {
         return endPoint;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
+        s.append(name + "\n");
         for (ChargingStation chargingStation : chargingStations) {
             s.append(chargingStation.toString());
             s.append("\n");

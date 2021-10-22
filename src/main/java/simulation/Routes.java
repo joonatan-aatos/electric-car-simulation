@@ -1,7 +1,5 @@
 package simulation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class Routes {
@@ -13,16 +11,18 @@ public class Routes {
         routes.put(
                 "HeLa",
                 new Route(
-                    heLa.getLength(),
-                    heLa.getChargingStations(),
-                    EndPoint.Helsinki,
-                    EndPoint.Lahti
+                        "HeLa",
+                        heLa.getLength(),
+                        heLa.getChargingStations(),
+                        EndPoint.Helsinki,
+                        EndPoint.Lahti
                 )
         );
         RoadData laJy = RoadData.readChargingStations("/La-Jy-latauspisteet.csv");
         routes.put(
                 "LaJy",
                 new Route(
+                        "LaJy",
                         laJy.getLength(),
                         laJy.getChargingStations(),
                         EndPoint.Lahti,
@@ -33,6 +33,7 @@ public class Routes {
         routes.put(
                 "JyOu",
                 new Route(
+                        "JyOu",
                         jyOu.getLength(),
                         jyOu.getChargingStations(),
                         EndPoint.Jyvaskyla,
@@ -43,6 +44,7 @@ public class Routes {
         routes.put(
                 "OuKe",
                 new Route(
+                        "OuKe",
                         ouKe.getLength(),
                         ouKe.getChargingStations(),
                         EndPoint.Oulu,
@@ -53,6 +55,7 @@ public class Routes {
         routes.put(
                 "KeRo",
                 new Route(
+                        "KeRo",
                         keRo.getLength(),
                         keRo.getChargingStations(),
                         EndPoint.Kemi,
@@ -63,12 +66,12 @@ public class Routes {
         routes.put(
                 "RoUt",
                 new Route(
+                        "RoUt",
                         roUt.getLength(),
                         roUt.getChargingStations(),
                         EndPoint.Rovaniemi,
                         EndPoint.Utsjoki
                 )
         );
-
     }
 }

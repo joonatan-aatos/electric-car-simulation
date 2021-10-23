@@ -20,11 +20,14 @@ public class Visualizer {
     final int END_POINT_DIAMETER = 20;
     final int CAR_DIAMETER = 16;
     final int END_POINT_NAME_PADDING = 42;
-    final int nameXCoordinate = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
+    final int NAME_X_COORDINATE = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
+
+    final int INFO_AREA_WIDTH = 600;
+    final int TEXT_PADDING = 32;
 
     private enum Palette {
         Primary(Color.decode("#001D3D")),
-        PrimaryDark(Color.decode("#000814")),
+        PrimaryDark(Color.decode("#001834")),
         PrimaryLight(Color.decode("#003566")),
         PrimaryContrast(Color.decode("#EEEEEE")),
         Secondary(Color.decode("#FFC300")),
@@ -43,7 +46,7 @@ public class Visualizer {
 
     public Visualizer() {
         frame = new JFrame("Simulaatio");
-        frame.setSize(600, 600);
+        frame.setSize(800, 800);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
@@ -70,6 +73,7 @@ public class Visualizer {
 
         drawRouteBar(g);
         drawCars(g, simulation.getCars());
+        drawInfo(g, simulation);
 
         ((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -102,7 +106,7 @@ public class Visualizer {
         );
         g.drawString(
                 routes.get(routeKeys.get(0)).getStartPoint().toString(),
-                nameXCoordinate,
+                NAME_X_COORDINATE,
                 1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2
         );
         for (String routeKey : routeKeys) {
@@ -116,7 +120,7 @@ public class Visualizer {
             );
             g.drawString(
                     route.getEndPoint().toString(),
-                    nameXCoordinate,
+                    NAME_X_COORDINATE,
                     1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2
             );
         }
@@ -167,5 +171,50 @@ public class Visualizer {
                     CAR_DIAMETER
             );
         }
+    }
+
+    public void drawInfo(Graphics2D g, Simulation simulation) {
+        g.setColor(Palette.PrimaryDark.getColor());
+        g.fillRect(1000 - INFO_AREA_WIDTH, 0, INFO_AREA_WIDTH, 1000);
+
+        ArrayList<Car> cars = simulation.getCars();
+        int onHighwayCount = 0, onWayToChargerCount = 0, onWayFromChargerCount = 0, chargingCount = 0, waitingCount = 0, batteryDepleatedCount = 0, destinationReachedCount = 0;
+        for (Car car : cars) {
+            switch (car.getState()) {
+                case Charging:
+                    chargingCount++;
+                    break;
+                case Waiting:
+                    waitingCount++;
+                    break;
+                case OnHighway:
+                    onHighwayCount++;
+                    break;
+                case OnWayToCharger:
+                    onWayToChargerCount++;
+                    break;
+                case OnWayFromCharger:
+                    onWayFromChargerCount++;
+                    break;
+                case DestinationReached:
+                    destinationReachedCount++;
+                    break;
+                case BatteryDepleted:
+                    batteryDepleatedCount++;
+                    break;
+            }
+        }
+        final int textSpacing = (int) (TEXT_PADDING * 1.5);
+
+        g.setColor(Palette.Secondary.getColor());
+        g.setFont(new Font("arial", Font.PLAIN, 30));
+        g.drawString("Valtatiellä: "+onHighwayCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60);
+        g.drawString("Matkalla laturille: "+onWayToChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + textSpacing);
+        g.drawString("Matkalla laturilta: "+onWayFromChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 2 * textSpacing);
+        g.drawString("Latautumassa: "+chargingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 3 * textSpacing);
+        g.drawString("Odottamassa: "+waitingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 4 * textSpacing);
+        g.drawString("Akku loppunut: "+batteryDepleatedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 5 * textSpacing);
+        g.drawString("Perillä: "+destinationReachedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 6 * textSpacing);
+        g.drawString("Yhteensä: "+cars.size(), 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 8 * textSpacing);
     }
 }

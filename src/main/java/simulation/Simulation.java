@@ -14,13 +14,13 @@ public class Simulation implements Runnable {
 
     private void createCars() {
         cars = new ArrayList<>();
-        cars.add(new Car(CarType.TESLAMOTORS_MODEL3));
+        for (int i = 0; i < 1000; i++) {
+            cars.add(new Car(CarType.TESLAMOTORS_MODEL3));
+        }
 
         for (Car car : cars) {
             car.setRoute(Route.generateRandomRoute());
         }
-
-        System.out.println(cars.get(0).getRoute().getName());
     }
 
     public void start() {

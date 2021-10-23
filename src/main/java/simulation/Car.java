@@ -37,7 +37,6 @@ public class Car {
     }
 
     public void tick() {
-        System.out.println(state + ", " + batteryLife);
         switch (state) {
             case OnHighway:
                 driveOnHighway();

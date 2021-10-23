@@ -1,9 +1,11 @@
 package simulation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Routes {
     public static HashMap<String, Route> routes = new HashMap<>();
+    public static ArrayList<String> routeKeys = new ArrayList<>();
 
     public static void generateRoutes() {
         System.out.println("Generating routes...");
@@ -73,5 +75,12 @@ public class Routes {
                         EndPoint.Utsjoki
                 )
         );
+
+        routeKeys.add("HeLa");
+        routeKeys.add("LaJy");
+        routeKeys.add("JyOu");
+        routeKeys.add("OuKe");
+        routeKeys.add("KeRo");
+        routeKeys.add("RoUt");
     }
 }

@@ -1,10 +1,8 @@
 package simulation;
 
-import visualizer.Visualizer;
-
 import java.util.ArrayList;
 
-public class Simulation {
+public class Simulation implements Runnable {
 
     ArrayList<Car> cars;
     int timeElapsed;
@@ -35,7 +33,15 @@ public class Simulation {
             timeElapsed++;
             if (timeElapsed == Integer.MAX_VALUE)
                 throw new RuntimeException("Time exceeded maximum integer value");
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
+        System.out.println("Done.");
     }
 
     private boolean allCarsHaveReachedTheirDestination() {
@@ -44,6 +50,11 @@ public class Simulation {
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public void run() {
+        start();
     }
 
     @Override

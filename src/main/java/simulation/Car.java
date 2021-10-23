@@ -2,15 +2,25 @@ package simulation;
 
 public class Car {
     private final Route route;
-    private final int batteryCapacity;
-    private final int batteryLife;
     private final CarType carType;
 
-    public Car(CarType carType_, EndPoint start, int batteryCapacity_) {
+    private int batteryLife;
+    private double drivenDistance;
+
+    public Car(CarType carType_) {
         carType = carType_;
-        batteryCapacity = batteryCapacity_;
-        batteryLife = batteryCapacity_;
         route = Route.generateRandomRoute();
+
+        batteryLife = carType.capacity;
+        drivenDistance = 0;
+    }
+
+    public void tick() {
+
+    }
+
+    public double getDrivenDistance() {
+        return drivenDistance;
     }
 
     public CarType getCarType() {
@@ -19,10 +29,6 @@ public class Car {
 
     public Route getRoute() {
         return route;
-    }
-
-    public int getBatteryCapacity() {
-        return batteryCapacity;
     }
 
     public int getBatteryLife() {

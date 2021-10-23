@@ -48,7 +48,7 @@ public class Simulation implements Runnable {
 
     private boolean allCarsHaveReachedTheirDestination() {
         for (Car car : cars) {
-            if (!car.isHasReachedDestination())
+            if (car.getState() != Car.State.DestinationReached)
                 return false;
         }
         return true;

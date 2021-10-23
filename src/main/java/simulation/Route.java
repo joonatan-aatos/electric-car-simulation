@@ -279,6 +279,10 @@ public class Route {
         return name;
     }
 
+    public ArrayList<Double> getChargingStationDistances() {
+        return chargingStationDistances;
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();

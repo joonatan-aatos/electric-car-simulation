@@ -5,7 +5,7 @@ import java.util.Collections;
 
 public class ChargingStation {
 
-    private class Charger implements Comparable {
+    public class Charger implements Comparable {
         private final int power;
         private boolean inUse;
         private ChargerType type;

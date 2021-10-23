@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Simulation {
 
     ArrayList<Car> cars;
+    int timeElapsed;
 
     public Simulation() {
         Routes.generateRoutes();
@@ -14,10 +15,33 @@ public class Simulation {
     private void createCars() {
         cars = new ArrayList<>();
         cars.add(new Car(CarType.TESLAMOTORS_MODEL3));
+
+        for (Car car : cars) {
+            car.setRoute(Route.generateRandomRoute());
+        }
     }
 
     public void start() {
         System.out.println("Starting...");
+
+        timeElapsed = 0;
+
+        while (!allCarsHaveReachedTheirDestination()) {
+            for (Car car : cars) {
+                car.tick();
+            }
+            timeElapsed++;
+            if (timeElapsed == Integer.MAX_VALUE)
+                throw new RuntimeException("Time exceeded maximum integer value");
+        }
+    }
+
+    private boolean allCarsHaveReachedTheirDestination() {
+        for (Car car : cars) {
+            if (!car.isHasReachedDestination())
+                return false;
+        }
+        return true;
     }
 
     @Override

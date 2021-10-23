@@ -87,7 +87,7 @@ public enum CarType {
     VOLVO_XC40(154, -1, -1, -1),
     GAS(-1, -1, -1, -1);
 
-    private final int DEFAULT_CAPACITY = 100; // kWh
+    private final int DEFAULT_CAPACITY = 50; // kWh
     private final int DEFAULT_CHARGING_EFFICIENCY = Integer.MAX_VALUE; // kW
     private final double DEFAULT_DRIVING_EFFICIENCY = 14; // kWh / 100km
     public final int amount;

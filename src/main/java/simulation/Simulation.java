@@ -19,6 +19,8 @@ public class Simulation implements Runnable {
         for (Car car : cars) {
             car.setRoute(Route.generateRandomRoute());
         }
+
+        System.out.println(cars.get(0).getRoute().getName());
     }
 
     public void start() {
@@ -50,6 +52,10 @@ public class Simulation implements Runnable {
                 return false;
         }
         return true;
+    }
+
+    public ArrayList<Car> getCars() {
+        return cars;
     }
 
     @Override

@@ -1,9 +1,6 @@
 package simulation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Route {
     private final double length;
@@ -97,10 +94,17 @@ public class Route {
                 // Route has been found
                 // Find the corresponding route from Routes.routes
                 for (Route rootRoute : Routes.routes.values()) {
-                    if (rootRoute.startPoint == startingPoint || rootRoute.endPoint == startingPoint) {
-                        if (rootRoute.getOppositeEndPoint(startingPoint) == endingPoint) {
-                            return rootRoute;
-                        }
+                    if (rootRoute.startPoint == startingPoint && rootRoute.endPoint == endingPoint) {
+                        return new Route(
+                                route.getStartPoint().toString() + " - " + route.getEndPoint().toString(),
+                                route.length,
+                                route.chargingStations,
+                                route.startPoint,
+                                route.endPoint
+                        );
+                    }
+                    else if (rootRoute.startPoint == endingPoint && rootRoute.endPoint == startingPoint) {
+                        return getFlippedRoute(rootRoute);
                     }
                 }
                 throw new RuntimeException("Generate Shortest Route algorithm failed");
@@ -233,6 +237,19 @@ public class Route {
         }
 
         return new Route(rootRoutes, startingPoint);
+    }
+
+    public static Route getFlippedRoute(Route route) {
+
+        ArrayList<ChargingStation> newChargingStations = (ArrayList<ChargingStation>) route.chargingStations.clone();
+        Collections.reverse(newChargingStations);
+        return new Route(
+                route.getEndPoint().toString() + " - " + route.getStartPoint().toString(),
+                route.length,
+                newChargingStations,
+                route.endPoint,
+                route.startPoint
+        );
     }
 
     public EndPoint getOppositeEndPoint(EndPoint oppositeEndPoint) {

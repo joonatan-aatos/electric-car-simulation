@@ -1,8 +1,6 @@
 package visualizer;
 
-import simulation.Route;
-import simulation.Routes;
-import simulation.Simulation;
+import simulation.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +11,16 @@ public class Visualizer {
 
     JFrame frame;
     Canvas canvas;
+
+    final double LENGTH_OF_ROUTES = Routes.routes.values().stream().mapToDouble(Route::getLength).sum();
+    final int BAR_PADDING = 30;
+    final int BAR_WIDTH = 8;
+    final int BAR_HEIGHT = 1000-2*BAR_PADDING;
+
+    final int END_POINT_DIAMETER = 20;
+    final int CAR_DIAMETER = 16;
+    final int END_POINT_NAME_PADDING = 42;
+    final int nameXCoordinate = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
 
     private enum Palette {
         Primary(Color.decode("#001D3D")),
@@ -61,6 +69,7 @@ public class Visualizer {
         g.fillRect(0, 0, 1000, 1000);
 
         drawRouteBar(g);
+        drawCars(g, simulation.getCars());
 
         ((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -78,18 +87,8 @@ public class Visualizer {
         final HashMap<String, Route> routes = Routes.routes;
         final ArrayList<String> routeKeys = Routes.routeKeys;
 
-        final int BAR_PADDING = 30;
-        final int BAR_WIDTH = 8;
-        final int BAR_HEIGHT = 1000-2*BAR_PADDING;
-
-        final int END_POINT_DIAMETER = 20;
-        final int END_POINT_NAME_PADDING = 42;
-        final int nameXCoordinate = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
-
         g.setColor(Palette.PrimaryLight.getColor());
         g.fillRect(BAR_PADDING, BAR_PADDING, BAR_WIDTH, BAR_HEIGHT);
-
-        double routesLength = routes.values().stream().mapToDouble(Route::getLength).sum();
 
         double subRouteLength = 0;
         g.setColor(Palette.Secondary.getColor());
@@ -97,28 +96,75 @@ public class Visualizer {
 
         g.fillOval(
                 BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2,
-                1000 - BAR_PADDING - (int) (subRouteLength / routesLength * BAR_HEIGHT) - END_POINT_DIAMETER / 2,
+                1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) - END_POINT_DIAMETER / 2,
                 END_POINT_DIAMETER,
                 END_POINT_DIAMETER
         );
         g.drawString(
                 routes.get(routeKeys.get(0)).getStartPoint().toString(),
                 nameXCoordinate,
-                1000 - BAR_PADDING - (int) (subRouteLength / routesLength * BAR_HEIGHT) + END_POINT_DIAMETER / 2
+                1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2
         );
         for (String routeKey : routeKeys) {
             Route route = routes.get(routeKey);
             subRouteLength += route.getLength();
             g.fillOval(
                     BAR_PADDING+BAR_WIDTH / 2 - END_POINT_DIAMETER / 2,
-                    1000 - BAR_PADDING - (int) (subRouteLength / routesLength * BAR_HEIGHT) - END_POINT_DIAMETER / 2,
+                    1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) - END_POINT_DIAMETER / 2,
                     END_POINT_DIAMETER,
                     END_POINT_DIAMETER
             );
             g.drawString(
                     route.getEndPoint().toString(),
                     nameXCoordinate,
-                    1000 - BAR_PADDING - (int) (subRouteLength / routesLength * BAR_HEIGHT) + END_POINT_DIAMETER / 2
+                    1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2
+            );
+        }
+    }
+
+    public void drawCars(Graphics2D g, ArrayList<Car> cars) {
+        for (Car car : cars) {
+            Route route = car.getRoute();
+            boolean goingUp = false;
+            if (route.getStartPoint().index == 0)
+                goingUp = true;
+            else {
+                for (
+                        int startPointIndex = route.getStartPoint().index + 1;
+                        startPointIndex < EndPoint.values().length;
+                        startPointIndex++
+                ) {
+                    if (EndPoint.values()[startPointIndex] == route.getEndPoint()) {
+                        goingUp = true;
+                        break;
+                    }
+                }
+            }
+
+            int carYCoordinate = -1;
+            if (goingUp) {
+                double startDistance = 0;
+                for (int i = 0; i < route.getStartPoint().index; i++) {
+                    startDistance += Routes.routes.get(Routes.routeKeys.get(i)).getLength();
+                }
+                double distance = car.getDrivenDistance() + startDistance;
+                carYCoordinate = 1000 - BAR_PADDING - (int) (distance / LENGTH_OF_ROUTES * BAR_HEIGHT) - CAR_DIAMETER / 2;
+            }
+            else {
+                double startDistance = 0;
+                for (int i = route.getStartPoint().index; i < Routes.routeKeys.size(); i++) {
+                    startDistance += Routes.routes.get(Routes.routeKeys.get(i)).getLength();
+                }
+                double distance = car.getDrivenDistance() + startDistance;
+                carYCoordinate = BAR_PADDING + (int) (distance / LENGTH_OF_ROUTES * BAR_HEIGHT) - CAR_DIAMETER / 2;
+            }
+
+            g.setColor(Color.GREEN);
+            g.fillOval(
+                    BAR_PADDING + BAR_WIDTH / 2 - CAR_DIAMETER / 2,
+                    carYCoordinate,
+                    CAR_DIAMETER,
+                    CAR_DIAMETER
             );
         }
     }

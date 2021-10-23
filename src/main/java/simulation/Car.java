@@ -61,6 +61,7 @@ public class Car {
         ChargingStation.Charger availableCharger = route.getChargingStations().get(nextChargingStationIndex).getAvailableCharger();
         if (availableCharger != null) {
             availableCharger.setInUse(true);
+            chargerOn = availableCharger;
             state = State.Charging;
         }
     }

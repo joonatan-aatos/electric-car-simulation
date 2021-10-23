@@ -1,6 +1,7 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -77,6 +78,13 @@ public class Route {
         return generateShortestRoute(startPoint, endPoint);
     }
 
+    /**
+     *
+     * @param startingPoint
+     * @param endingPoint
+     * @return Returns the shortest route between the given points
+     * @author Joonatan Aatos Korpela
+     */
     public static Route generateShortestRoute(EndPoint startingPoint, EndPoint endingPoint) {
         if (startingPoint == endingPoint)
             throw new IllegalArgumentException("Can't generate the shortest route between given points");
@@ -98,7 +106,7 @@ public class Route {
                 throw new RuntimeException("Generate Shortest Route algorithm failed");
             }
             else {
-                // Add new endPoints to reachedEndPoints
+                // Add new endPoints to list of previous end points
                 ArrayList<EndPoint> previousPoints = new ArrayList<>();
                 previousPoints.add(startingPoint);
                 previousPoints.add(route.getOppositeEndPoint(startingPoint));
@@ -128,6 +136,7 @@ public class Route {
             listOfPreviousPoints = newListOfPreviousPoints;
         }
 
+        // Find the shortest route
         Route shortestRoute = null;
         double shortestRouteLength = Double.MAX_VALUE;
         for (ArrayList<EndPoint> possibleRoute : possibleRoutes) {
@@ -150,6 +159,80 @@ public class Route {
             }
         }
         return shortestRoute;
+    }
+
+    /**
+     *
+     * @param startingPoint
+     * @param desiredEndPoint
+     * @return Returns the shortest route between the given points
+     * @author Justus Zendium Christian Hansen
+     */
+    public static Route generateShortestRoute2(EndPoint startingPoint, EndPoint desiredEndPoint) {
+        if (startingPoint == desiredEndPoint)
+            throw new IllegalArgumentException("Can't generate the shortest route between given points");
+
+        ArrayList<EndPoint> toDoEndPoints = new ArrayList<>();
+        ArrayList<ArrayList<EndPoint>> toDoPreviousEndPoints = new ArrayList<>();
+
+        HashMap<EndPoint, Boolean> isEndPointDone = new HashMap<>();
+        for (EndPoint e : EndPoint.values()) {
+            isEndPointDone.put(e, false);
+        }
+
+        int amountDone = 0;
+        EndPoint currentPoint = startingPoint;
+        ArrayList<EndPoint> currentPreviousEndPoints = new ArrayList<>();
+        currentPreviousEndPoints.add(currentPoint);
+
+        whileLoop:
+        while (amountDone < EndPoint.values().length) {
+
+            for (Route route : currentPoint.getConnectedRoutes()) {
+                EndPoint nextEndPoint = route.getOppositeEndPoint(currentPoint);
+                if (isEndPointDone.get(nextEndPoint))
+                    continue;
+
+                if (nextEndPoint.equals(desiredEndPoint)) {
+                    currentPreviousEndPoints.add(nextEndPoint);
+                    break whileLoop;
+                }
+
+                ArrayList<EndPoint> nextPreviousEndPoints = new ArrayList<>(currentPreviousEndPoints);
+                nextPreviousEndPoints.add(nextEndPoint);
+                toDoPreviousEndPoints.add(nextPreviousEndPoints);
+                toDoEndPoints.add(nextEndPoint);
+            }
+
+            isEndPointDone.put(currentPoint, true);
+            amountDone++;
+            if (toDoEndPoints.size() > 0) {
+                currentPreviousEndPoints = toDoPreviousEndPoints.get(0);
+                currentPoint = toDoEndPoints.get(0);
+                toDoPreviousEndPoints.remove(0);
+                toDoEndPoints.remove(0);
+            } else {
+                throw new RuntimeException("Generate Shortest Route algorithm failed");
+            }
+        }
+
+        ArrayList<EndPoint> endPointsOnRoute = currentPreviousEndPoints;
+        ArrayList<Route> rootRoutes = new ArrayList<>();
+        currentPoint = startingPoint;
+
+        while (endPointsOnRoute.size() > 1) {
+
+            for (Route connectedRoute : currentPoint.getConnectedRoutes()) {
+                if (connectedRoute.getOppositeEndPoint(currentPoint).equals(endPointsOnRoute.get(1))) {
+                    rootRoutes.add(connectedRoute);
+                    endPointsOnRoute.remove(0);
+                    currentPoint = connectedRoute.getOppositeEndPoint(currentPoint);
+                    break;
+                }
+            }
+        }
+
+        return new Route(rootRoutes, startingPoint);
     }
 
     public EndPoint getOppositeEndPoint(EndPoint oppositeEndPoint) {

@@ -28,10 +28,15 @@ public class Route {
         }
     }
 
+    /**
+     * Merge routes together
+     *
+     * @param rootRoutes Routes that will be merged together
+     * @param startPoint_ Starting point of the route
+     */
     public Route(ArrayList<Route> rootRoutes, EndPoint startPoint_) {
         if (rootRoutes.size() < 1)
             throw new IllegalArgumentException("No root routes were provided");
-        name = rootRoutes.get(0).getName() + " - " + rootRoutes.get(rootRoutes.size() - 1).getName();
         startPoint = startPoint_;
         chargingStations = new ArrayList<>();
         chargingStationDistances = new ArrayList<>();
@@ -40,7 +45,6 @@ public class Route {
         EndPoint previousEndPoint = startPoint;
 
         for (Route route : rootRoutes) {
-
             if (route.startPoint != previousEndPoint && route.endPoint != previousEndPoint)
                 throw new IllegalArgumentException("Invalid route");
 
@@ -57,11 +61,12 @@ public class Route {
             }
 
             sumOfLengths += route.length;
-            previousEndPoint = route.endPoint;
+            previousEndPoint = shouldBeFlipped ? route.startPoint : route.endPoint;
         }
 
         length = sumOfLengths;
         endPoint = previousEndPoint;
+        name = startPoint.toString() + " - " + endPoint.toString();
     }
 
     public static Route generateRandomRoute() {
@@ -72,9 +77,86 @@ public class Route {
         return generateShortestRoute(startPoint, endPoint);
     }
 
-    public static Route generateShortestRoute(EndPoint startPoint, EndPoint endPoint) {
-        // TODO: Implement this
-        return null;
+    public static Route generateShortestRoute(EndPoint startingPoint, EndPoint endingPoint) {
+        if (startingPoint == endingPoint)
+            throw new IllegalArgumentException("Can't generate the shortest route between given points");
+
+        ArrayList<ArrayList<EndPoint>> listOfPreviousPoints = new ArrayList<>();
+
+        ArrayList<Route> connectedRoutesToStartPoint = startingPoint.getConnectedRoutes();
+        for (Route route : connectedRoutesToStartPoint) {
+            if (route.startPoint == endingPoint || route.endPoint == endingPoint) {
+                // Route has been found
+                // Find the corresponding route from Routes.routes
+                for (Route rootRoute : Routes.routes.values()) {
+                    if (rootRoute.startPoint == startingPoint || rootRoute.endPoint == startingPoint) {
+                        if (rootRoute.getOppositeEndPoint(startingPoint) == endingPoint) {
+                            return rootRoute;
+                        }
+                    }
+                }
+                throw new RuntimeException("Generate Shortest Route algorithm failed");
+            }
+            else {
+                // Add new endPoints to reachedEndPoints
+                ArrayList<EndPoint> previousPoints = new ArrayList<>();
+                previousPoints.add(startingPoint);
+                previousPoints.add(route.getOppositeEndPoint(startingPoint));
+                listOfPreviousPoints.add(previousPoints);
+            }
+        }
+
+        ArrayList<ArrayList<EndPoint>> possibleRoutes = new ArrayList<>();
+
+        while (possibleRoutes.size() == 0) {
+            ArrayList<ArrayList<EndPoint>> newListOfPreviousPoints = new ArrayList<>();
+            for (ArrayList<EndPoint> previousPoints : listOfPreviousPoints) {
+                EndPoint previousEndPoint = previousPoints.get(previousPoints.size() - 1);
+                ArrayList<Route> connectedRoutes = previousEndPoint.getConnectedRoutes();
+                for (Route route : connectedRoutes) {
+
+                    // Add new endPoints to reachedEndPoints
+                    ArrayList<EndPoint> newPreviousPoints = new ArrayList<>(previousPoints);
+                    newPreviousPoints.add(route.getOppositeEndPoint(previousEndPoint));
+                    newListOfPreviousPoints.add(newPreviousPoints);
+
+                    if (newPreviousPoints.get(newPreviousPoints.size() - 1) == endingPoint) {
+                        possibleRoutes.add(newPreviousPoints);
+                    }
+                }
+            }
+            listOfPreviousPoints = newListOfPreviousPoints;
+        }
+
+        Route shortestRoute = null;
+        double shortestRouteLength = Double.MAX_VALUE;
+        for (ArrayList<EndPoint> possibleRoute : possibleRoutes) {
+            ArrayList<Route> rootRoutes = new ArrayList<>();
+            double routeLength = 0;
+            for (int i = 1; i < possibleRoute.size(); i++) {
+                for (Route route : Routes.routes.values()) {
+                    if (route.startPoint == possibleRoute.get(i-1) || route.endPoint == possibleRoute.get(i-1)) {
+                        if (route.getOppositeEndPoint(possibleRoute.get(i - 1)) == possibleRoute.get(i)) {
+                            rootRoutes.add(route);
+                            routeLength += route.getLength();
+                            break;
+                        }
+                    }
+                }
+            }
+            if (routeLength < shortestRouteLength) {
+                shortestRouteLength = routeLength;
+                shortestRoute = new Route(rootRoutes, startingPoint);
+            }
+        }
+        return shortestRoute;
+    }
+
+    public EndPoint getOppositeEndPoint(EndPoint oppositeEndPoint) {
+        if (oppositeEndPoint != startPoint && oppositeEndPoint != endPoint)
+            throw new IllegalArgumentException("The given endpoint is not an endpoint of this route");
+
+        return oppositeEndPoint == startPoint ? endPoint : startPoint;
     }
 
     public double getLength() {

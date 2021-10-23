@@ -4,13 +4,20 @@ import java.util.ArrayList;
 
 public class Simulation {
 
-    private Simulation() {
+    ArrayList<Car> cars;
+
+    public Simulation() {
         Routes.generateRoutes();
+        createCars();
+    }
+
+    private void createCars() {
+        cars = new ArrayList<>();
+        cars.add(new Car(CarType.TESLAMOTORS_MODEL3));
     }
 
     public void start() {
         System.out.println("Starting...");
-        System.out.println(this.toString());
     }
 
     @Override
@@ -27,5 +34,6 @@ public class Simulation {
     public static void main(String[] args) {
         Simulation simulation = new Simulation();
         simulation.start();
+        System.out.println("Done.");
     }
 }

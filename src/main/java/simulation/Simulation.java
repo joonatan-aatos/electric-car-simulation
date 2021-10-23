@@ -1,5 +1,7 @@
 package simulation;
 
+import visualizer.Visualizer;
+
 import java.util.ArrayList;
 
 public class Simulation {
@@ -53,11 +55,5 @@ public class Simulation {
             stringBuilder.append(route.toString()).append("\n");
         }
         return stringBuilder.toString();
-    }
-
-    public static void main(String[] args) {
-        Simulation simulation = new Simulation();
-        simulation.start();
-        System.out.println("Done.");
     }
 }

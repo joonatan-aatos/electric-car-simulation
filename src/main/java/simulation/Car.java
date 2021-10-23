@@ -19,7 +19,6 @@ public class Car {
         OnWayToCharger,
         OnWayFromCharger,
         Waiting,
-        ImpossibleRoute,
         DestinationReached,
         BatteryDepleted,
         Charging
@@ -152,8 +151,8 @@ public class Car {
         }
 
         if (lastChargingStationIndex >= nextChargingStationIndex ) {
-            state = State.ImpossibleRoute;
             nextChargingStationIndex = 0;
+            canReachDestination = true; // Can't reach destination, but will desparately try anyway
         }
 
     }

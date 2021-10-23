@@ -163,7 +163,10 @@ public class Visualizer {
                 carYCoordinate = BAR_PADDING + (int) (distance / LENGTH_OF_ROUTES * BAR_HEIGHT) - CAR_DIAMETER / 2;
             }
 
-            g.setColor(new Color(255 - (int)(car.getBatteryLife()/car.getCarType().capacity*255), (int)(car.getBatteryLife()/car.getCarType().capacity*255), 0));
+            double batteryPercentage = car.getBatteryLife()/car.getCarType().capacity;
+            int red = batteryPercentage > 0.5 ? 255 - (int)(car.getBatteryLife()/car.getCarType().capacity/2*255) : 255;
+            int green = batteryPercentage > 0.5 ? 255 : (int)(car.getBatteryLife()/car.getCarType().capacity*2*255);
+            g.setColor(new Color(red, green, 0, 40));
             g.fillOval(
                     BAR_PADDING + BAR_WIDTH / 2 - CAR_DIAMETER / 2,
                     carYCoordinate,

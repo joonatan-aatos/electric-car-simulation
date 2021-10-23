@@ -1,18 +1,31 @@
 package simulation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 public class Car {
-    private boolean isElectric;
-    private Route route;
-    private int batteryCapacity;
-    private int batteryLife;
+    private final Route route;
+    private final int batteryCapacity;
+    private final int batteryLife;
+    private final CarType carType;
 
-    public Car(boolean isElectric_, EndPoint start, int batteryCapacity_) {
-        isElectric = isElectric_;
+    public Car(CarType carType_, EndPoint start, int batteryCapacity_) {
+        carType = carType_;
         batteryCapacity = batteryCapacity_;
         batteryLife = batteryCapacity_;
         route = Route.generateRandomRoute();
+    }
+
+    public CarType getCarType() {
+        return carType;
+    }
+
+    public Route getRoute() {
+        return route;
+    }
+
+    public int getBatteryCapacity() {
+        return batteryCapacity;
+    }
+
+    public int getBatteryLife() {
+        return batteryLife;
     }
 }

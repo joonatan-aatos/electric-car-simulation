@@ -18,11 +18,11 @@ public class Visualizer {
     final int BAR_HEIGHT = 1000-2*BAR_PADDING;
 
     final int END_POINT_DIAMETER = 20;
-    final int CAR_DIAMETER = 16;
+    final int CAR_DIAMETER = 10;
     final int END_POINT_NAME_PADDING = 42;
     final int NAME_X_COORDINATE = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
 
-    final int INFO_AREA_WIDTH = 600;
+    final int INFO_AREA_WIDTH = 700;
     final int TEXT_PADDING = 32;
 
     private enum Palette {
@@ -59,6 +59,7 @@ public class Visualizer {
     public void draw(Simulation simulation) {
         Graphics graphics = canvas.getGraphics();
         if(graphics == null) {
+            System.out.println("Unable to obtain graphics instance");
             return;
         }
 
@@ -145,6 +146,7 @@ public class Visualizer {
                 }
             }
 
+            // calculate the y coordinate of the car
             int carYCoordinate = -1;
             if (goingUp) {
                 double startDistance = 0;
@@ -163,12 +165,24 @@ public class Visualizer {
                 carYCoordinate = BAR_PADDING + (int) (distance / LENGTH_OF_ROUTES * BAR_HEIGHT) - CAR_DIAMETER / 2;
             }
 
-            double batteryPercentage = car.getBatteryLife()/car.getCarType().capacity;
-            int red = batteryPercentage > 0.5 ? 255 - (int)(car.getBatteryLife()/car.getCarType().capacity/2*255) : 255;
-            int green = batteryPercentage > 0.5 ? 255 : (int)(car.getBatteryLife()/car.getCarType().capacity*2*255);
-            g.setColor(new Color(red, green, 0, 40));
+            // Calculate the x coordinate of the car
+            int carXCoordinate = BAR_PADDING + BAR_WIDTH / 2 - CAR_DIAMETER / 2;
+
+            // Calculate the color of the car
+            switch (car.getState()) {
+                case BatteryDepleted:
+                    g.setColor(new Color(0, 0, 0, 50));
+                    break;
+                default:
+                    double batteryPercentage = car.getBatteryLife()/car.getCarType().capacity;
+                    int red = batteryPercentage > 0.5 ? 255 - (int)(car.getBatteryLife()/car.getCarType().capacity/2*255) : 255;
+                    int green = batteryPercentage > 0.5 ? 255 : (int)(car.getBatteryLife()/car.getCarType().capacity*2*255);
+                    g.setColor(new Color(red, green, 0, 50));
+                    break;
+            }
+
             g.fillOval(
-                    BAR_PADDING + BAR_WIDTH / 2 - CAR_DIAMETER / 2,
+                    carXCoordinate,
                     carYCoordinate,
                     CAR_DIAMETER,
                     CAR_DIAMETER

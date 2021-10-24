@@ -3,13 +3,15 @@ package simulation;
 public class Car {
     private Route route;
     private final CarType carType;
+    private final double THRESHOLD_PERCENTAGE = 0.3;
+    private final double SPEED_ON_HIGHWAY = 120;
+    private final double SPEED_OUTSIDE_HIGHWAY = 30;
 
     private double batteryLife;
     private double drivenDistance;
-    private double distanceOffHighway;
+    private double distanceFromHighway;
     private double drivingSpeed;
     private int nextChargingStationIndex;
-    private final double THRESHOLD_PERCENTAGE = 0.3;
     private boolean canReachDestination;
     private ChargingStation.Charger chargerOn;
     private State state;
@@ -28,10 +30,10 @@ public class Car {
         carType = carType_;
         batteryLife = carType.capacity;
         drivenDistance = 0;
-        drivingSpeed = 120;
+        drivingSpeed = SPEED_ON_HIGHWAY;
         nextChargingStationIndex = -1;
         state = State.OnHighway;
-        distanceOffHighway = 0;
+        distanceFromHighway = 0;
         canReachDestination = false;
         chargerOn = null;
     }
@@ -78,11 +80,11 @@ public class Car {
 
     public void driveToStation() {
         double deltaDistance = drivingSpeed / 60d;
-        distanceOffHighway += deltaDistance;
+        distanceFromHighway += deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
         ChargingStation station = route.getChargingStations().get(nextChargingStationIndex);
-        if (distanceOffHighway >= station.getDistanceFromHighway()) {
+        if (distanceFromHighway >= station.getDistanceFromHighway()) {
             ChargingStation.Charger availableCharger = station.getAvailableCharger();
             if (availableCharger == null) {
                 state = State.Waiting;
@@ -96,13 +98,13 @@ public class Car {
 
     public void driveToHighway() {
         double deltaDistance = drivingSpeed / 60d;
-        distanceOffHighway -= deltaDistance;
+        distanceFromHighway -= deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
-        if (distanceOffHighway <= 0) {
+        if (distanceFromHighway <= 0) {
             calculateNextChargingStationIndex();
-            drivingSpeed = 120;
-            distanceOffHighway = 0;
+            drivingSpeed = SPEED_ON_HIGHWAY;
+            distanceFromHighway = 0;
             state = State.OnHighway;
         }
     }
@@ -118,8 +120,8 @@ public class Car {
 
         if (route.getChargingStationDistances().get(nextChargingStationIndex) - drivenDistance < 0 && !canReachDestination) {
             state = State.OnWayToCharger;
-            drivingSpeed = 40;
-            distanceOffHighway = 0;
+            drivingSpeed = SPEED_OUTSIDE_HIGHWAY;
+            distanceFromHighway = 0;
         }
 
         if (drivenDistance >= route.getLength()) {
@@ -155,6 +157,10 @@ public class Car {
             canReachDestination = true; // Can't reach destination, but will desparately try anyway
         }
 
+    }
+
+    public double getDistanceFromHighway() {
+        return distanceFromHighway;
     }
 
     public double getDrivenDistance() {

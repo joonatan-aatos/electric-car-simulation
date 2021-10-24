@@ -4,6 +4,8 @@ import simulation.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -11,6 +13,9 @@ public class Visualizer {
 
     JFrame frame;
     Canvas canvas;
+
+    private boolean showChargers = true;
+    private boolean showCities = true;
 
     private final double LENGTH_OF_ROUTES = Routes.routes.values().stream().mapToDouble(Route::getLength).sum();
     private final int BAR_PADDING = 30;
@@ -24,10 +29,12 @@ public class Visualizer {
 
     private final int INFO_AREA_WIDTH = 700;
     private final int TEXT_PADDING = 32;
+    private final int TEXT_PADDING_TOP = 50;
 
-    private int CAR_OPACITY = 255;
+    private int CAR_OPACITY = 50;
 
     private final Route wholeRoute;
+    private final ArrayList<Component> optionsComponents;
 
     private enum Palette {
         Primary(Color.decode("#001D3D")),
@@ -53,13 +60,32 @@ public class Visualizer {
         frame.setSize(800, 800);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
-        frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         canvas = new Canvas();
+        wholeRoute = Route.generateShortestRoute2(EndPoint.Helsinki, EndPoint.Utsjoki);
+        System.out.println(wholeRoute.getChargingStations().get(wholeRoute.getChargingStations().size()-1));
+
+        optionsComponents = SwingHelper.getOptionsPanel(actionEvent -> {
+            switch (actionEvent.getActionCommand()) {
+                case "Näytä latauspisteet":
+                    showChargers = ((JCheckBox) actionEvent.getSource()).isSelected();
+                    break;
+                case "Näytä kaupungit":
+                    showCities = ((JCheckBox) actionEvent.getSource()).isSelected();
+                    break;
+            }
+        });
+        for (Component c : optionsComponents) {
+            c.setVisible(true);
+            c.setBackground(Palette.PrimaryDark.getColor());
+            c.setForeground(Palette.Secondary.getColor());
+            frame.add(c);
+        }
+
         frame.add(canvas);
 
-        wholeRoute = Route.generateShortestRoute(EndPoint.Helsinki, EndPoint.Utsjoki);
+        frame.setVisible(true);
     }
 
     public void draw(Simulation simulation) {
@@ -79,8 +105,8 @@ public class Visualizer {
         g.fillRect(0, 0, 1000, 1000);
 
         drawRouteBar(g);
-        drawChargingStations(g);
-        drawCities(g);
+        if (showChargers) drawChargingStations(g);
+        if (showCities) drawCities(g);
         drawCars(g, simulation.getCars());
         drawInfo(g, simulation);
 
@@ -269,17 +295,17 @@ public class Visualizer {
                     break;
             }
         }
-        final int textSpacing = (int) (TEXT_PADDING * 1.5);
+        final int textSpacing = (int) (TEXT_PADDING * 1.1);
 
         g.setColor(Palette.Secondary.getColor());
-        g.setFont(new Font("arial", Font.PLAIN, 30));
-        g.drawString("Valtatiellä: "+onHighwayCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60);
-        g.drawString("Matkalla laturille: "+onWayToChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + textSpacing);
-        g.drawString("Matkalla laturilta: "+onWayFromChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 2 * textSpacing);
-        g.drawString("Latautumassa: "+chargingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 3 * textSpacing);
-        g.drawString("Odottamassa: "+waitingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 4 * textSpacing);
-        g.drawString("Akku loppunut: "+batteryDepleatedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 5 * textSpacing);
-        g.drawString("Perillä: "+destinationReachedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 6 * textSpacing);
-        g.drawString("Yhteensä: "+cars.size(), 1000 - INFO_AREA_WIDTH + TEXT_PADDING, 60 + 8 * textSpacing);
+        g.setFont(new Font("arial", Font.PLAIN, 24));
+        g.drawString("Valtatiellä: "+onHighwayCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP);
+        g.drawString("Matkalla laturille: "+onWayToChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + textSpacing);
+        g.drawString("Matkalla laturilta: "+onWayFromChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 2 * textSpacing);
+        g.drawString("Latautumassa: "+chargingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 3 * textSpacing);
+        g.drawString("Odottamassa: "+waitingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 4 * textSpacing);
+        g.drawString("Akku loppunut: "+batteryDepleatedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 5 * textSpacing);
+        g.drawString("Perillä: "+destinationReachedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 6 * textSpacing);
+        g.drawString("Yhteensä: "+cars.size(), 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 8 * textSpacing);
     }
 }

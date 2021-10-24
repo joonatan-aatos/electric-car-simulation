@@ -35,20 +35,21 @@ public class RoadData {
             br.readLine();
             br.readLine();
 
+            String[] data = null;
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.length() <= 0) break;
-                String[] data = line.split(";");
+                data = line.split(";");
                 if (!lastAppearingName.equals(data[0])) {   // First of a station
                     if (lineNumber != 0) roadData.chargingStations.add(lastStation);
                     lastStation = new ChargingStation(
+                            data[0],
                             Double.parseDouble(data[1]),
                             Double.parseDouble(data[2]),
                             new ArrayList<>(),
                             new ArrayList<>(),
                             new boolean[]{"1".equals(data[6]), "1".equals(data[7]), "1".equals(data[8])}
                     );
-
                 }
                 ChargingStation.ChargerType type = null;
                 switch (data[5]) {
@@ -80,6 +81,10 @@ public class RoadData {
                 lastAppearingName = data[0];
                 lineNumber++;
             }
+            roadData.chargingStations.add(lastStation);
+
+            System.out.println(roadData.chargingStations.get(roadData.chargingStations.size()-1));
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {

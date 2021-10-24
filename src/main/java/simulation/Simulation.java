@@ -10,7 +10,7 @@ public class Simulation implements Runnable {
     private int tps;
     private final int NORM_DIST_MEAN = 7200;
     private final int NORM_DIST_STANDARD_DEVIATION = 1800;
-    private final int TOTAL_CARS = 100000;
+    private final int TOTAL_CARS = 10000;
 
     public Simulation() {
         Routes.generateRoutes();
@@ -33,7 +33,6 @@ public class Simulation implements Runnable {
             }
 
             int newCarCount = (int) Math.round(distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP);
-            System.out.println(newCarCount);
             for (int i = 0; i < newCarCount; i++) {
                 Car car = new Car(CarType.TESLAMOTORS_MODEL3);
                 car.setRoute(Route.generateRandomRoute());

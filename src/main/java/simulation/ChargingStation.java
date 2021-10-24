@@ -63,8 +63,10 @@ public class ChargingStation {
     // Chargers are sorted by charging power
     private final ArrayList<Charger> chargers;
     private final boolean customerExclusive, hasShop, hasFood;
+    private final String name;
 
-    public ChargingStation(double distance_, double distanceFromHighway_, ArrayList<Integer> powers, ArrayList<ChargerType> types, boolean[] info) {
+    public ChargingStation(String name_, double distance_, double distanceFromHighway_, ArrayList<Integer> powers, ArrayList<ChargerType> types, boolean[] info) {
+        name = name_;
         distance = distance_;
         distanceFromHighway = distanceFromHighway_;
         chargers = new ArrayList<>();
@@ -104,6 +106,7 @@ public class ChargingStation {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
+        s.append(name).append(": ");
         for (Charger charger : chargers) {
             s.append(charger.toString());
         }

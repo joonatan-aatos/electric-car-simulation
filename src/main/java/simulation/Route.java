@@ -243,13 +243,17 @@ public class Route {
 
         ArrayList<ChargingStation> newChargingStations = (ArrayList<ChargingStation>) route.chargingStations.clone();
         Collections.reverse(newChargingStations);
-        return new Route(
+        Route newRoute = new Route(
                 route.getEndPoint().toString() + " - " + route.getStartPoint().toString(),
                 route.length,
                 newChargingStations,
                 route.endPoint,
                 route.startPoint
         );
+        for (int i = 0; i < newRoute.chargingStationDistances.size(); i++) {
+            newRoute.chargingStationDistances.set(i, newRoute.length - newRoute.chargingStationDistances.get(i));
+        }
+        return newRoute;
     }
 
     public EndPoint getOppositeEndPoint(EndPoint oppositeEndPoint) {

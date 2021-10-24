@@ -1,4 +1,4 @@
-Pituus:;451;km;;;;;;
+Pituus:;451;;;;;;;
 ;;;;;;;;
 Latauspiste;Etäisyys;Etäisyys tiestä;Teho (kW);Laturien lkm;Tyyppi;Kauppa;Ruoka;Asiakkaille
 Scandic Rovaniemi City;0;0.5;22;3;Type2;0;1;0
@@ -9,7 +9,7 @@ Original Sokos Hotel Vaakuna Rovaniemi;0;0.7;11;4;Type2;0;1;1
 Napapiirin Energia ja Vesi Palkisentie;0;1.2;22;1;Type2;0;0;0
 Napapiirin Energia ja Vesi Palkisentie;0;2.6;22;1;Type2;0;0;0
 Lapland Hotels Sky Ounasvaara;0;3.6;22;2;Type2;0;1;0
-K-Citymarket Rovaniemi;1.7;0.7;50;2;CSS;1;1;0
+K-Citymarket Rovaniemi;1.7;0.7;50;2;CCS;1;1;0
 K-Citymarket Rovaniemi;1.7;0.7;50;2;CHAdeMO;1;1;0
 K-Citymarket Rovaniemi;1.7;0.7;22;4;Type2;1;1;0
 Rovaniemen Lentoasema (RVN);6;2;22;2;Type2;0;0;0

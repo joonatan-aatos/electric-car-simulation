@@ -2,7 +2,6 @@ package simulation;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class RoadData {
     private double length;
@@ -51,24 +50,27 @@ public class RoadData {
                     );
 
                 }
-                ChargerType type = null;
+                ChargingStation.ChargerType type = null;
                 switch (data[5]) {
                     case ("Type2"):
-                        type = ChargerType.Type2;
+                        type = ChargingStation.ChargerType.Type2;
                         break;
                     case ("CCS"):
-                        type = ChargerType.CCS;
+                        type = ChargingStation.ChargerType.CCS;
                         break;
-                    case ("Tesla"):
-                        type = ChargerType.Tesla;
+                    case ("CCS (HPC)"):
+                        type = ChargingStation.ChargerType.CCS_HPC;
+                    case ("SuperCharger"):
+                        type = ChargingStation.ChargerType.Tesla;
                         break;
                     case ("CHAdeMO"):
-                        type = ChargerType.CHAdeMO;
+                        type = ChargingStation.ChargerType.CHAdeMO;
                         break;
                     case ("Työmaapistoke"):
-                        type = ChargerType.Tyomaapistoke;
+                        type = ChargingStation.ChargerType.Tyomaapistoke;
                         break;
-
+                    default:
+                        throw new IllegalArgumentException(String.format("Illegal charger type at line %s in file %s: \"%s\"", lineNumber, path, data[5]));
                 }
 
                 for (int i = 0; i < Integer.parseInt(data[4]); i++) {
@@ -80,6 +82,9 @@ public class RoadData {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Charger file is in wrong format");
         }
 
         return roadData;

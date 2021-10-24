@@ -12,18 +12,22 @@ public class Visualizer {
     JFrame frame;
     Canvas canvas;
 
-    final double LENGTH_OF_ROUTES = Routes.routes.values().stream().mapToDouble(Route::getLength).sum();
-    final int BAR_PADDING = 30;
-    final int BAR_WIDTH = 8;
-    final int BAR_HEIGHT = 1000-2*BAR_PADDING;
+    private final double LENGTH_OF_ROUTES = Routes.routes.values().stream().mapToDouble(Route::getLength).sum();
+    private final int BAR_PADDING = 30;
+    private final int BAR_WIDTH = 8;
+    private final int BAR_HEIGHT = 1000-2*BAR_PADDING;
 
-    final int END_POINT_DIAMETER = 20;
-    final int CAR_DIAMETER = 10;
-    final int END_POINT_NAME_PADDING = 42;
-    final int NAME_X_COORDINATE = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
+    private final int END_POINT_DIAMETER = 20;
+    private final int CAR_DIAMETER = 10;
+    private final int END_POINT_NAME_PADDING = 42;
+    private final int NAME_X_COORDINATE = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
 
-    final int INFO_AREA_WIDTH = 700;
-    final int TEXT_PADDING = 32;
+    private final int INFO_AREA_WIDTH = 700;
+    private final int TEXT_PADDING = 32;
+
+    private int CAR_OPACITY = 255;
+
+    private final Route wholeRoute;
 
     private enum Palette {
         Primary(Color.decode("#001D3D")),
@@ -54,6 +58,8 @@ public class Visualizer {
 
         canvas = new Canvas();
         frame.add(canvas);
+
+        wholeRoute = Route.generateShortestRoute(EndPoint.Helsinki, EndPoint.Utsjoki);
     }
 
     public void draw(Simulation simulation) {
@@ -73,6 +79,8 @@ public class Visualizer {
         g.fillRect(0, 0, 1000, 1000);
 
         drawRouteBar(g);
+        drawChargingStations(g);
+        drawCities(g);
         drawCars(g, simulation.getCars());
         drawInfo(g, simulation);
 
@@ -94,6 +102,12 @@ public class Visualizer {
 
         g.setColor(Palette.PrimaryLight.getColor());
         g.fillRect(BAR_PADDING, BAR_PADDING, BAR_WIDTH, BAR_HEIGHT);
+    }
+
+    public void drawCities(Graphics2D g) {
+
+        final HashMap<String, Route> routes = Routes.routes;
+        final ArrayList<String> routeKeys = Routes.routeKeys;
 
         double subRouteLength = 0;
         g.setColor(Palette.Secondary.getColor());
@@ -171,13 +185,13 @@ public class Visualizer {
             // Calculate the color of the car
             switch (car.getState()) {
                 case BatteryDepleted:
-                    g.setColor(new Color(0, 0, 0, 50));
+                    g.setColor(new Color(0, 0, 0, CAR_OPACITY));
                     break;
                 default:
                     double batteryPercentage = car.getBatteryLife()/car.getCarType().capacity;
                     int red = batteryPercentage > 0.5 ? 255 - (int)(car.getBatteryLife()/car.getCarType().capacity/2*255) : 255;
                     int green = batteryPercentage > 0.5 ? 255 : (int)(car.getBatteryLife()/car.getCarType().capacity*2*255);
-                    g.setColor(new Color(red, green, 0, 50));
+                    g.setColor(new Color(red, green, 0, CAR_OPACITY));
                     break;
             }
 
@@ -186,6 +200,39 @@ public class Visualizer {
                     carYCoordinate,
                     CAR_DIAMETER,
                     CAR_DIAMETER
+            );
+        }
+    }
+
+    public void drawChargingStations(Graphics2D g) {
+
+        ArrayList<ChargingStation> chargingStations = wholeRoute.getChargingStations();
+
+        for (int i = 0; i < chargingStations.size(); i++) {
+            ChargingStation chargingStation = chargingStations.get(i);
+            double distance = wholeRoute.getChargingStationDistances().get(i);
+
+            switch (chargingStation.getChargers().get(0).getType()) {
+                case Tesla:
+                    g.setColor(new Color(255, 0, 0));
+                    break;
+                case CHAdeMO:
+                case CCS:
+                    g.setColor(new Color(0, 92, 231));
+                    break;
+                case Tyomaapistoke:
+                    g.setColor(new Color(4, 199, 192));
+                    break;
+                case Type2:
+                    g.setColor(new Color(73, 235, 52));
+                    break;
+            }
+
+            g.fillRect(
+                    BAR_PADDING,
+                    BAR_PADDING + (int) ((double) BAR_HEIGHT * (1d - distance/wholeRoute.getLength())) - 1,
+                    BAR_WIDTH,
+                    2
             );
         }
     }

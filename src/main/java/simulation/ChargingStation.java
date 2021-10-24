@@ -5,6 +5,15 @@ import java.util.Collections;
 
 public class ChargingStation {
 
+    public enum ChargerType {
+        Type2,
+        CCS,
+        CCS_HPC,
+        Tesla,
+        CHAdeMO,
+        Tyomaapistoke
+    }
+
     public class Charger implements Comparable {
         private final int power;
         private boolean inUse;
@@ -51,6 +60,7 @@ public class ChargingStation {
 
     private final double distance;
     private final double distanceFromHighway;
+    // Chargers are sorted by charging power
     private final ArrayList<Charger> chargers;
     private final boolean customerExclusive, hasShop, hasFood;
 

@@ -3,9 +3,11 @@ package simulation;
 public class Car {
     private Route route;
     private final CarType carType;
-    private final double THRESHOLD_PERCENTAGE = 0.3;
+    private final double DESTINATION_BATTERY_THRESHOLD = 0.05;
+    private final double BATTERY_CHARGING_THRESHOLD = 0.3;
     private final double SPEED_ON_HIGHWAY = 120;
     private final double SPEED_OUTSIDE_HIGHWAY = 30;
+    private long timestep;
 
     private double batteryLife;
     private double drivenDistance;
@@ -38,7 +40,8 @@ public class Car {
         chargerOn = null;
     }
 
-    public void tick() {
+    public void tick(long TIME_STEP) {
+        timestep = TIME_STEP;
         switch (state) {
             case OnHighway:
                 driveOnHighway();
@@ -69,7 +72,7 @@ public class Car {
     }
 
     public void charge() {
-        batteryLife += Math.min(carType.chargingEfficiency, chargerOn.getPower()) / 60d;
+        batteryLife += Math.min(carType.chargingEfficiency, chargerOn.getPower()) * (timestep/3600d);
         if (batteryLife >= carType.capacity) {
             batteryLife = carType.capacity;
             chargerOn.setInUse(false);
@@ -79,7 +82,7 @@ public class Car {
     }
 
     public void driveToStation() {
-        double deltaDistance = drivingSpeed / 60d;
+        double deltaDistance = drivingSpeed * (timestep/3600d);
         distanceFromHighway += deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
@@ -97,7 +100,7 @@ public class Car {
     }
 
     public void driveToHighway() {
-        double deltaDistance = drivingSpeed / 60d;
+        double deltaDistance = drivingSpeed * (timestep/3600d);
         distanceFromHighway -= deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
@@ -110,7 +113,7 @@ public class Car {
     }
 
     public void driveOnHighway() {
-        double deltaDistance = drivingSpeed / 60d;
+        double deltaDistance = drivingSpeed * (timestep/3600d);
         drivenDistance += deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
@@ -131,8 +134,8 @@ public class Car {
     }
 
     public void calculateNextChargingStationIndex() {
-        double threshHoldDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - THRESHOLD_PERCENTAGE) + drivenDistance;
-        double maximumDistance = carType.capacity / carType.drivingEfficiency * 100 + drivenDistance;
+        double threshHoldDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
+        double maximumDistance = carType.capacity / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
 
         canReachDestination = maximumDistance > route.getLength();
         if (canReachDestination) {
@@ -153,7 +156,11 @@ public class Car {
         }
 
         if (lastChargingStationIndex >= nextChargingStationIndex ) {
-            nextChargingStationIndex = 0;
+            if (route.getChargingStationDistances().size() > nextChargingStationIndex + 1) {
+                nextChargingStationIndex++;
+            } else {
+                nextChargingStationIndex = 0;
+            }
             canReachDestination = true; // Can't reach destination, but will desparately try anyway
         }
 

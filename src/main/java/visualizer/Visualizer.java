@@ -141,7 +141,8 @@ public class Visualizer {
         }
     }
 
-    public void drawCars(Graphics2D g, ArrayList<Car> cars) {
+    public void drawCars(Graphics2D g, ArrayList<Car> carsList) {
+        ArrayList<Car> cars = (ArrayList<Car>) carsList.clone();
         for (Car car : cars) {
             Route route = car.getRoute();
             boolean goingUp = false;
@@ -241,7 +242,7 @@ public class Visualizer {
         g.setColor(Palette.PrimaryDark.getColor());
         g.fillRect(1000 - INFO_AREA_WIDTH, 0, INFO_AREA_WIDTH, 1000);
 
-        ArrayList<Car> cars = simulation.getCars();
+        ArrayList<Car> cars = (ArrayList<Car>) simulation.getCars().clone();
         int onHighwayCount = 0, onWayToChargerCount = 0, onWayFromChargerCount = 0, chargingCount = 0, waitingCount = 0, batteryDepleatedCount = 0, destinationReachedCount = 0;
         for (Car car : cars) {
             switch (car.getState()) {

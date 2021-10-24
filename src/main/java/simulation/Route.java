@@ -72,7 +72,7 @@ public class Route {
         EndPoint startPoint = endPoints.get(random.nextInt(endPoints.size()));
         endPoints.remove(startPoint);
         EndPoint endPoint = endPoints.get(random.nextInt(endPoints.size()));
-        return generateShortestRoute(startPoint, endPoint);
+        return generateShortestRoute2(startPoint, endPoint);
     }
 
     /**

@@ -14,6 +14,7 @@ public class Visualizer {
 
     JFrame frame;
     Canvas canvas;
+    Simulation simulation;
 
     private boolean showChargers = true;
     private boolean showCities = true;
@@ -56,7 +57,9 @@ public class Visualizer {
         }
     }
 
-    public Visualizer() {
+    public Visualizer(Simulation simulation_) {
+        simulation = simulation_;
+
         frame = new JFrame("Simulaatio");
         frame.setSize(800, 800);
         frame.setLocationRelativeTo(null);
@@ -66,16 +69,20 @@ public class Visualizer {
         canvas = new Canvas();
         wholeRoute = Route.generateShortestRoute2(EndPoint.Helsinki, EndPoint.Utsjoki);
 
-        optionsComponents = SwingHelper.getOptionsPanel(actionEvent -> {
-            switch (actionEvent.getActionCommand()) {
-                case "Näytä latauspisteet":
-                    showChargers = ((JCheckBox) actionEvent.getSource()).isSelected();
-                    break;
-                case "Näytä kaupungit":
-                    showCities = ((JCheckBox) actionEvent.getSource()).isSelected();
-                    break;
-            }
-        });
+        optionsComponents = SwingHelper.getOptionsPanel(
+                actionEvent -> {
+                    switch (actionEvent.getActionCommand()) {
+                        case "Näytä latauspisteet":
+                            showChargers = ((JCheckBox) actionEvent.getSource()).isSelected();
+                            break;
+                        case "Näytä kaupungit":
+                            showCities = ((JCheckBox) actionEvent.getSource()).isSelected();
+                            break;
+                    }
+                }, changeEvent -> {
+                    simulation.setTps(((JSlider) changeEvent.getSource()).getValue());
+                }
+        );
         for (Component c : optionsComponents) {
             c.setVisible(true);
             c.setBackground(Palette.PrimaryDark.getColor());
@@ -88,7 +95,7 @@ public class Visualizer {
         frame.setVisible(true);
     }
 
-    public void draw(Simulation simulation) {
+    public void draw() {
         Graphics graphics = canvas.getGraphics();
         if(graphics == null) {
             System.out.println("Unable to obtain graphics instance");

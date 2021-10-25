@@ -17,7 +17,7 @@ public class Simulation implements Runnable {
     public Simulation() {
         Routes.generateRoutes();
         createCars();
-        tps = 60;
+        tps = 100;
     }
 
     private void createCars() {

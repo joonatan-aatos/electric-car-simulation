@@ -83,8 +83,6 @@ public class RoadData {
             }
             roadData.chargingStations.add(lastStation);
 
-            System.out.println(roadData.chargingStations.get(roadData.chargingStations.size()-1));
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {

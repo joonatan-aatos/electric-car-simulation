@@ -10,7 +10,7 @@ public class Simulation implements Runnable {
     private int tps;
     private final int NORM_DIST_MEAN = 7200;
     private final int NORM_DIST_STANDARD_DEVIATION = 1800;
-    private final int TOTAL_CARS = 10000;
+    private final int TOTAL_CARS = 1000;
 
     public Simulation() {
         Routes.generateRoutes();
@@ -65,7 +65,7 @@ public class Simulation implements Runnable {
         return true;
     }
 
-    public long sencondsPassed() {
+    public long getPassedSeconds() {
         return seconds;
     }
 

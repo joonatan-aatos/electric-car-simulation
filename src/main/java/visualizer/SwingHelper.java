@@ -47,7 +47,6 @@ public class SwingHelper {
         comboBox1.addActionListener(actionListener);
         comboBox1.addItem("Akkuvirran mukaan");
         comboBox1.addItem("Tilan mukaan");
-        comboBox1.addItem("Tehokkuuden mukaan");
         components.add(comboBox1);
 
         return components;

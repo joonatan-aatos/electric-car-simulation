@@ -108,6 +108,7 @@ public class Visualizer {
         Graphics2D g = (Graphics2D) dbImage.getGraphics(); // The graphics for the dbImage
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g.setStroke(new BasicStroke(3));
 
         // Draw here
         g.setColor(Palette.Primary.getColor());
@@ -118,6 +119,7 @@ public class Visualizer {
         if (showCities) drawCities(g);
         drawCars(g, simulation.getCars());
         drawInfo(g, simulation);
+        drawColorCodingInfo(g);
 
         ((Graphics2D) graphics).setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                 RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -366,5 +368,71 @@ public class Visualizer {
         g.drawString(String.format("Aika: %d h, %d min, %d sec", hours, minutes, seconds), 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP);
 
         g.drawString("AUTOT:", 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 2 * textSpacing);
+    }
+
+    public void drawColorCodingInfo(Graphics2D g) {
+
+        final int COLOR_TOP = 390;
+        final int COLOR_LEFT = 750;
+        final int COLOR_SPACING = 75;
+        final int COLOR_SIZE = 30;
+
+        switch (carColorCodeIndex) {
+            case 0:
+                g.setColor(new Color(255, 0, 0));
+                g.fillRect(COLOR_LEFT, COLOR_TOP, COLOR_SPACING, COLOR_SIZE);
+                g.setColor(new Color(255, 255, 0));
+                g.fillRect(COLOR_LEFT + COLOR_SPACING, COLOR_TOP, COLOR_SPACING, COLOR_SIZE);
+                g.setColor(new Color(0, 255, 0));
+                g.fillRect(COLOR_LEFT + 2 * COLOR_SPACING, COLOR_TOP, COLOR_SPACING, COLOR_SIZE);
+                g.setColor(Color.BLACK);
+                g.drawRect(COLOR_LEFT, COLOR_TOP, COLOR_SPACING*3, COLOR_SIZE);
+
+                g.setColor(new Color(255, 255, 255));
+                g.fillRect(COLOR_LEFT, COLOR_TOP + 2 * COLOR_SPACING / 2 + COLOR_SIZE /  2, COLOR_SIZE, COLOR_SIZE);
+                g.setColor(new Color(0, 0, 0));
+                g.fillRect(COLOR_LEFT, COLOR_TOP + 3 * COLOR_SPACING / 2 + COLOR_SIZE /  2, COLOR_SIZE, COLOR_SIZE);
+
+                g.drawRect(COLOR_LEFT, COLOR_TOP + 2 * COLOR_SPACING / 2 + COLOR_SIZE /  2, COLOR_SIZE, COLOR_SIZE);
+                g.drawRect(COLOR_LEFT, COLOR_TOP + 3 * COLOR_SPACING / 2 + COLOR_SIZE /  2, COLOR_SIZE, COLOR_SIZE);
+
+                g.setColor(Palette.Secondary.getColor());
+                g.setFont(new Font("arial", Font.PLAIN, 20));
+
+                g.drawString("0%--------50%-----100%", COLOR_LEFT, COLOR_TOP + COLOR_SIZE * 2);
+                g.drawString("Perillä", COLOR_LEFT + 3 * COLOR_SIZE / 2, COLOR_TOP + 24 + 2 * COLOR_SPACING / 2 + COLOR_SIZE /  2);
+                g.drawString("Akku loppunut", COLOR_LEFT + 3 * COLOR_SIZE / 2, COLOR_TOP + 24 + 3 * COLOR_SPACING / 2 + COLOR_SIZE /  2);
+                break;
+            case 1:
+                g.setColor(new Color(0, 255, 0));
+                g.fillRect(COLOR_LEFT, COLOR_TOP, COLOR_SIZE, COLOR_SIZE);
+                g.setColor(new Color(255, 255, 0));
+                g.fillRect(COLOR_LEFT, COLOR_TOP + COLOR_SPACING / 2, COLOR_SIZE, COLOR_SIZE);
+                g.setColor(new Color(0, 0, 255));
+                g.fillRect(COLOR_LEFT, COLOR_TOP + 2 * COLOR_SPACING / 2, COLOR_SIZE, COLOR_SIZE);
+                g.setColor(new Color(255, 0, 0));
+                g.fillRect(COLOR_LEFT, COLOR_TOP + 3 * COLOR_SPACING / 2, COLOR_SIZE, COLOR_SIZE);
+                g.setColor(new Color(255, 255, 255));
+                g.fillRect(COLOR_LEFT, COLOR_TOP + 4 * COLOR_SPACING / 2, COLOR_SIZE, COLOR_SIZE);
+                g.setColor(new Color(0, 0, 0));
+                g.fillRect(COLOR_LEFT, COLOR_TOP + 5 * COLOR_SPACING / 2, COLOR_SIZE, COLOR_SIZE);
+                for (int i = 0; i < 6; i++) {
+                    g.setColor(Color.BLACK);
+                    g.drawRect(COLOR_LEFT, COLOR_TOP + i * COLOR_SPACING / 2, COLOR_SIZE, COLOR_SIZE);
+                }
+
+                g.setColor(Palette.Secondary.getColor());
+                g.setFont(new Font("arial", Font.PLAIN, 20));
+
+                g.drawString("Valtatiellä", COLOR_LEFT + 10 + COLOR_SIZE, COLOR_TOP + 24);
+                g.drawString("Latautumassa", COLOR_LEFT + 10 + COLOR_SIZE, COLOR_TOP + 24 + COLOR_SPACING / 2);
+                g.drawString("Matkalla laturille", COLOR_LEFT + 10 + COLOR_SIZE, COLOR_TOP + 24 + 2 * COLOR_SPACING / 2);
+                g.drawString("Odottamassa", COLOR_LEFT + 10 + COLOR_SIZE, COLOR_TOP + 24 + 3 * COLOR_SPACING / 2);
+                g.drawString("Perillä", COLOR_LEFT + 10 + COLOR_SIZE, COLOR_TOP + 24 + 4 * COLOR_SPACING / 2);
+                g.drawString("Akku loppunut", COLOR_LEFT + 10 + COLOR_SIZE, COLOR_TOP + 24 + 5 * COLOR_SPACING / 2);
+
+                break;
+        }
+
     }
 }

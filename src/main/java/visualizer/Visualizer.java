@@ -4,11 +4,8 @@ import simulation.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 public class Visualizer {
 
@@ -18,13 +15,14 @@ public class Visualizer {
 
     private boolean showChargers = true;
     private boolean showCities = true;
+    private int carColorCodeIndex = 0;
 
     private final double LENGTH_OF_ROUTES = Routes.routes.values().stream().mapToDouble(Route::getLength).sum();
     private final int BAR_PADDING = 30;
     private final int BAR_WIDTH = 8;
     private final int BAR_HEIGHT = 1000-2*BAR_PADDING;
 
-    private final int END_POINT_DIAMETER = 20;
+    private final int END_POINT_DIAMETER = 16;
     private final int CAR_DIAMETER = 10;
     private final int END_POINT_NAME_PADDING = 42;
     private final int NAME_X_COORDINATE = BAR_PADDING + BAR_WIDTH / 2 - END_POINT_DIAMETER / 2 + END_POINT_NAME_PADDING;
@@ -71,13 +69,17 @@ public class Visualizer {
 
         optionsComponents = SwingHelper.getOptionsPanel(
                 actionEvent -> {
-                    switch (actionEvent.getActionCommand()) {
-                        case "Näytä latauspisteet":
-                            showChargers = ((JCheckBox) actionEvent.getSource()).isSelected();
-                            break;
-                        case "Näytä kaupungit":
-                            showCities = ((JCheckBox) actionEvent.getSource()).isSelected();
-                            break;
+                    if (actionEvent.getSource() instanceof JComboBox)
+                        carColorCodeIndex = ((JComboBox<String>) actionEvent.getSource()).getSelectedIndex();
+                    else {
+                        switch (actionEvent.getActionCommand()) {
+                            case "Näytä latauspisteet":
+                                showChargers = ((JCheckBox) actionEvent.getSource()).isSelected();
+                                break;
+                            case "Näytä kaupungit":
+                                showCities = ((JCheckBox) actionEvent.getSource()).isSelected();
+                                break;
+                        }
                     }
                 }, changeEvent -> {
                     simulation.setTps(((JSlider) changeEvent.getSource()).getValue());
@@ -155,7 +157,7 @@ public class Visualizer {
         g.drawString(
                 routes.get(routeKeys.get(0)).getStartPoint().toString(),
                 NAME_X_COORDINATE,
-                1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2
+                1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2 + 3
         );
         for (String routeKey : routeKeys) {
             Route route = routes.get(routeKey);
@@ -169,7 +171,7 @@ public class Visualizer {
             g.drawString(
                     route.getEndPoint().toString(),
                     NAME_X_COORDINATE,
-                    1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2
+                    1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2 + 3
             );
         }
     }
@@ -217,16 +219,51 @@ public class Visualizer {
             int carXCoordinate = BAR_PADDING + BAR_WIDTH / 2 - CAR_DIAMETER / 2;
 
             // Calculate the color of the car
-            switch (car.getState()) {
-                case BatteryDepleted:
-                    g.setColor(new Color(0, 0, 0, CAR_OPACITY));
+            switch (carColorCodeIndex) {
+                case 0:
+                    // By battery
+                    if (car.getState() == Car.State.BatteryDepleted) {
+                        g.setColor(new Color(0, 0, 0, CAR_OPACITY));
+                    } else {
+                        double batteryPercentage = car.getBatteryLife() / car.getCarType().capacity;
+                        int red = batteryPercentage > 0.5 ? 255 - (int) (car.getBatteryLife() / car.getCarType().capacity / 2 * 255) : 255;
+                        int green = batteryPercentage > 0.5 ? 255 : (int) (car.getBatteryLife() / car.getCarType().capacity * 2 * 255);
+                        g.setColor(new Color(red, green, 0, CAR_OPACITY));
+                    }
+                    break;
+                case 1:
+                    // By state
+                    switch (car.getState()) {
+                        case BatteryDepleted:
+                            g.setColor(new Color(0, 0, 0, CAR_OPACITY));
+                            break;
+                        case DestinationReached:
+                            g.setColor(new Color(255, 255, 255, CAR_OPACITY));
+                            break;
+                        case OnWayFromCharger:
+                        case OnWayToCharger:
+                            g.setColor(new Color(0, 0, 255, CAR_OPACITY));
+                            break;
+                        case OnHighway:
+                            g.setColor(new Color(0, 255, 0, CAR_OPACITY));
+                            break;
+                        case Waiting:
+                            g.setColor(new Color(255, 0, 0, CAR_OPACITY));
+                            break;
+                        case Charging:
+                            g.setColor(new Color(255, 255, 0, CAR_OPACITY));
+                            break;
+                    }
+                    break;
+                case 2:
+                    // By efficiency
+                    CarType type = car.getCarType();
+                    double efficiency = type.drivingEfficiency * type.capacity;
+                    int efficiencyColor = (int) (efficiency / 500d * 255d);
+                    g.setColor(new Color(efficiencyColor, efficiencyColor, efficiencyColor, CAR_OPACITY));
                     break;
                 default:
-                    double batteryPercentage = car.getBatteryLife()/car.getCarType().capacity;
-                    int red = batteryPercentage > 0.5 ? 255 - (int)(car.getBatteryLife()/car.getCarType().capacity/2*255) : 255;
-                    int green = batteryPercentage > 0.5 ? 255 : (int)(car.getBatteryLife()/car.getCarType().capacity*2*255);
-                    g.setColor(new Color(red, green, 0, CAR_OPACITY));
-                    break;
+                    g.setColor(Color.BLACK);
             }
 
             g.fillOval(

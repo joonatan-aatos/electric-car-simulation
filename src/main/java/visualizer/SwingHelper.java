@@ -37,6 +37,19 @@ public class SwingHelper {
         checkBox2.addActionListener(actionListener);
         components.add(checkBox2);
 
+        JLabel label2 = new JLabel("Autot värikoodataan:");
+        label2.setBounds(612, PADDING_TOP + 7 * SPACING, 160, 20);
+        label2.setOpaque(true);
+        components.add(label2);
+
+        JComboBox<String> comboBox1 = new JComboBox<>();
+        comboBox1.setBounds(600, PADDING_TOP + 8 * SPACING, 180, 30);
+        comboBox1.addActionListener(actionListener);
+        comboBox1.addItem("Akkuvirran mukaan");
+        comboBox1.addItem("Tilan mukaan");
+        comboBox1.addItem("Tehokkuuden mukaan");
+        components.add(comboBox1);
+
         return components;
     }
 }

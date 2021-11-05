@@ -3,6 +3,7 @@ package simulation;
 public class Car {
     private Route route;
     private final CarType carType;
+    private final int index;
     private final double DESTINATION_BATTERY_THRESHOLD = 0.1;
     private final double BATTERY_CHARGING_THRESHOLD = 0.3;
     private final double SPEED_ON_HIGHWAY = 120;
@@ -10,7 +11,6 @@ public class Car {
 
     private final double DISTANCE_FROM_THRESHOLD_FACTOR = 5;
     private final double LINE_LENGHT_FACTOR = 0.5;
-
 
     private long timestep;
 
@@ -20,7 +20,7 @@ public class Car {
     private double drivingSpeed;
     private int nextChargingStationIndex;
     private boolean canReachDestination;
-    private ChargingStation.Charger chargerOn;
+    private ChargingStation.Charger currentCharger;
     private State state;
 
     public enum State {
@@ -33,8 +33,9 @@ public class Car {
         Charging
     };
 
-    public Car(CarType carType_) {
+    public Car(CarType carType_, int index_) {
         carType = carType_;
+        index = index_;
         batteryLife = carType.capacity;
         drivenDistance = 0;
         drivingSpeed = SPEED_ON_HIGHWAY;
@@ -42,7 +43,7 @@ public class Car {
         state = State.OnHighway;
         distanceFromHighway = 0;
         canReachDestination = false;
-        chargerOn = null;
+        currentCharger = null;
     }
 
     public void tick(long TIME_STEP) {
@@ -67,22 +68,24 @@ public class Car {
         if (batteryLife <= 0) state = State.BatteryDepleted;
     }
 
-    public void waitOnStation() {       // TODO: Add some sort of system to prevent long-ass waiting due to being the last car to get ticked.
+    public void waitOnStation() {
         ChargingStation.Charger availableCharger = route.getChargingStations().get(nextChargingStationIndex).getAvailableCharger();
-        if (availableCharger != null) {
+        int nextInQueue = route.getChargingStations().get(nextChargingStationIndex).getNextInQueue();
+        if (availableCharger != null && (nextInQueue == index || nextInQueue == -1)) {
+            assert !availableCharger.isInUse();
             availableCharger.setInUse(true);
-            route.getChargingStations().get(nextChargingStationIndex).remove1FromLine();
-            chargerOn = availableCharger;
+            route.getChargingStations().get(nextChargingStationIndex).removeFromQueue(index);
+            currentCharger = availableCharger;
             state = State.Charging;
         }
     }
 
     public void charge() {
-        batteryLife += Math.min(carType.chargingEfficiency, chargerOn.getPower()) * (timestep/3600d);
+        batteryLife += Math.min(carType.chargingEfficiency, currentCharger.getPower()) * (timestep/3600d);
         if (batteryLife >= carType.capacity) {
             batteryLife = carType.capacity;
-            chargerOn.setInUse(false);
-            chargerOn = null;
+            currentCharger.setInUse(false);
+            currentCharger = null;
             state = State.OnWayFromCharger;
         }
     }
@@ -97,10 +100,11 @@ public class Car {
             ChargingStation.Charger availableCharger = station.getAvailableCharger();
             if (availableCharger == null) {
                 state = State.Waiting;
-                route.getChargingStations().get(nextChargingStationIndex).add1ToLine();
+                route.getChargingStations().get(nextChargingStationIndex).addToQueue(index);
             } else {
+                assert !availableCharger.isInUse();
                 availableCharger.setInUse(true);
-                chargerOn = availableCharger;
+                currentCharger = availableCharger;
                 state = State.Charging;
             }
         }
@@ -200,7 +204,7 @@ public class Car {
         double normalizedDFT = distanceFromThreshold / (thresholdDistance - drivenDistance);
         points += Math.pow(1 - normalizedDFT, 2) * DISTANCE_FROM_THRESHOLD_FACTOR;
 
-        points -= route.getChargingStations().get(i).getLineLength() * LINE_LENGHT_FACTOR;
+        points -= route.getChargingStations().get(i).getQueueLength() * LINE_LENGHT_FACTOR;
 
         return points;
     }

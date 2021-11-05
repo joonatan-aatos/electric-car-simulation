@@ -64,7 +64,7 @@ public class ChargingStation {
     private final ArrayList<Charger> chargers;
     private final boolean customerExclusive, hasShop, hasFood;
     private final String name;
-    private long lineLength;
+    private final ArrayList<Integer> queue;
 
     public ChargingStation(String name_, double distance_, double distanceFromHighway_, ArrayList<Integer> powers, ArrayList<ChargerType> types, boolean[] info) {
         name = name_;
@@ -78,7 +78,7 @@ public class ChargingStation {
             chargers.add(new Charger(powers.get(i), types.get(i)));
         }
         Collections.sort(chargers);
-        lineLength = 0;
+        queue = new ArrayList<>();
     }
 
     public void addCharger(int power, ChargerType type) {
@@ -93,16 +93,20 @@ public class ChargingStation {
         return null;
     }
 
-    public long getLineLength() {
-        return lineLength;
+    public int getQueueLength() {
+        return queue.size();
     }
 
-    public void add1ToLine() {
-        lineLength++;
+    public int getNextInQueue() {
+        return queue.size() > 0 ? queue.get(0) : -1;
     }
 
-    public void remove1FromLine() {
-        lineLength--;
+    public void addToQueue(int carIndex) {
+        queue.add(carIndex);
+    }
+
+    public void removeFromQueue(int carIndex) {
+        queue.remove(Integer.valueOf(carIndex));
     }
 
     public double getDistance() {

@@ -10,7 +10,7 @@ public class Simulation implements Runnable {
     private int tps;
     private final int NORM_DIST_MEAN = 7200;
     private final int NORM_DIST_STANDARD_DEVIATION = 1800;
-    private final int TOTAL_CARS = 1000;
+    private final int TOTAL_CARS = 0;
 
     private double cumulativeDistributionCounter = 0;
 
@@ -29,6 +29,12 @@ public class Simulation implements Runnable {
 
         seconds = 0;
 
+        for (int i = 0; i < 10; i++) {
+            Car car = new Car(CarType.TESLAMOTORS_MODEL3, i);
+            car.setRoute(Route.generateShortestRoute(EndPoint.Helsinki, EndPoint.Utsjoki));
+            cars.add(car);
+        }
+
         while (!allCarsHaveReachedTheirDestination() || seconds < NORM_DIST_MEAN) {
             for (Car car : cars) {
                 car.tick(TIME_STEP);
@@ -36,7 +42,7 @@ public class Simulation implements Runnable {
 
             cumulativeDistributionCounter += distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP;
             while (cumulativeDistributionCounter >= 1) {
-                Car car = new Car(CarType.TESLAMOTORS_MODEL3);
+                Car car = new Car(CarType.TESLAMOTORS_MODEL3, cars.size());
                 car.setRoute(Route.generateRandomRoute());
                 cars.add(car);
                 cumulativeDistributionCounter -= 1;

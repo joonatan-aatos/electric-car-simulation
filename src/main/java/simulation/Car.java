@@ -192,7 +192,7 @@ public class Car {
             } else {
                 nextChargingStationIndex = 0;
             }
-            canReachDestination = true; // Can't reach destination, but will desparately try anyway
+            canReachDestination = true; // Can't reach destination, but will desperately try anyway
         }
 
     }

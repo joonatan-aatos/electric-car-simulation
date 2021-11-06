@@ -116,7 +116,7 @@ public class Car {
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
         if (distanceFromHighway <= 0) {
-            calculateNextChargingStationIndex();
+            nextChargingStationIndex = calculateNextChargingStationIndex();
             drivingSpeed = SPEED_ON_HIGHWAY;
             distanceFromHighway = 0;
             state = State.OnHighway;
@@ -128,19 +128,21 @@ public class Car {
         drivenDistance += deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
-
-        if (nextChargingStationIndex == -1)
-            calculateNextChargingStationIndex();
-
-        if (route.getChargingStationDistances().get(nextChargingStationIndex) - drivenDistance < 0 && !canReachDestination) {
-            state = State.OnWayToCharger;
-            drivingSpeed = SPEED_OUTSIDE_HIGHWAY;
-            distanceFromHighway = 0;
-        }
-
         if (drivenDistance >= route.getLength()) {
             state = State.DestinationReached;
             drivenDistance = route.getLength();
+        }
+
+        if (canReachDestination)
+            return;
+
+        if (nextChargingStationIndex == -1)
+            nextChargingStationIndex = calculateNextChargingStationIndex();
+
+        if (route.getChargingStationDistances().get(nextChargingStationIndex) - drivenDistance < 0) {
+            state = State.OnWayToCharger;
+            drivingSpeed = SPEED_OUTSIDE_HIGHWAY;
+            distanceFromHighway = 0;
         }
     }
 
@@ -148,16 +150,19 @@ public class Car {
         return route.getChargingStationDistances().get(i) + route.getChargingStations().get(i).getDistanceFromHighway();
     }
 
-    public void calculateNextChargingStationIndex() {
-        if (route.getChargingStationDistances().size() <= nextChargingStationIndex + 1) {
-            nextChargingStationIndex = 0;
+    public int calculateNextChargingStationIndex() {
+        if (
+            // If this is true, there are no more charging stations left, so the car will
+            // drive until it has either reached its destination or drained its battery
+            route.getChargingStationDistances().size() <= nextChargingStationIndex + 1 ||
+            (
+                // If this is true, there's at least one more charging station left but the car can't reach it
+                route.getChargingStationDistances().size() <= nextChargingStationIndex + 2 &&
+                fullDistanceTo(nextChargingStationIndex + 1) >= route.getLength())
+            )
+        {
             canReachDestination = true;
-            return;
-        }
-        if (route.getChargingStationDistances().size() <= nextChargingStationIndex + 2 && fullDistanceTo(nextChargingStationIndex + 1) >= route.getLength()) {
-            nextChargingStationIndex = 0;
-            canReachDestination = true;
-            return;
+            return -1;
         }
 
         double threshHoldDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
@@ -165,39 +170,29 @@ public class Car {
 
         canReachDestination = maximumDistance > route.getLength();
         if (canReachDestination) {
-            nextChargingStationIndex = 0;
-            return;
+            // The car can reach its destination
+            return -1;
         }
 
-        int lastChargingStationIndex = Math.max(nextChargingStationIndex, 0);
+        int previousChargingStationIndex = nextChargingStationIndex;
         int preferredStationIndex = 0;
         double mostPreferencePoints = 0;
 
-        for (int i = lastChargingStationIndex; i < route.getChargingStations().size(); i++) {
+        for (int i = previousChargingStationIndex + 1; i < route.getChargingStations().size(); i++) {
             if (fullDistanceTo(i) > maximumDistance) {
                 break;
             }
-            double pfp = preferencePoints(i, threshHoldDistance);
-            if (pfp > mostPreferencePoints){
-                mostPreferencePoints = pfp;
+            double preferencePoints = calculatePreferencePoints(i, threshHoldDistance);
+            if (preferencePoints > mostPreferencePoints){
+                mostPreferencePoints = preferencePoints;
                 preferredStationIndex = i;
             }
         }
 
-        nextChargingStationIndex = preferredStationIndex;
-
-        if (lastChargingStationIndex >= nextChargingStationIndex ) {
-            if (route.getChargingStationDistances().size() > nextChargingStationIndex + 1) {
-                nextChargingStationIndex++;
-            } else {
-                nextChargingStationIndex = 0;
-            }
-            canReachDestination = true; // Can't reach destination, but will desperately try anyway
-        }
-
+        return preferredStationIndex;
     }
 
-    public double preferencePoints(int i, double thresholdDistance) {
+    public double calculatePreferencePoints(int i, double thresholdDistance) {
         double points = 0;
 
         double distanceFromThreshold = Math.abs(route.getChargingStationDistances().get(i) - thresholdDistance);

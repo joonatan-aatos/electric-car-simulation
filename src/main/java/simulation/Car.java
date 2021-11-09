@@ -9,9 +9,6 @@ public class Car {
     private final double SPEED_ON_HIGHWAY = 120;
     private final double SPEED_OUTSIDE_HIGHWAY = 30;
 
-    private final double DISTANCE_FROM_THRESHOLD_FACTOR = 5;
-    private final double LINE_LENGHT_FACTOR = 0.5;
-
     private long timestep;
 
     private double batteryLife;
@@ -186,7 +183,7 @@ public class Car {
      */
     private int calculateNextChargingStationIndex() {
 
-        double threshHoldDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
+        double optimalDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
         double maximumDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
 
         canReachDestination = maximumDistance > route.getLength();
@@ -216,7 +213,7 @@ public class Car {
             if (distanceFromStartToChargingStation(i) > maximumDistance) {
                 break;
             }
-            double preferencePoints = calculatePreferencePointsOnHighway(i, threshHoldDistance);
+            double preferencePoints = calculatePreferencePointsOnHighway(i, optimalDistance);
             if (preferencePoints > mostPreferencePoints){
                 mostPreferencePoints = preferencePoints;
                 preferredStationIndex = i;
@@ -226,16 +223,20 @@ public class Car {
         return preferredStationIndex;
     }
 
-    private double calculatePreferencePointsOnHighway(int i, double thresholdDistance) {
-        double points = 0;
+    private double calculatePreferencePointsOnHighway(int chargingStationIndex, double optimalDistance) {
 
-        double distanceFromThreshold = Math.abs(route.getChargingStationDistances().get(i) - thresholdDistance);
-        double normalizedDFT = distanceFromThreshold / (thresholdDistance - drivenDistance);
-        points += Math.pow(1 - normalizedDFT, 2) * DISTANCE_FROM_THRESHOLD_FACTOR;
+        ChargingStation chargingStation = route.getChargingStations().get(chargingStationIndex);
 
-        points -= route.getChargingStations().get(i).getQueueLength() * LINE_LENGHT_FACTOR;
+        double distanceCoefficient = 1 +
+                Math.abs(distanceFromStartToChargingStation(chargingStationIndex) - optimalDistance);
+        distanceCoefficient = Math.pow(distanceCoefficient, 2);
 
-        return points;
+        double commonPreferencePoints = calculateCommonPreferencePoints(chargingStation);
+
+        return
+                (commonPreferencePoints) /
+                /*-----division line-----*/
+                (distanceCoefficient);
     }
 
     private double calculatePreferencePointsOnCharger(int nextChargingStationIndex) {
@@ -248,18 +249,28 @@ public class Car {
                 route.getChargingStationDistances().get(currentChargingStationIndex) +
                 currentChargingStation.getDistanceFromHighway();
 
-        double chargerPowerCoefficient = nextChargingStation.getChargers().get(0).getPower();
-        double chargerCountCoefficient = Math.pow(nextChargingStation.getChargers().size(), 2);
-        double lineLengthCoefficient = Math.pow(nextChargingStation.getQueueLength(), 2);
-        double amenitiesCoefficient = 2 +
-                (nextChargingStation.isHasFood() ? 1 : 0) +
-                (nextChargingStation.isHasShop() ? 1 : 0) +
-                (nextChargingStation.isCustomerExclusive() ? -1 : 0);
+        double commonPreferencePoints = calculateCommonPreferencePoints(nextChargingStation);
 
         return
-            (chargerPowerCoefficient * chargerCountCoefficient * amenitiesCoefficient) /
-            /*-----------------------------division line-------------------------------*/
-            (chargerDistanceCoefficient * lineLengthCoefficient);
+            (commonPreferencePoints) /
+            /*-----division line-----*/
+            (chargerDistanceCoefficient);
+    }
+
+    private double calculateCommonPreferencePoints(ChargingStation chargingStation) {
+
+        double chargerPowerCoefficient = chargingStation.getChargers().get(0).getPower();
+        double chargerCountCoefficient = Math.pow(chargingStation.getChargers().size(), 2);
+        double lineLengthCoefficient = Math.pow(1 + chargingStation.getQueueLength(), 2);
+        double amenitiesCoefficient = 2 +
+                (chargingStation.isHasFood() ? 1 : 0) +
+                (chargingStation.isHasShop() ? 1 : 0) +
+                (chargingStation.isCustomerExclusive() ? -1 : 0);
+
+        return
+                (chargerPowerCoefficient * chargerCountCoefficient * amenitiesCoefficient) /
+                /*-----------------------------division line-------------------------------*/
+                (lineLengthCoefficient);
     }
 
     private boolean canReachChargingStation(int chargingStationIndex) throws IndexOutOfBoundsException {
@@ -280,7 +291,7 @@ public class Car {
     }
 
     private void log(String s) {
-        System.out.printf("Car %d (%s): %s\n", index, state.toString(), s);
+        //System.out.printf("Car %d (%s): %s\n", index, state.toString(), s);
     }
 
     public double getDistanceFromHighway() {

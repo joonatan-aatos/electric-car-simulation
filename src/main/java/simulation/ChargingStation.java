@@ -62,18 +62,18 @@ public class ChargingStation {
     private final double distanceFromHighway;
     // Chargers are sorted by charging power
     private final ArrayList<Charger> chargers;
-    private final boolean customerExclusive, hasShop, hasFood;
+    private final boolean hasShop, hasFood, customerExclusive;
     private final String name;
     private final ArrayList<Integer> queue;
 
-    public ChargingStation(String name_, double distance_, double distanceFromHighway_, ArrayList<Integer> powers, ArrayList<ChargerType> types, boolean[] info) {
+    public ChargingStation(String name_, double distance_, double distanceFromHighway_, ArrayList<Integer> powers, ArrayList<ChargerType> types, boolean[] amenities) {
         name = name_;
         distance = distance_;
         distanceFromHighway = distanceFromHighway_;
+        hasShop = amenities[0];
+        hasFood = amenities[1];
+        customerExclusive = amenities[2];
         chargers = new ArrayList<>();
-        customerExclusive = info[0];
-        hasShop = info[1];
-        hasFood = info[2];
         for (int i = 0; i < powers.size(); i++) {
             chargers.add(new Charger(powers.get(i), types.get(i)));
         }
@@ -119,6 +119,18 @@ public class ChargingStation {
 
     public ArrayList<Charger> getChargers() {
         return chargers;
+    }
+
+    public boolean isHasShop() {
+        return hasShop;
+    }
+
+    public boolean isHasFood() {
+        return hasFood;
+    }
+
+    public boolean isCustomerExclusive() {
+        return customerExclusive;
     }
 
     @Override

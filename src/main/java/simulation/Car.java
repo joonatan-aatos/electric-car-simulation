@@ -81,17 +81,24 @@ public class Car {
             state = State.Charging;
         }
         else {
-            for (int i = 2; i > 0; i--) {
+            int bestChargingStationIndex = currentChargingStationIndex;
+            double bestChargingStationPreferencePoints = calculatePreferencePointsOnCharger(currentChargingStationIndex);
+            for (int i = 1; i <= 3; i++) {
                 if (
                     currentChargingStationIndex + i <= route.getChargingStations().size() - 1 &&
                     canReachChargingStation(currentChargingStationIndex + i))
                 {
-                    if (route.getChargingStations().get(currentChargingStationIndex + i).getAvailableCharger() != null) {
-                        route.getChargingStations().get(currentChargingStationIndex).removeFromQueue(index);
-                        nextChargingStationIndex = currentChargingStationIndex + i;
-                        state = State.OnWayFromCharger;
+                    double preferencePoints = calculatePreferencePointsOnCharger(currentChargingStationIndex + i);
+                    if (preferencePoints > bestChargingStationPreferencePoints) {
+                        bestChargingStationIndex = currentChargingStationIndex + i;
+                        bestChargingStationPreferencePoints = preferencePoints;
                     }
                 }
+            }
+            if (bestChargingStationIndex != currentChargingStationIndex) {
+                route.getChargingStations().get(currentChargingStationIndex).removeFromQueue(index);
+                nextChargingStationIndex = bestChargingStationIndex;
+                state = State.OnWayFromCharger;
             }
         }
     }
@@ -170,7 +177,7 @@ public class Car {
         }
     }
 
-    private double fullDistanceTo(int i) {
+    private double distanceFromStartToChargingStation(int i) {
         return route.getChargingStationDistances().get(i) + route.getChargingStations().get(i).getDistanceFromHighway();
     }
 
@@ -195,7 +202,7 @@ public class Car {
             (
                 // If this is true, there's at least one more charging station left but the car can't reach it
                 route.getChargingStationDistances().size() <= currentChargingStationIndex + 2 &&
-                fullDistanceTo(currentChargingStationIndex + 1) >= route.getLength())
+                distanceFromStartToChargingStation(currentChargingStationIndex + 1) >= route.getLength())
             )
         {
             return -1;
@@ -206,10 +213,10 @@ public class Car {
         double mostPreferencePoints = 0;
 
         for (int i = previousChargingStationIndex + 1; i < route.getChargingStations().size(); i++) {
-            if (fullDistanceTo(i) > maximumDistance) {
+            if (distanceFromStartToChargingStation(i) > maximumDistance) {
                 break;
             }
-            double preferencePoints = calculatePreferencePoints(i, threshHoldDistance);
+            double preferencePoints = calculatePreferencePointsOnHighway(i, threshHoldDistance);
             if (preferencePoints > mostPreferencePoints){
                 mostPreferencePoints = preferencePoints;
                 preferredStationIndex = i;
@@ -219,7 +226,7 @@ public class Car {
         return preferredStationIndex;
     }
 
-    private double calculatePreferencePoints(int i, double thresholdDistance) {
+    private double calculatePreferencePointsOnHighway(int i, double thresholdDistance) {
         double points = 0;
 
         double distanceFromThreshold = Math.abs(route.getChargingStationDistances().get(i) - thresholdDistance);
@@ -229,6 +236,30 @@ public class Car {
         points -= route.getChargingStations().get(i).getQueueLength() * LINE_LENGHT_FACTOR;
 
         return points;
+    }
+
+    private double calculatePreferencePointsOnCharger(int nextChargingStationIndex) {
+
+        ChargingStation currentChargingStation = route.getChargingStations().get(currentChargingStationIndex);
+        ChargingStation nextChargingStation = route.getChargingStations().get(nextChargingStationIndex);
+
+        double chargerDistanceCoefficient = 1 +
+                distanceFromStartToChargingStation(nextChargingStationIndex) -
+                route.getChargingStationDistances().get(currentChargingStationIndex) +
+                currentChargingStation.getDistanceFromHighway();
+
+        double chargerPowerCoefficient = nextChargingStation.getChargers().get(0).getPower();
+        double chargerCountCoefficient = Math.pow(nextChargingStation.getChargers().size(), 2);
+        double lineLengthCoefficient = Math.pow(nextChargingStation.getQueueLength(), 2);
+        double amenitiesCoefficient = 2 +
+                (nextChargingStation.isHasFood() ? 1 : 0) +
+                (nextChargingStation.isHasShop() ? 1 : 0) +
+                (nextChargingStation.isCustomerExclusive() ? -1 : 0);
+
+        return
+            (chargerPowerCoefficient * chargerCountCoefficient * amenitiesCoefficient) /
+            /*-----------------------------division line-------------------------------*/
+            (chargerDistanceCoefficient * lineLengthCoefficient);
     }
 
     private boolean canReachChargingStation(int chargingStationIndex) throws IndexOutOfBoundsException {

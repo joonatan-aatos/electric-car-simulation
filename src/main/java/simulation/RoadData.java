@@ -48,7 +48,7 @@ public class RoadData {
                             Double.parseDouble(data[2]),
                             new ArrayList<>(),
                             new ArrayList<>(),
-                            new boolean[]{"1".equals(data[6]), "1".equals(data[7]), "1".equals(data[8])}
+                            new boolean[]{data[6].equals("1"), data[7].equals("1"), data[8].equals("1")}
                     );
                 }
                 ChargingStation.ChargerType type = null;

@@ -14,9 +14,13 @@ public class Car {
     private final double BATTERY_CHARGING_THRESHOLD = 0.3;
     private final double SPEED_ON_HIGHWAY = 120;
     private final double SPEED_OUTSIDE_HIGHWAY = 30;
+    private final double EATING_DURATION = 45 * 60; // In seconds
 
     private long timestep;
 
+    private double hunger; // In seconds since last eaten
+    private double timesShopped;
+    private double timeSpentCharging;
     private double batteryLife;
     private double drivenDistance;
     private double distanceFromHighway;
@@ -49,11 +53,14 @@ public class Car {
         distanceFromHighway = 0;
         canReachDestination = false;
         currentCharger = null;
+        hunger = 0;
+        timesShopped = 0;
         logger.log(Level.FINER, "Created car: " + this.toString());
     }
 
     public void tick(long TIME_STEP) {
         timestep = TIME_STEP;
+        hunger += timestep;
         switch (state) {
             case OnHighway:
                 driveOnHighway();
@@ -108,12 +115,20 @@ public class Car {
     }
 
     public void charge() {
-        batteryLife += Math.min(carType.chargingEfficiency, currentCharger.getPower()) * (timestep/3600d);
+        timeSpentCharging += timestep;
         if (batteryLife >= carType.capacity) {
+            if (route.getChargingStations().get(currentChargingStationIndex).isHasFood() && timeSpentCharging < EATING_DURATION ) {
+                return;
+            }
+            if (route.getChargingStations().get(currentChargingStationIndex).isHasFood()) {
+                hunger = 0;
+            }
             batteryLife = carType.capacity;
             currentCharger.setInUse(false);
             currentCharger = null;
             state = State.OnWayFromCharger;
+        } else {
+            batteryLife += Math.min(carType.chargingEfficiency, currentCharger.getPower()) * (timestep / 3600d);
         }
     }
 
@@ -124,6 +139,9 @@ public class Car {
 
         ChargingStation station = route.getChargingStations().get(currentChargingStationIndex);
         if (distanceFromHighway >= station.getDistanceFromHighway()) {
+            if (station.isHasShop()) {
+                timesShopped++;
+            }
             ChargingStation.Charger availableCharger = station.getAvailableCharger();
             if (availableCharger == null) {
                 state = State.Waiting;
@@ -273,9 +291,11 @@ public class Car {
         double chargerPowerCoefficient = chargingStation.getChargers().get(0).getPower();
         double chargerCountCoefficient = Math.pow(chargingStation.getChargers().size(), 2);
         double lineLengthCoefficient = Math.pow(1 + chargingStation.getQueueLength(), 2);
+
+
         double amenitiesCoefficient = 2 +
-                (chargingStation.isHasFood() ? 1 : 0) +
-                (chargingStation.isHasShop() ? 1 : 0) +
+                (chargingStation.isHasFood() ? 1 : 0) * hunger/3600 +       // Coefficient attains +1 per hour hungry
+                (chargingStation.isHasShop() ? 1 : 0) / Math.pow(2, timesShopped) + //  Shopping number gets multiplied by 1/2 for every time shopped
                 (chargingStation.isCustomerExclusive() ? -1 : 0);
 
         return

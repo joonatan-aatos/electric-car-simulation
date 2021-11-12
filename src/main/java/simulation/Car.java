@@ -1,6 +1,12 @@
 package simulation;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Car {
+
+    private static final Logger logger = Logger.getGlobal();
+
     private Route route;
     private final CarType carType;
     private final int index;
@@ -43,6 +49,7 @@ public class Car {
         distanceFromHighway = 0;
         canReachDestination = false;
         currentCharger = null;
+        logger.log(Level.FINER, "Created car: " + this.toString());
     }
 
     public void tick(long TIME_STEP) {
@@ -103,7 +110,6 @@ public class Car {
     public void charge() {
         batteryLife += Math.min(carType.chargingEfficiency, currentCharger.getPower()) * (timestep/3600d);
         if (batteryLife >= carType.capacity) {
-            log("Current charging station: " + route.getChargingStations().get(currentChargingStationIndex).toString());
             batteryLife = carType.capacity;
             currentCharger.setInUse(false);
             currentCharger = null;
@@ -127,6 +133,11 @@ public class Car {
                 availableCharger.setInUse(true);
                 currentCharger = availableCharger;
                 state = State.Charging;
+                logger.log(Level.FINE, String.format(
+                        "%s: %s\n", this.toString(),
+                        "Entering charging station: " +
+                                route.getChargingStations().get(currentChargingStationIndex).toString())
+                );
             }
         }
     }
@@ -290,10 +301,6 @@ public class Car {
         return maximumDistance > distanceToNextChargingStation;
     }
 
-    private void log(String s) {
-        //System.out.printf("Car %d (%s): %s\n", index, state.toString(), s);
-    }
-
     public double getDistanceFromHighway() {
         return distanceFromHighway;
     }
@@ -320,5 +327,10 @@ public class Car {
 
     public double getBatteryLife() {
         return batteryLife;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Car %d (%s)", index, state.toString());
     }
 }

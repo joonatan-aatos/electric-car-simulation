@@ -117,7 +117,12 @@ public class Route {
         }
         EndPoint endPoint = endPoints.get(endPointIndex);
 
-        return generateShortestRoute2(startPoint, endPoint);
+        // Randomly flip the route
+        Route route = generateShortestRoute2(startPoint, endPoint);
+        if (Math.random() > 0.5) {
+            route = Route.getFlippedRoute(route);
+        }
+        return route;
     }
 
     /**
@@ -295,9 +300,13 @@ public class Route {
                 route.endPoint,
                 route.startPoint
         );
-        for (int i = 0; i < newRoute.chargingStationDistances.size(); i++) {
-            newRoute.chargingStationDistances.set(i, newRoute.length - newRoute.chargingStationDistances.get(i));
+        ArrayList<Double> newChargingStationDistances = new ArrayList<>();
+        for (int i = 0; i < route.chargingStationDistances.size(); i++) {
+            newChargingStationDistances.add(route.length - route.chargingStationDistances.get(i));
         }
+        Collections.reverse(newChargingStationDistances);
+        newRoute.chargingStationDistances.clear();
+        newRoute.chargingStationDistances.addAll(newChargingStationDistances);
         return newRoute;
     }
 

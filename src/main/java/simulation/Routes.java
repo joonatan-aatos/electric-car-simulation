@@ -1,11 +1,18 @@
 package simulation;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class Routes {
     public static HashMap<String, Route> routes = new HashMap<>();
+    public static HashMap<String, Double> trafficData = new HashMap<>();
     public static ArrayList<String> routeKeys = new ArrayList<>();
+    public static ArrayList<Double> endPointWeights = new ArrayList<>();
 
     public static void generateRoutes() {
         System.out.println("Generating routes...");
@@ -82,5 +89,62 @@ public class Routes {
         routeKeys.add("OuKe");
         routeKeys.add("KeRo");
         routeKeys.add("RoUt");
+
+        trafficData = readTrafficData("/Liikennemaarat.csv");
+        endPointWeights = calculateEndpointWeights();
+    }
+
+    private static HashMap<String, Double> readTrafficData(String path) {
+
+        HashMap<String, Double> trafficData = new HashMap<>();
+
+        try {
+            InputStream in = RoadData.class.getResourceAsStream(path);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+            br.readLine();
+
+            String[] data = null;
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.length() <= 0) break;
+                data = line.split(";");
+                String routeId = data[0];
+                double routeTraffic = Double.parseDouble(data[2]);
+                trafficData.put(routeId, routeTraffic);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException | NullPointerException | NumberFormatException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Charger file is in wrong format");
+        }
+
+        return trafficData;
+    }
+
+    private static ArrayList<Double> calculateEndpointWeights() {
+
+        if (trafficData.size() <= 0)
+            return new ArrayList<>();
+
+        ArrayList<Double> weights = new ArrayList<>();
+        double sum = 0;
+        weights.add(trafficData.get(routeKeys.get(0)));
+        sum += weights.get(0);
+
+        for (int i = 1; i < trafficData.size(); i++) {
+            weights.add(trafficData.get(routeKeys.get(i)) + trafficData.get(routeKeys.get(i-1)));
+            sum += weights.get(i);
+        }
+
+        weights.add(trafficData.get(routeKeys.get(routeKeys.size()-1)));
+        sum += weights.get(weights.size()-1);
+
+        final double finalSum = sum;
+        weights = weights.stream().map(weight -> weight / finalSum).collect(Collectors.toCollection(ArrayList::new));
+
+        return weights;
     }
 }

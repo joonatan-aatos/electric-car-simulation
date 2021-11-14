@@ -1,6 +1,7 @@
 package simulation;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Route {
     private final double length;
@@ -69,9 +70,53 @@ public class Route {
 
     public static Route generateRandomRoute() {
         ArrayList<EndPoint> endPoints = new ArrayList<>(List.of(EndPoint.values()));
-        EndPoint startPoint = endPoints.get(random.nextInt(endPoints.size()));
-        endPoints.remove(startPoint);
-        EndPoint endPoint = endPoints.get(random.nextInt(endPoints.size()));
+        // Select random start point with weights
+        int startPointIndex = 0;
+        for (double r = Math.random(); startPointIndex < Routes.endPointWeights.size() - 1; ++startPointIndex) {
+            r -= Routes.endPointWeights.get(startPointIndex);
+            if (r <= 0.0) break;
+        }
+        EndPoint startPoint = endPoints.get(startPointIndex);
+
+        // Calculate weights for end points
+        HashMap<String, Double> trafficData = Routes.trafficData;
+        ArrayList<Double> weights = new ArrayList<>();
+        double sumOfWeights = 0;
+        boolean before = true;
+        for (int i = 0; i < endPoints.size(); i++) {
+            if (i == startPointIndex) {
+                weights.add(0d);
+                before = false;
+            }
+            else {
+                double weight;
+                if (before) {
+                    weight = trafficData.get(Routes.routeKeys.get(i));
+                    for (int j = i+1; j < startPointIndex; j++) {
+                        weight *= trafficData.get(Routes.routeKeys.get(j));
+                    }
+                }
+                else {
+                    weight = trafficData.get(Routes.routeKeys.get(i-1));
+                    for (int j = startPointIndex + 1; j < i; j++) {
+                        weight *= trafficData.get(Routes.routeKeys.get(j-1));
+                    }
+                }
+                weights.add(weight);
+                sumOfWeights += weight;
+            }
+        }
+        final double finalSumOfWeights = sumOfWeights;
+        weights = weights.stream().map(weight -> weight / finalSumOfWeights).collect(Collectors.toCollection(ArrayList::new));
+
+        // Select random start point with weights
+        int endPointIndex = 0;
+        for (double r = Math.random(); endPointIndex < weights.size() - 1; ++endPointIndex) {
+            r -= weights.get(endPointIndex);
+            if (r <= 0.0) break;
+        }
+        EndPoint endPoint = endPoints.get(endPointIndex);
+
         return generateShortestRoute2(startPoint, endPoint);
     }
 

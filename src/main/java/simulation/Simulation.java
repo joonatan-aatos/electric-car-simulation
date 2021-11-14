@@ -70,7 +70,7 @@ public class Simulation implements Runnable {
 
     private boolean allCarsHaveReachedTheirDestination() {
         for (Car car : cars) {
-            if (car.getState() != Car.State.DestinationReached)
+            if (car.getState() != Car.State.DestinationReached && car.getState() != Car.State.BatteryDepleted)
                 return false;
         }
         return true;

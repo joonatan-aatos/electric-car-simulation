@@ -1,4 +1,6 @@
 import simulation.Simulation;
+import simulation.Statistics;
+import util.CustomFormatter;
 import visualizer.Visualizer;
 
 import java.io.IOException;
@@ -6,24 +8,36 @@ import java.util.logging.*;
 
 public class CarSimulation {
     public static void main(String[] args) throws InterruptedException {
+        boolean showUI = false;
         configureLogger();
-        Simulation simulation = new Simulation();
-        Visualizer visualizer = new Visualizer(simulation);
+        Simulation simulation = new Simulation(showUI);
+        Visualizer visualizer = showUI ? new Visualizer(simulation) : null;
         Thread simulationThread = new Thread(simulation);
         simulationThread.start();
-        while (simulationThread.isAlive()) {
+        if (showUI) {
+            while (simulationThread.isAlive()) {
+                visualizer.draw();
+                Thread.sleep(10);
+            }
             visualizer.draw();
-            Thread.sleep(10);
         }
+        else
+            simulationThread.join();
+
+        // Export simulation statistics
+        Statistics statistics = new Statistics(simulation);
+        System.out.println(statistics);
     }
 
     private static void configureLogger() {
 
         final Logger logger = Logger.getGlobal();
         logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
 
         Handler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.CONFIG);
+        consoleHandler.setFormatter(new CustomFormatter());
 
         Handler fileHandler = null;
         try {

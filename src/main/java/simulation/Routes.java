@@ -6,16 +6,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Routes {
+    private static final Logger logger = Logger.getGlobal();
+
     public static HashMap<String, Route> routes = new HashMap<>();
     public static HashMap<String, Double> trafficData = new HashMap<>();
     public static ArrayList<String> routeKeys = new ArrayList<>();
     public static ArrayList<Double> endPointWeights = new ArrayList<>();
 
     public static void generateRoutes() {
-        System.out.println("Generating routes...");
+        logger.info("Generating routes...");
         RoadData heLa = RoadData.readChargingStations("/He-La-latauspisteet.csv");
         routes.put(
                 "HeLa",

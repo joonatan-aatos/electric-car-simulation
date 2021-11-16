@@ -1,8 +1,11 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class Simulation implements Runnable {
+
+    private static final Logger logger = Logger.getGlobal();
 
     ArrayList<Car> cars;
     private long seconds;
@@ -10,14 +13,16 @@ public class Simulation implements Runnable {
     private int tps;
     private final int NORM_DIST_MEAN = 7200;
     private final int NORM_DIST_STANDARD_DEVIATION = 1800;
-    private final int TOTAL_CARS = 1000;
+    private final int TOTAL_CARS = 10000;
+    private final boolean shouldWait;
 
     private double cumulativeDistributionCounter = 0;
 
-    public Simulation() {
+    public Simulation(boolean shouldWait_) {
         Routes.generateRoutes();
         createCars();
         tps = 100;
+        shouldWait = shouldWait_;
     }
 
     private void createCars() {
@@ -25,7 +30,7 @@ public class Simulation implements Runnable {
     }
 
     public void start() {
-        System.out.println("Starting...");
+        logger.info("Starting...");
 
         seconds = 0;
 
@@ -36,6 +41,8 @@ public class Simulation implements Runnable {
             cars.add(car);
         }
          */
+
+        boolean carsCreatedLogged = false;
 
         while (!allCarsHaveReachedTheirDestination() || seconds < NORM_DIST_MEAN) {
             for (Car car : cars) {
@@ -50,17 +57,26 @@ public class Simulation implements Runnable {
                 cumulativeDistributionCounter -= 1;
             }
 
-            try {
-                Thread.sleep(Math.round(1000d / tps));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (shouldWait) {
+                try {
+                    Thread.sleep(Math.round(1000d / tps));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+
+            // Logging
+            if (!carsCreatedLogged && cars.size() == TOTAL_CARS-1) {
+                logger.config("All cars created");
+                carsCreatedLogged = true;
+            }
+
             seconds += TIME_STEP;
             if (seconds == Long.MAX_VALUE)
                 throw new RuntimeException("Time exceeded maximum long value");
         }
 
-        System.out.println("Done.");
+        logger.info("Done.");
     }
 
     private double distributionProbability() {

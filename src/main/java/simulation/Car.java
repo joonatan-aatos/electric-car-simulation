@@ -16,7 +16,7 @@ public class Car {
     private final double SPEED_OUTSIDE_HIGHWAY = 30;
     private final double EATING_DURATION = 45 * 60; // In seconds
 
-    private long timestep;
+    private long timeStep;
 
     private double hunger; // In seconds since last eaten
     private double timesShopped;
@@ -30,15 +30,22 @@ public class Car {
     private boolean canReachDestination;
     private ChargingStation.Charger currentCharger;
     private State state;
+    private long[] stateTime;
 
     public enum State {
-        OnHighway,
-        OnWayToCharger,
-        OnWayFromCharger,
-        Waiting,
-        DestinationReached,
-        BatteryDepleted,
-        Charging
+        OnHighway(0),
+        OnWayToCharger(1),
+        OnWayFromCharger(2),
+        Waiting(3),
+        DestinationReached(4),
+        BatteryDepleted(5),
+        Charging(6);
+
+        public final int index;
+
+        private State(int index_) {
+            index = index_;
+        }
     };
 
     public Car(CarType carType_, int index_) {
@@ -55,12 +62,13 @@ public class Car {
         currentCharger = null;
         hunger = 0;
         timesShopped = 0;
+        stateTime = new long[7];
         logger.log(Level.FINER, "Created car: " + this.toString());
     }
 
     public void tick(long TIME_STEP) {
-        timestep = TIME_STEP;
-        hunger += timestep;
+        timeStep = TIME_STEP;
+        hunger += timeStep;
         switch (state) {
             case OnHighway:
                 driveOnHighway();
@@ -79,6 +87,7 @@ public class Car {
                 break;
         }
         if (batteryLife <= 0) state = State.BatteryDepleted;
+        stateTime[state.index] += timeStep;
     }
 
     public void waitOnStation() {
@@ -115,7 +124,7 @@ public class Car {
     }
 
     public void charge() {
-        timeSpentCharging += timestep;
+        timeSpentCharging += timeStep;
         if (batteryLife >= carType.capacity) {
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood() && timeSpentCharging < EATING_DURATION ) {
                 return;
@@ -128,12 +137,12 @@ public class Car {
             currentCharger = null;
             state = State.OnWayFromCharger;
         } else {
-            batteryLife += Math.min(carType.chargingEfficiency, currentCharger.getPower()) * (timestep / 3600d);
+            batteryLife += Math.min(carType.chargingEfficiency, currentCharger.getPower()) * (timeStep / 3600d);
         }
     }
 
     public void driveToStation() {
-        double deltaDistance = drivingSpeed * (timestep/3600d);
+        double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway += deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
@@ -161,7 +170,7 @@ public class Car {
     }
 
     public void driveToHighway() {
-        double deltaDistance = drivingSpeed * (timestep/3600d);
+        double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway -= deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
@@ -181,7 +190,7 @@ public class Car {
     }
 
     public void driveOnHighway() {
-        double deltaDistance = drivingSpeed * (timestep/3600d);
+        double deltaDistance = drivingSpeed * (timeStep /3600d);
         drivenDistance += deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
@@ -347,6 +356,10 @@ public class Car {
 
     public double getBatteryLife() {
         return batteryLife;
+    }
+
+    public long[] getStateTime() {
+        return stateTime;
     }
 
     @Override

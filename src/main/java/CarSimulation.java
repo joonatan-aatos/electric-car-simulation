@@ -3,14 +3,17 @@ import simulation.Statistics;
 import util.CustomFormatter;
 import visualizer.Visualizer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 
 public class CarSimulation {
     public static void main(String[] args) throws InterruptedException {
-        boolean showUI = false;
+        boolean showUI = true;
+        File dir = new File("./output");
+        dir.mkdirs();
         configureLogger();
-        Simulation simulation = new Simulation(showUI);
+        Simulation simulation = new Simulation(showUI, 1000);
         Visualizer visualizer = showUI ? new Visualizer(simulation) : null;
         Thread simulationThread = new Thread(simulation);
         simulationThread.start();
@@ -27,6 +30,7 @@ public class CarSimulation {
         // Export simulation statistics
         Statistics statistics = new Statistics(simulation);
         System.out.println(statistics);
+        statistics.export("statistics.txt");
     }
 
     private static void configureLogger() {
@@ -41,7 +45,7 @@ public class CarSimulation {
 
         Handler fileHandler = null;
         try {
-            fileHandler = new FileHandler("logs.txt");
+            fileHandler = new FileHandler("output/logs.txt");
         } catch (IOException e) {
             System.out.println("Failed to create file handler for logger");
         }

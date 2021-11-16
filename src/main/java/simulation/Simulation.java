@@ -13,14 +13,15 @@ public class Simulation implements Runnable {
     private int tps;
     private final int NORM_DIST_MEAN = 7200;
     private final int NORM_DIST_STANDARD_DEVIATION = 1800;
-    private final int TOTAL_CARS = 10000;
+    private final int TOTAL_CARS;
     private final boolean shouldWait;
 
     private double cumulativeDistributionCounter = 0;
 
-    public Simulation(boolean shouldWait_) {
+    public Simulation(boolean shouldWait_, int carCount) {
         Routes.generateRoutes();
         createCars();
+        TOTAL_CARS = carCount;
         tps = 100;
         shouldWait = shouldWait_;
     }

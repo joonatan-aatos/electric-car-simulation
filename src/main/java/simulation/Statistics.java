@@ -1,10 +1,15 @@
 package simulation;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
 public class Statistics {
+
+    private static final Logger logger = Logger.getGlobal();
 
     private class CarStatistics {
 
@@ -51,8 +56,19 @@ public class Statistics {
         }
     }
 
-    public static void exportStatistics(String path) {
-        // TODO: write this.toString() to a file at the given path
+    public void export(String name) {
+        PrintWriter printWriter = null;
+        try {
+            printWriter = new PrintWriter("output/"+name, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.severe("Failed to export statistics");
+            return;
+        }
+
+        printWriter.println(this.toString());
+
+        printWriter.close();
     }
 
     @Override
@@ -68,9 +84,9 @@ public class Statistics {
         for (int i = 0; i < states.length; i++) {
             if (i == 4)
                 continue;
-            s.append(" - ").append(states[i].toString()).append(String.format(": %.1f h/car (%.1f %%)", (double) stateStatistics[i] / (double) (totalCars*3600L), (double) stateStatistics[i] / (double) totalStateTime * 100d)).append("\n");
+            s.append(" - ").append(states[i].toString()).append(String.format(": %.0f min/car (%.1f %%)", (double) stateStatistics[i] / (double) (totalCars*60L), (double) stateStatistics[i] / (double) totalStateTime * 100d)).append("\n");
         }
-        s.append(String.format("Total time driving: %.1f h/car\n", (double) totalStateTime / (double) (totalCars*3600L)));
+        s.append(String.format("Total time driving: %.0f min/car\n", (double) totalStateTime / (double) (totalCars*60L)));
         s.append("\n");
 
         // Traffic statistics

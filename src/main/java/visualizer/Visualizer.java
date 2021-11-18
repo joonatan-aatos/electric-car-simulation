@@ -314,6 +314,7 @@ public class Visualizer {
         g.setColor(Palette.PrimaryDark.getColor());
         g.fillRect(1000 - INFO_AREA_WIDTH, 0, INFO_AREA_WIDTH, 1000);
 
+        // CARS
         ArrayList<Car> cars = (ArrayList<Car>) simulation.getCars().clone();
         int onHighwayCount = 0, onWayToChargerCount = 0, onWayFromChargerCount = 0, chargingCount = 0, waitingCount = 0, batteryDepleatedCount = 0, destinationReachedCount = 0;
         for (Car car : cars) {
@@ -362,6 +363,32 @@ public class Visualizer {
         g.drawString("Akku loppunut: "+batteryDepleatedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 8 * textSpacing);
         g.drawString("Perillä: "+destinationReachedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 9 * textSpacing);
         g.drawString("Yhteensä: "+cars.size(), 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 10 * textSpacing);
+
+
+        // ROADS
+        int[] chargersInUse = {0, 0, 0, 0, 0, 0};
+        for (int i = 0; i < Routes.routeKeys.size(); i++) {
+            String key = Routes.routeKeys.get(i);
+            for (ChargingStation station : Routes.routes.get(key).getChargingStations()) {
+                for (ChargingStation.Charger charger : station.getChargers()) {
+                    if (charger.isInUse()) {
+                        chargersInUse[i]++;
+                    }
+                }
+            }
+        }
+        int[] carsOnRoad = {0, 0, 0, 0, 0, 0};
+        for (int i = 0; i < Routes.routeKeys.size(); i++) {
+            String key = Routes.routeKeys.get(i);
+            Route route = Routes.routes.get(key);
+            String routeName = route.getStartPoint().toString() + " - " + route.getEndPoint().toString();
+            int xCoordinate = 1000 - INFO_AREA_WIDTH + TEXT_PADDING + i / 3 * 350;
+            g.setFont(new Font("arial", Font.BOLD, 24));
+            g.drawString(routeName, xCoordinate, 690 + (3 * (i % 3)) * textSpacing);
+            g.setFont(new Font("arial", Font.PLAIN, 24));
+            g.drawString(" - Autoa: "+carsOnRoad[i], xCoordinate, 690 + (1 + 3 * (i % 3)) * textSpacing);
+            g.drawString(" - Laturia käytössä: "+chargersInUse[i], xCoordinate, 690 + (2 + 3 * (i % 3)) * textSpacing);
+        }
 
         g.setFont(new Font("arial", Font.BOLD, 24));
 

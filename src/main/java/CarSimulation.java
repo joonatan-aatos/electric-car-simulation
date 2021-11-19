@@ -30,7 +30,7 @@ public class CarSimulation {
         // Export simulation statistics
         Statistics statistics = new Statistics(simulation);
         System.out.println(statistics);
-        statistics.export("statistics.txt");
+        statistics.export("statistics.csv");
     }
 
     private static void configureLogger() {

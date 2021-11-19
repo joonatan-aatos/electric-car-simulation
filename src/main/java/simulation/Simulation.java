@@ -11,8 +11,8 @@ public class Simulation implements Runnable {
     private long seconds;
     private final long TIME_STEP = 10; // simulationSeconds / realSeconds
     private int tps;
-    private final int NORM_DIST_MEAN = 7200;
-    private final int NORM_DIST_STANDARD_DEVIATION = 1800;
+    private final int NORM_DIST_MEAN = 14400;
+    private final int NORM_DIST_STANDARD_DEVIATION = 3600;
     private final int TOTAL_CARS;
     private final boolean shouldWait;
 

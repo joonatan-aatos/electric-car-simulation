@@ -378,6 +378,20 @@ public class Visualizer {
             }
         }
         int[] carsOnRoad = {0, 0, 0, 0, 0, 0};
+        for (Car car : cars) {
+            if (car.getState() == Car.State.DestinationReached)
+                continue;
+            ArrayList<Route> rootRoutes = car.getRoute().getRootRoutes();
+            double drivenDistance = car.getDrivenDistance();
+            for (Route rootRoute : rootRoutes) {
+                drivenDistance -= rootRoute.getLength();
+                if (drivenDistance < 0) {
+                    int index = Math.min(rootRoute.getStartPoint().index, rootRoute.getEndPoint().index);
+                    carsOnRoad[index]++;
+                    break;
+                }
+            }
+        }
         for (int i = 0; i < Routes.routeKeys.size(); i++) {
             String key = Routes.routeKeys.get(i);
             Route route = Routes.routes.get(key);

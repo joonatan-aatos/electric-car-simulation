@@ -12,9 +12,30 @@ public class Route {
     private final EndPoint startPoint;
     private final EndPoint endPoint;
 
+    /**
+     * Is null if this is a root route.
+     * Otherwise, contains all root routes this route consists of
+     */
+    private final ArrayList<Route> rootRoutes;
+
     private static final Random random = new Random();
 
     public Route(String name_, double length_, ArrayList<ChargingStation> chargingStations_, EndPoint startPoint_, EndPoint endPoint_) {
+        rootRoutes = null;
+        name = name_;
+        length = length_;
+        startPoint = startPoint_;
+        endPoint = endPoint_;
+        chargingStations = chargingStations_;
+
+        chargingStationDistances = new ArrayList<>();
+        for (ChargingStation station : chargingStations) {
+            chargingStationDistances.add(station.getDistance());
+        }
+    }
+
+    private Route(String name_, double length_, ArrayList<ChargingStation> chargingStations_, EndPoint startPoint_, EndPoint endPoint_, ArrayList<Route> rootRoutes_) {
+        rootRoutes = rootRoutes_;
         name = name_;
         length = length_;
         startPoint = startPoint_;
@@ -30,12 +51,13 @@ public class Route {
     /**
      * Merge routes together
      *
-     * @param rootRoutes Routes that will be merged together
+     * @param rootRoutes_ Routes that will be merged together
      * @param startPoint_ Starting point of the route
      */
-    public Route(ArrayList<Route> rootRoutes, EndPoint startPoint_) {
-        if (rootRoutes.size() < 1)
+    private Route(ArrayList<Route> rootRoutes_, EndPoint startPoint_) {
+        if (rootRoutes_.size() < 1)
             throw new IllegalArgumentException("No root routes were provided");
+        rootRoutes = rootRoutes_;
         startPoint = startPoint_;
         chargingStations = new ArrayList<>();
         chargingStationDistances = new ArrayList<>();
@@ -292,13 +314,17 @@ public class Route {
     public static Route getFlippedRoute(Route route) {
 
         ArrayList<ChargingStation> newChargingStations = (ArrayList<ChargingStation>) route.chargingStations.clone();
+        ArrayList<Route> newRootRoutes = route.getRootRoutes();
         Collections.reverse(newChargingStations);
+        if (newRootRoutes != null)
+            Collections.reverse(newRootRoutes);
         Route newRoute = new Route(
                 route.getEndPoint().toString() + " - " + route.getStartPoint().toString(),
                 route.length,
                 newChargingStations,
                 route.endPoint,
-                route.startPoint
+                route.startPoint,
+                newRootRoutes
         );
         ArrayList<Double> newChargingStationDistances = new ArrayList<>();
         for (int i = 0; i < route.chargingStationDistances.size(); i++) {
@@ -339,6 +365,10 @@ public class Route {
 
     public ArrayList<Double> getChargingStationDistances() {
         return chargingStationDistances;
+    }
+
+    public ArrayList<Route> getRootRoutes() {
+        return rootRoutes;
     }
 
     @Override

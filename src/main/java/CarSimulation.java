@@ -13,7 +13,7 @@ public class CarSimulation {
         File dir = new File("./output");
         dir.mkdirs();
         configureLogger();
-        Simulation simulation = new Simulation(showUI, 3000);
+        Simulation simulation = new Simulation(showUI, 1000);
         Visualizer visualizer = showUI ? new Visualizer(simulation) : null;
         Thread simulationThread = new Thread(simulation);
         simulationThread.start();

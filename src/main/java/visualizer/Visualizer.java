@@ -242,7 +242,7 @@ public class Visualizer {
                             g.setColor(new Color(0, 0, 0));
                             break;
                         case DestinationReached:
-                            g.setColor(new Color(255, 255, 255, 0));
+                            g.setColor(new Color(255, 255, 255));
                             break;
                         case OnHighway:
                             g.setColor(new Color(0, 255, 0, CAR_OPACITY));

@@ -31,6 +31,7 @@ public class Car {
     private ChargingStation.Charger currentCharger;
     private State state;
     private long[] stateTime;
+    private double destinationDistanceFromEndPoint; // Is never changed, assigned once in setRoute
 
     public enum State {
         OnHighway(0),
@@ -39,7 +40,9 @@ public class Car {
         Waiting(3),
         DestinationReached(4),
         BatteryDepleted(5),
-        Charging(6);
+        Charging(6),
+        OnWayToHighway(7),
+        OnWayFromHighway(8);
 
         public final int index;
 
@@ -51,18 +54,20 @@ public class Car {
     public Car(CarType carType_, int index_) {
         carType = carType_;
         index = index_;
+
         batteryLife = carType.capacity;
+
         drivenDistance = 0;
         drivingSpeed = SPEED_ON_HIGHWAY;
         currentChargingStationIndex = -1;
         nextChargingStationIndex = -1;
-        state = State.OnHighway;
+        state = State.OnWayToHighway;
         distanceFromHighway = 0;
         canReachDestination = false;
         currentCharger = null;
         hunger = 0;
         timesShopped = 0;
-        stateTime = new long[7];
+        stateTime = new long[9];
         logger.log(Level.FINER, "Created car: " + this.toString());
     }
 
@@ -70,6 +75,9 @@ public class Car {
         timeStep = TIME_STEP;
         hunger += timeStep;
         switch (state) {
+            case OnWayToHighway:
+                driveToHighway();
+                break;
             case OnHighway:
                 driveOnHighway();
                 break;
@@ -77,7 +85,7 @@ public class Car {
                 driveToStation();
                 break;
             case OnWayFromCharger:
-                driveToHighway();
+                driveFromStation();
                 break;
             case Waiting:
                 waitOnStation();
@@ -85,9 +93,33 @@ public class Car {
             case Charging:
                 charge();
                 break;
+            case OnWayFromHighway:
+                driveFromHighway();
+                break;
         }
         if (batteryLife <= 0) state = State.BatteryDepleted;
         stateTime[state.index] += timeStep;
+    }
+
+    public void driveToHighway() {
+        double deltaDistance = drivingSpeed * (timeStep /3600d);
+        distanceFromHighway -= deltaDistance;
+        batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
+
+        if (distanceFromHighway <= 0) {
+            distanceFromHighway = 0;
+            state = State.OnHighway;
+        }
+    }
+
+    public void driveFromHighway() {
+        double deltaDistance = drivingSpeed * (timeStep /3600d);
+        distanceFromHighway += deltaDistance;
+        batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
+
+        if (distanceFromHighway >= destinationDistanceFromEndPoint) {
+            state = State.DestinationReached;
+        }
     }
 
     public void waitOnStation() {
@@ -169,7 +201,7 @@ public class Car {
         }
     }
 
-    public void driveToHighway() {
+    public void driveFromStation() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway -= deltaDistance;
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
@@ -195,8 +227,7 @@ public class Car {
         batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
 
         if (drivenDistance >= route.getLength()) {
-            state = State.DestinationReached;
-            drivenDistance = route.getLength();
+            state = State.OnWayFromHighway;
         }
 
         if (currentChargingStationIndex == -1)
@@ -224,7 +255,7 @@ public class Car {
         double optimalDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
         double maximumDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
 
-        canReachDestination = maximumDistance > route.getLength();
+        canReachDestination = maximumDistance > route.getLength() + destinationDistanceFromEndPoint;
         if (canReachDestination) {
             // The car can reach its destination
             return -1;
@@ -233,12 +264,8 @@ public class Car {
         if (
             // If this is true, there are no more charging stations left, so the car will
             // drive until it has either reached its destination or drained its battery
-            route.getChargingStationDistances().size() <= currentChargingStationIndex + 1 ||
-            (
-                // If this is true, there's at least one more charging station left but the car can't reach it
-                route.getChargingStationDistances().size() <= currentChargingStationIndex + 2 &&
-                distanceFromStartToChargingStation(currentChargingStationIndex + 1) >= route.getLength())
-            )
+            route.getChargingStationDistances().size() <= currentChargingStationIndex + 1
+        )
         {
             return -1;
         }
@@ -348,6 +375,8 @@ public class Car {
 
     public void setRoute(Route route) {
         this.route = route;
+        distanceFromHighway = Math.random() * route.getStartPoint().maxDistanceFromStartPoint;
+        destinationDistanceFromEndPoint = Math.random() * route.getEndPoint().maxDistanceFromStartPoint;
     }
 
     public State getState() {

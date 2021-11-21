@@ -32,7 +32,7 @@ public class Statistics {
 
     public Statistics (Simulation simulation) {
         trafficStatistics = new int[6];
-        stateStatistics = new long[7];
+        stateStatistics = new long[9];
         carStatistics = new ArrayList<>();
         totalTime = simulation.getPassedSeconds();
 

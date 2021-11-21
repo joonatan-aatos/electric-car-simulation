@@ -225,7 +225,9 @@ public class Visualizer {
                 case 0:
                     // By battery
                     if (car.getState() == Car.State.BatteryDepleted) {
-                        g.setColor(new Color(0, 0, 0, CAR_OPACITY));
+                        g.setColor(new Color(0, 0, 0));
+                    } else if (car.getState() == Car.State.DestinationReached) {
+                        g.setColor(new Color(255, 255, 255));
                     } else {
                         double batteryPercentage = car.getBatteryLife() / car.getCarType().capacity;
                         int red = batteryPercentage > 0.5 ? 255 - (int) (car.getBatteryLife() / car.getCarType().capacity / 2 * 255) : 255;
@@ -237,14 +239,10 @@ public class Visualizer {
                     // By state
                     switch (car.getState()) {
                         case BatteryDepleted:
-                            g.setColor(new Color(0, 0, 0, CAR_OPACITY));
+                            g.setColor(new Color(0, 0, 0));
                             break;
                         case DestinationReached:
-                            g.setColor(new Color(255, 255, 255, CAR_OPACITY));
-                            break;
-                        case OnWayFromCharger:
-                        case OnWayToCharger:
-                            g.setColor(new Color(0, 0, 255, CAR_OPACITY));
+                            g.setColor(new Color(255, 255, 255, 0));
                             break;
                         case OnHighway:
                             g.setColor(new Color(0, 255, 0, CAR_OPACITY));
@@ -255,14 +253,10 @@ public class Visualizer {
                         case Charging:
                             g.setColor(new Color(255, 255, 0, CAR_OPACITY));
                             break;
+                        default:
+                            g.setColor(new Color(0, 0, 255, CAR_OPACITY));
+                            break;
                     }
-                    break;
-                case 2:
-                    // By efficiency
-                    CarType type = car.getCarType();
-                    double efficiency = type.drivingEfficiency * type.capacity;
-                    int efficiencyColor = (int) (efficiency / 500d * 255d);
-                    g.setColor(new Color(efficiencyColor, efficiencyColor, efficiencyColor, CAR_OPACITY));
                     break;
                 default:
                     g.setColor(Color.BLACK);
@@ -316,31 +310,9 @@ public class Visualizer {
 
         // CARS
         ArrayList<Car> cars = (ArrayList<Car>) simulation.getCars().clone();
-        int onHighwayCount = 0, onWayToChargerCount = 0, onWayFromChargerCount = 0, chargingCount = 0, waitingCount = 0, batteryDepleatedCount = 0, destinationReachedCount = 0;
+        int[] stateCount = {0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (Car car : cars) {
-            switch (car.getState()) {
-                case Charging:
-                    chargingCount++;
-                    break;
-                case Waiting:
-                    waitingCount++;
-                    break;
-                case OnHighway:
-                    onHighwayCount++;
-                    break;
-                case OnWayToCharger:
-                    onWayToChargerCount++;
-                    break;
-                case OnWayFromCharger:
-                    onWayFromChargerCount++;
-                    break;
-                case DestinationReached:
-                    destinationReachedCount++;
-                    break;
-                case BatteryDepleted:
-                    batteryDepleatedCount++;
-                    break;
-            }
+            stateCount[car.getState().index]++;
         }
 
         final int textSpacing = (int) (TEXT_PADDING * 1.1);
@@ -355,14 +327,16 @@ public class Visualizer {
         time -= minutes*60L;
         int seconds = (int) time;
 
-        g.drawString("Valtatiellä: "+onHighwayCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 3 * textSpacing);
-        g.drawString("Matkalla laturille: "+onWayToChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 4 * textSpacing);
-        g.drawString("Matkalla laturilta: "+onWayFromChargerCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 5 * textSpacing);
-        g.drawString("Latautumassa: "+chargingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 6 * textSpacing);
-        g.drawString("Odottamassa: "+waitingCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 7 * textSpacing);
-        g.drawString("Akku loppunut: "+batteryDepleatedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 8 * textSpacing);
-        g.drawString("Perillä: "+destinationReachedCount, 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 9 * textSpacing);
-        g.drawString("Yhteensä: "+cars.size(), 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 10 * textSpacing);
+        g.drawString("Valtatiellä: "+stateCount[Car.State.OnHighway.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 3 * textSpacing);
+        g.drawString("Matkalla valtatielle: "+stateCount[Car.State.OnWayToHighway.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 4 * textSpacing);
+        g.drawString("Matkalla valtatieltä: "+stateCount[Car.State.OnWayFromHighway.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 5 * textSpacing);
+        g.drawString("Matkalla laturille: "+stateCount[Car.State.OnWayToCharger.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 6 * textSpacing);
+        g.drawString("Matkalla laturilta: "+stateCount[Car.State.OnWayFromCharger.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 7 * textSpacing);
+        g.drawString("Latautumassa: "+stateCount[Car.State.Charging.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 8 * textSpacing);
+        g.drawString("Odottamassa: "+stateCount[Car.State.Waiting.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 9 * textSpacing);
+        g.drawString("Akku loppunut: "+stateCount[Car.State.BatteryDepleted.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 10 * textSpacing);
+        g.drawString("Perillä: "+stateCount[Car.State.DestinationReached.index], 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 11 * textSpacing);
+        g.drawString("Yhteensä: "+cars.size(), 1000 - INFO_AREA_WIDTH + TEXT_PADDING, TEXT_PADDING_TOP + 12 * textSpacing);
 
 
         // ROADS

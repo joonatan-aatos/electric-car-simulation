@@ -68,7 +68,7 @@ public class Car {
         hunger = 0;
         timesShopped = 0;
         stateTime = new long[9];
-        logger.log(Level.FINER, "Created car: " + this.toString());
+        logger.finer("Created car: " + this.toString());
     }
 
     public void tick(long TIME_STEP) {
@@ -97,7 +97,10 @@ public class Car {
                 driveFromHighway();
                 break;
         }
-        if (batteryLife <= 0) state = State.BatteryDepleted;
+        if (batteryLife <= 0 && state != State.BatteryDepleted) {
+            logger.severe(String.format("%s: %s", this.toString(), "Battery depleted"));
+            state = State.BatteryDepleted;
+        }
         stateTime[state.index] += timeStep;
     }
 
@@ -150,6 +153,10 @@ public class Car {
             if (bestChargingStationIndex != currentChargingStationIndex) {
                 route.getChargingStations().get(currentChargingStationIndex).removeFromQueue(index);
                 nextChargingStationIndex = bestChargingStationIndex;
+                logger.finer(String.format(
+                        "%s: %s", this.toString(), "Continue to next charger: " +
+                                route.getChargingStations().get(nextChargingStationIndex).toString()
+                ));
                 state = State.OnWayFromCharger;
             }
         }
@@ -185,18 +192,22 @@ public class Car {
             }
             ChargingStation.Charger availableCharger = station.getAvailableCharger();
             if (availableCharger == null) {
+                logger.finer(String.format(
+                        "%s: %s", this.toString(), "Going to wait at charger: " +
+                                route.getChargingStations().get(currentChargingStationIndex).toString()
+                ));
                 state = State.Waiting;
                 route.getChargingStations().get(currentChargingStationIndex).addToQueue(index);
             } else {
                 assert !availableCharger.isInUse();
                 availableCharger.setInUse(true);
                 currentCharger = availableCharger;
-                state = State.Charging;
-                logger.log(Level.FINE, String.format(
-                        "%s: %s\n", this.toString(),
+                logger.fine(String.format(
+                        "%s: %s", this.toString(),
                         "Entering charging station: " +
                                 route.getChargingStations().get(currentChargingStationIndex).toString())
                 );
+                state = State.Charging;
             }
         }
     }
@@ -265,8 +276,7 @@ public class Car {
             // If this is true, there are no more charging stations left, so the car will
             // drive until it has either reached its destination or drained its battery
             route.getChargingStationDistances().size() <= currentChargingStationIndex + 1
-        )
-        {
+        ) {
             return -1;
         }
 
@@ -393,6 +403,6 @@ public class Car {
 
     @Override
     public String toString() {
-        return String.format("Car %d (%s)", index, state.toString());
+        return String.format("Car %d (%s %.1f%%)", index, state.toString(), batteryLife/carType.capacity*100);
     }
 }

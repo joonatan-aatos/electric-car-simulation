@@ -73,8 +73,11 @@ public class Simulation implements Runnable {
             }
 
             seconds += TIME_STEP;
-            if (seconds == Long.MAX_VALUE)
-                throw new RuntimeException("Time exceeded maximum long value");
+
+            if (seconds > 360000) {
+                logger.severe("Simulation stopped by force");
+                break;
+            }
         }
 
         logger.info("Done.");

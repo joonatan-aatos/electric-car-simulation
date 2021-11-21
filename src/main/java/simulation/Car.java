@@ -364,7 +364,7 @@ public class Car {
 
         double maximumDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD);
 
-        return maximumDistance > distanceToNextChargingStation;
+        return maximumDistance > distanceToNextChargingStation + 1;
     }
 
     public double getDistanceFromHighway() {

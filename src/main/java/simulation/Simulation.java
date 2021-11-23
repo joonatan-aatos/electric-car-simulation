@@ -72,9 +72,26 @@ public class Simulation implements Runnable {
             }
 
             // Logging
+            // All cars created
             if (!carsCreatedLogged && cars.size() == TOTAL_CARS-1) {
                 logger.config(String.format("[%s]: All cars created", name));
                 carsCreatedLogged = true;
+            }
+            // Car state
+            int[] stateCount = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+            for (Car car : cars) {
+                stateCount[car.getState().index]++;
+            }
+            if (seconds % 3600 == 0) {
+                logger.config(String.format(
+                        "[%s]: Driving: %d;  Charging: %d;  Waiting: %d;  At destination: %d;  Battery depleted: %d",
+                        name,
+                        stateCount[Car.State.OnHighway.index],
+                        stateCount[Car.State.Charging.index],
+                        stateCount[Car.State.Waiting.index],
+                        stateCount[Car.State.DestinationReached.index],
+                        stateCount[Car.State.BatteryDepleted.index]
+                ));
             }
 
             seconds += TIME_STEP;

@@ -7,13 +7,14 @@ import visualizer.Visualizer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.logging.*;
 
 public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 3;
+    private static final int REPEAT_COUNT = 5;
     private static final int MAX_CAR_COUNT = 2000;
     private static final int MIN_CAR_COUNT = 2000;
     private static final int CAR_COUNT_CHANGE = 1;
@@ -69,13 +70,18 @@ public class CarSimulation {
         @Override
         public void run() {
             while (true) {
-                if (simulations.size() <= 0)
-                    return;
-                Simulation simulation = simulations.remove(0);
-                simulation.start();
-                // Export simulation statistics
-                Statistics statistics = new Statistics(simulation);
-                //statistics.export("statistics.csv");
+                try {
+                    if (simulations.size() <= 0)
+                        return;
+                    Simulation simulation = simulations.remove(0);
+                    simulation.start();
+                    // Export simulation statistics
+                    Statistics statistics = new Statistics(simulation);
+                    //statistics.export("statistics.csv");
+                } catch (ConcurrentModificationException | NullPointerException | ArrayIndexOutOfBoundsException e) {
+                    logger.warning("Exception caught: "+e.getLocalizedMessage());
+                    e.printStackTrace();
+                }
             }
         }
     }

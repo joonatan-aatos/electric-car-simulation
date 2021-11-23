@@ -94,7 +94,22 @@ public class ChargingStation implements Cloneable {
     }
 
     public int getNextInQueue() {
-        return queue.size() > 0 ? queue.get(0) : -1;
+        try {
+            if (queue.size() > 0) {
+                Integer i = queue.get(0);
+                if (i == null) {
+                    System.out.println("bruh");
+                    int i2 = queue.get(0);
+                    System.out.println(i2);
+                }
+                i.toString();
+            }
+            return queue.size() > 0 ? queue.get(0) : -1;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            System.exit(-1);
+            return -1;
+        }
     }
 
     public void addToQueue(int carIndex) {

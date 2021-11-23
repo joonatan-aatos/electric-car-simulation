@@ -3,7 +3,7 @@ package simulation;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ChargingStation {
+public class ChargingStation implements Cloneable {
 
     public enum ChargerType {
         Type2,
@@ -14,7 +14,7 @@ public class ChargingStation {
         Tyomaapistoke
     }
 
-    public class Charger implements Comparable {
+    public class Charger implements Comparable, Cloneable {
         private final int power;
         private boolean inUse;
         private ChargerType type;
@@ -66,7 +66,7 @@ public class ChargingStation {
     private final String name;
     private final ArrayList<Integer> queue;
 
-    public ChargingStation(String name_, double distance_, double distanceFromHighway_, ArrayList<Integer> powers, ArrayList<ChargerType> types, boolean[] amenities) {
+    public ChargingStation(String name_, double distance_, double distanceFromHighway_, boolean[] amenities) {
         name = name_;
         distance = distance_;
         distanceFromHighway = distanceFromHighway_;
@@ -74,10 +74,6 @@ public class ChargingStation {
         hasFood = amenities[1];
         customerExclusive = amenities[2];
         chargers = new ArrayList<>();
-        for (int i = 0; i < powers.size(); i++) {
-            chargers.add(new Charger(powers.get(i), types.get(i)));
-        }
-        Collections.sort(chargers);
         queue = new ArrayList<>();
     }
 
@@ -133,6 +129,10 @@ public class ChargingStation {
         return customerExclusive;
     }
 
+    public void sortChargers() {
+        Collections.sort(chargers);
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
@@ -141,5 +141,21 @@ public class ChargingStation {
             s.append(charger.toString());
         }
         return s.toString();
+    }
+
+    @Override
+    public ChargingStation clone() {
+        ChargingStation clone = new ChargingStation(
+                name,
+                distance,
+                distanceFromHighway,
+                new boolean[]{hasShop, hasFood, customerExclusive}
+        );
+
+        for (Charger charger : chargers) {
+            clone.addCharger(charger.getPower(), charger.getType());
+        }
+
+        return clone;
     }
 }

@@ -17,7 +17,8 @@ public class Visualizer {
     private boolean showCities = true;
     private int carColorCodeIndex = 0;
 
-    private final double LENGTH_OF_ROUTES = Routes.routes.values().stream().mapToDouble(Route::getLength).sum();
+    private final Routes routes;
+    private final double LENGTH_OF_ROUTES;
     private final int BAR_PADDING = 30;
     private final int BAR_WIDTH = 8;
     private final int BAR_HEIGHT = 1000-2*BAR_PADDING;
@@ -55,8 +56,11 @@ public class Visualizer {
         }
     }
 
-    public Visualizer(Simulation simulation_) {
+    public Visualizer(Simulation simulation_, Routes routes_) {
+        routes = routes_;
         simulation = simulation_;
+
+        LENGTH_OF_ROUTES = routes.routes.values().stream().mapToDouble(Route::getLength).sum();
 
         frame = new JFrame("Simulaatio");
         frame.setSize(800, 800);
@@ -65,7 +69,7 @@ public class Visualizer {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         canvas = new Canvas();
-        wholeRoute = Route.generateShortestRoute2(EndPoint.Helsinki, EndPoint.Utsjoki);
+        wholeRoute = routes.generateShortestRoute2(EndPoint.Helsinki, EndPoint.Utsjoki);
 
         optionsComponents = SwingHelper.getOptionsPanel(
                 actionEvent -> {
@@ -134,17 +138,11 @@ public class Visualizer {
 
     public void drawRouteBar(Graphics2D g) {
 
-        final HashMap<String, Route> routes = Routes.routes;
-        final ArrayList<String> routeKeys = Routes.routeKeys;
-
         g.setColor(Palette.PrimaryLight.getColor());
         g.fillRect(BAR_PADDING, BAR_PADDING, BAR_WIDTH, BAR_HEIGHT);
     }
 
     public void drawCities(Graphics2D g) {
-
-        final HashMap<String, Route> routes = Routes.routes;
-        final ArrayList<String> routeKeys = Routes.routeKeys;
 
         double subRouteLength = 0;
         g.setColor(Palette.Secondary.getColor());
@@ -157,12 +155,12 @@ public class Visualizer {
                 END_POINT_DIAMETER
         );
         g.drawString(
-                routes.get(routeKeys.get(0)).getStartPoint().toString(),
+                routes.routes.get(routes.routeKeys.get(0)).getStartPoint().toString(),
                 NAME_X_COORDINATE,
                 1000 - BAR_PADDING - (int) (subRouteLength / LENGTH_OF_ROUTES * BAR_HEIGHT) + END_POINT_DIAMETER / 2 + 3
         );
-        for (String routeKey : routeKeys) {
-            Route route = routes.get(routeKey);
+        for (String routeKey : routes.routeKeys) {
+            Route route = routes.routes.get(routeKey);
             subRouteLength += route.getLength();
             g.fillOval(
                     BAR_PADDING+BAR_WIDTH / 2 - END_POINT_DIAMETER / 2,
@@ -203,15 +201,15 @@ public class Visualizer {
             if (goingUp) {
                 double startDistance = 0;
                 for (int i = 0; i < route.getStartPoint().index; i++) {
-                    startDistance += Routes.routes.get(Routes.routeKeys.get(i)).getLength();
+                    startDistance += routes.routes.get(routes.routeKeys.get(i)).getLength();
                 }
                 double distance = car.getDrivenDistance() + startDistance;
                 carYCoordinate = 1000 - BAR_PADDING - (int) (distance / LENGTH_OF_ROUTES * BAR_HEIGHT) - CAR_DIAMETER / 2;
             }
             else {
                 double startDistance = 0;
-                for (int i = route.getStartPoint().index; i < Routes.routeKeys.size(); i++) {
-                    startDistance += Routes.routes.get(Routes.routeKeys.get(i)).getLength();
+                for (int i = route.getStartPoint().index; i < routes.routeKeys.size(); i++) {
+                    startDistance += routes.routes.get(routes.routeKeys.get(i)).getLength();
                 }
                 double distance = car.getDrivenDistance() + startDistance;
                 carYCoordinate = BAR_PADDING + (int) (distance / LENGTH_OF_ROUTES * BAR_HEIGHT) - CAR_DIAMETER / 2;
@@ -341,9 +339,9 @@ public class Visualizer {
 
         // ROADS
         int[] chargersInUse = {0, 0, 0, 0, 0, 0};
-        for (int i = 0; i < Routes.routeKeys.size(); i++) {
-            String key = Routes.routeKeys.get(i);
-            for (ChargingStation station : Routes.routes.get(key).getChargingStations()) {
+        for (int i = 0; i < routes.routeKeys.size(); i++) {
+            String key = routes.routeKeys.get(i);
+            for (ChargingStation station : routes.routes.get(key).getChargingStations()) {
                 for (ChargingStation.Charger charger : station.getChargers()) {
                     if (charger.isInUse()) {
                         chargersInUse[i]++;
@@ -366,9 +364,9 @@ public class Visualizer {
                 }
             }
         }
-        for (int i = 0; i < Routes.routeKeys.size(); i++) {
-            String key = Routes.routeKeys.get(i);
-            Route route = Routes.routes.get(key);
+        for (int i = 0; i < routes.routeKeys.size(); i++) {
+            String key = routes.routeKeys.get(i);
+            Route route = routes.routes.get(key);
             String routeName = route.getStartPoint().toString() + " - " + route.getEndPoint().toString();
             int xCoordinate = 1000 - INFO_AREA_WIDTH + TEXT_PADDING + i / 3 * 350;
             g.setFont(new Font("arial", Font.BOLD, 24));

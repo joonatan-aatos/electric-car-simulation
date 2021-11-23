@@ -46,8 +46,6 @@ public class RoadData {
                             data[0],
                             Double.parseDouble(data[1]),
                             Double.parseDouble(data[2]),
-                            new ArrayList<>(),
-                            new ArrayList<>(),
                             new boolean[]{data[6].equals("1"), data[7].equals("1"), data[8].equals("1")}
                     );
                 }
@@ -74,10 +72,13 @@ public class RoadData {
                         throw new IllegalArgumentException(String.format("Illegal charger type at line %s in file %s: \"%s\"", lineNumber, path, data[5]));
                 }
 
+                assert lastStation != null;
+
                 for (int i = 0; i < Integer.parseInt(data[4]); i++) {
                     lastStation.addCharger(Integer.parseInt(data[3]), type);
                 }
 
+                lastStation.sortChargers();
                 lastAppearingName = data[0];
                 lineNumber++;
             }

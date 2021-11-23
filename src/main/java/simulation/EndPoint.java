@@ -17,10 +17,10 @@ public enum EndPoint {
     public final int index;
     public final double maxDistanceFromStartPoint;
 
-    public ArrayList<Route> getConnectedRoutes() {
+    public ArrayList<Route> getConnectedRoutes(Routes routes) {
         if (connectedRoutes.size() == 0) {
             for (String id : connectedRouteIDs) {
-                connectedRoutes.add(Routes.routes.get(id));
+                connectedRoutes.add(routes.routes.get(id));
             }
         }
         return connectedRoutes;

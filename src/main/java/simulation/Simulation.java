@@ -11,17 +11,22 @@ public class Simulation implements Runnable {
     private long seconds;
     private final long TIME_STEP = 10; // simulationSeconds / realSeconds
     private int tps;
-    private final int NORM_DIST_MEAN = 14400;
-    private final int NORM_DIST_STANDARD_DEVIATION = 3600;
+    private final int NORM_DIST_MEAN;
+    private final int NORM_DIST_STANDARD_DEVIATION;
     private final int TOTAL_CARS;
     private final boolean shouldWait;
+    private final Routes routes;
+    private final String name;
 
     private double cumulativeDistributionCounter = 0;
 
-    public Simulation(boolean shouldWait_, int carCount) {
-        Routes.generateRoutes();
+    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_) {
+        name = name_;
+        routes = routes_ != null ? routes_ : new Routes();
         createCars();
         TOTAL_CARS = carCount;
+        NORM_DIST_STANDARD_DEVIATION = standardDeviation;
+        NORM_DIST_MEAN = mean;
         tps = 100;
         shouldWait = shouldWait_;
     }
@@ -31,7 +36,7 @@ public class Simulation implements Runnable {
     }
 
     public void start() {
-        logger.info("Starting...");
+        logger.info(String.format("[%s]: Starting...", name));
 
         seconds = 0;
 
@@ -53,7 +58,7 @@ public class Simulation implements Runnable {
             cumulativeDistributionCounter += distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP;
             while (cumulativeDistributionCounter >= 1) {
                 Car car = new Car(CarType.TESLAMOTORS_MODEL3, cars.size());
-                car.setRoute(Route.generateRandomRoute());
+                car.setRoute(routes.generateRandomRoute());
                 cars.add(car);
                 cumulativeDistributionCounter -= 1;
             }
@@ -68,19 +73,19 @@ public class Simulation implements Runnable {
 
             // Logging
             if (!carsCreatedLogged && cars.size() == TOTAL_CARS-1) {
-                logger.config("All cars created");
+                logger.config(String.format("[%s]: All cars created", name));
                 carsCreatedLogged = true;
             }
 
             seconds += TIME_STEP;
 
-            if (seconds > 360000) {
-                logger.severe("Simulation stopped by force");
+            if (seconds > 720000) {
+                logger.severe(String.format("[%s]: Simulation stopped by force", name));
                 break;
             }
         }
 
-        logger.info("Done.");
+        logger.info(String.format("[%s]: Done.", name));
     }
 
     private double distributionProbability() {
@@ -112,6 +117,14 @@ public class Simulation implements Runnable {
         return cars;
     }
 
+    public Routes getRoutes() {
+        return routes;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public void run() {
         start();
@@ -121,7 +134,7 @@ public class Simulation implements Runnable {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\nALL ROUTES\n\n");
-        ArrayList<Route> allRoutes = new ArrayList<>(Routes.routes.values());
+        ArrayList<Route> allRoutes = new ArrayList<>(routes.routes.values());
         for (Route route : allRoutes) {
             stringBuilder.append(route.toString()).append("\n");
         }

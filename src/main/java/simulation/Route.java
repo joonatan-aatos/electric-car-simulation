@@ -97,7 +97,10 @@ public class Route {
     public Route getFlippedRoute(Routes routes) {
 
         Route route = this;
-        ArrayList<ChargingStation> newChargingStations = (ArrayList<ChargingStation>) route.chargingStations.clone();
+        ArrayList<ChargingStation> newChargingStations = route.chargingStations.stream()
+            .map(ChargingStation::createNew)
+            .collect(Collectors.toCollection(ArrayList::new));
+
         ArrayList<Route> newRootRoutes = route.getRootRoutes();
         Collections.reverse(newChargingStations);
         if (newRootRoutes != null)
@@ -165,20 +168,5 @@ public class Route {
             s.append("\n");
         }
         return s.toString();
-    }
-
-    public Route clone(Routes newRoutes) {
-        ArrayList<ChargingStation> newChargingStations = new ArrayList<>();
-        for (ChargingStation station : chargingStations) {
-            newChargingStations.add(station.clone());
-        }
-        return new Route(
-                newRoutes,
-                name,
-                length,
-                newChargingStations,
-                startPoint,
-                endPoint
-        );
     }
 }

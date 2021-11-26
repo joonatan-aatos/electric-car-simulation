@@ -2,8 +2,9 @@ package simulation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
-public class ChargingStation implements Cloneable {
+public class ChargingStation {
 
     public enum ChargerType {
         Type2,
@@ -14,7 +15,7 @@ public class ChargingStation implements Cloneable {
         Tyomaapistoke
     }
 
-    public class Charger implements Comparable, Cloneable {
+    public class Charger implements Comparable {
         private final int power;
         private boolean inUse;
         private ChargerType type;
@@ -158,19 +159,9 @@ public class ChargingStation implements Cloneable {
         return s.toString();
     }
 
-    @Override
-    public ChargingStation clone() {
-        ChargingStation clone = new ChargingStation(
-                name,
-                distance,
-                distanceFromHighway,
-                new boolean[]{hasShop, hasFood, customerExclusive}
-        );
-
-        for (Charger charger : chargers) {
-            clone.addCharger(charger.getPower(), charger.getType());
-        }
-
-        return clone;
+    public ChargingStation createNew() {
+        ChargingStation chargingStation = new ChargingStation(name, distance, distanceFromHighway, new boolean[] {hasShop, hasFood, customerExclusive});
+        chargers.forEach(charger -> chargingStation.addCharger(charger.getPower(), charger.getType()));
+        return chargingStation;
     }
 }

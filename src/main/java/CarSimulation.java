@@ -29,10 +29,10 @@ public class CarSimulation {
         dir.mkdirs();
         configureLogger();
 
-        Routes routes = new Routes();
-        routes.generateRoutes();
-
         if (showUI) {
+            Routes routes = new Routes();
+            routes.generateRoutes();
+
             Simulation simulation = new Simulation("visualized", routes, 1000, 3600, 14400, true);
             Visualizer visualizer = showUI ? new Visualizer(simulation, routes) : null;
             Thread simulationThread = new Thread(simulation);
@@ -47,7 +47,10 @@ public class CarSimulation {
         else {
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
                 for (int i = 0; i < REPEAT_COUNT; i++) {
-                    simulations.add(new Simulation(String.format("r%d-%d", i, carCount), routes.clone(), carCount, 3600, 14400, false));
+                    Routes routes = new Routes();
+                    routes.generateRoutes();
+
+                    simulations.add(new Simulation(String.format("r%d-%d", i, carCount), routes, carCount, 3600, 14400, false));
                 }
             }
 

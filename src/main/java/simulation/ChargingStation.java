@@ -65,7 +65,7 @@ public class ChargingStation {
     private final ArrayList<Charger> chargers;
     private final boolean hasShop, hasFood, customerExclusive;
     private final String name;
-    private final ArrayList<Integer> queue;
+    private final ThreadLocal<List<Integer>> queue;
 
     public ChargingStation(String name_, double distance_, double distanceFromHighway_, boolean[] amenities) {
         name = name_;
@@ -75,7 +75,7 @@ public class ChargingStation {
         hasFood = amenities[1];
         customerExclusive = amenities[2];
         chargers = new ArrayList<>();
-        queue = new ArrayList<>();
+        queue = ThreadLocal.withInitial(ArrayList::new);
     }
 
     public void addCharger(int power, ChargerType type) {
@@ -91,21 +91,21 @@ public class ChargingStation {
     }
 
     public int getQueueLength() {
-        return queue.size();
+        return queue.get().size();
     }
 
     public int getNextInQueue() {
         try {
-            if (queue.size() > 0) {
-                Integer i = queue.get(0);
+            if (queue.get().size() > 0) {
+                Integer i = queue.get().get(0);
                 if (i == null) {
                     System.out.println("bruh");
-                    int i2 = queue.get(0);
+                    int i2 = queue.get().get(0);
                     System.out.println(i2);
                 }
                 i.toString();
             }
-            return queue.size() > 0 ? queue.get(0) : -1;
+            return queue.get().size() > 0 ? queue.get().get(0) : -1;
         } catch (NullPointerException e) {
             e.printStackTrace();
             System.exit(-1);
@@ -114,11 +114,11 @@ public class ChargingStation {
     }
 
     public void addToQueue(int carIndex) {
-        queue.add(carIndex);
+        queue.get().add(carIndex);
     }
 
     public void removeFromQueue(int carIndex) {
-        queue.remove(Integer.valueOf(carIndex));
+        queue.get().remove(Integer.valueOf(carIndex));
     }
 
     public double getDistance() {

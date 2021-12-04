@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class Routes implements Cloneable {
+public class Routes {
     private final Logger logger = Logger.getGlobal();
 
     public HashMap<String, Route> routes = new HashMap<>();
@@ -377,19 +377,5 @@ public class Routes implements Cloneable {
         }
 
         return new Route(this, rootRoutes, startingPoint);
-    }
-
-    @Override
-    public Routes clone() {
-        try {
-            Routes clone = (Routes) super.clone();
-            clone.routes = new HashMap<>();
-            for (String key : routes.keySet()) {
-                clone.routes.put(key, routes.get(key).clone(clone));
-            }
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
     }
 }

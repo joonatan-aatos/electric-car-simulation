@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.*;
 
 public class CarSimulation {
@@ -16,8 +18,8 @@ public class CarSimulation {
 
     private static final int REPEAT_COUNT = 5;
     private static final int MAX_CAR_COUNT = 2000;
-    private static final int MIN_CAR_COUNT = 2000;
-    private static final int CAR_COUNT_CHANGE = 1;
+    private static final int MIN_CAR_COUNT = 1000;
+    private static final int CAR_COUNT_CHANGE = 1000;
 
     private static final int THREAD_COUNT = 8;
     private static final ArrayList<Thread> threads = new ArrayList<>();
@@ -26,7 +28,9 @@ public class CarSimulation {
     public static void main(String[] args) throws InterruptedException {
         boolean showUI = false;
         File dir = new File("./output");
-        dir.mkdirs();
+        if (!dir.mkdirs()) {
+            purgeDirectory(dir);
+        }
         configureLogger();
 
         if (showUI) {
@@ -49,13 +53,15 @@ public class CarSimulation {
                 for (int i = 0; i < REPEAT_COUNT; i++) {
                     Routes routes = new Routes();
                     routes.generateRoutes();
-
-                    simulations.add(new Simulation(String.format("r%d-%d", i, carCount), routes, carCount, 3600, 14400, false));
+                    simulations.add(new Simulation(String.format("r%d-c%d", i+1, carCount), routes, carCount, 3600, 14400, false));
                 }
             }
 
+            final int simulationCount = simulations.size();
+            logger.info("Total simulation count: " + simulationCount);
+
             for (int i = 0; i < THREAD_COUNT; i++) {
-                Thread thread = new Thread(new SimulationThread());
+                Thread thread = new Thread(new SimulationThread(simulations.subList(i*simulationCount/THREAD_COUNT, (i+1)*simulationCount/THREAD_COUNT)));
                 thread.start();
                 threads.add(thread);
             }
@@ -70,22 +76,32 @@ public class CarSimulation {
 
     private static class SimulationThread implements Runnable {
 
+        private final ThreadLocal<List<Simulation>> localSimulations;
+        public SimulationThread (List<Simulation> simulations_) {
+            localSimulations = ThreadLocal.withInitial(() -> new ArrayList<>(simulations_));
+        }
+
         @Override
         public void run() {
-            while (true) {
+            while (localSimulations.get().size() > 0) {
                 try {
-                    if (simulations.size() <= 0)
-                        return;
-                    Simulation simulation = simulations.remove(0);
+                    Simulation simulation = localSimulations.get().remove(0);
                     simulation.start();
                     // Export simulation statistics
                     Statistics statistics = new Statistics(simulation);
-                    //statistics.export("statistics.csv");
+                    statistics.export(String.format("%s-statistics.csv", simulation.getName()));
                 } catch (ConcurrentModificationException | NullPointerException | ArrayIndexOutOfBoundsException e) {
                     logger.warning("Exception caught: "+e.getLocalizedMessage());
-                    e.printStackTrace();
                 }
             }
+        }
+    }
+
+    private static void purgeDirectory(File dir) {
+        for (File file: Objects.requireNonNull(dir.listFiles())) {
+            if (file.isDirectory())
+                purgeDirectory(file);
+            file.delete();
         }
     }
 

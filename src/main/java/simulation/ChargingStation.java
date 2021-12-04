@@ -95,22 +95,7 @@ public class ChargingStation {
     }
 
     public int getNextInQueue() {
-        try {
-            if (queue.get().size() > 0) {
-                Integer i = queue.get().get(0);
-                if (i == null) {
-                    System.out.println("bruh");
-                    int i2 = queue.get().get(0);
-                    System.out.println(i2);
-                }
-                i.toString();
-            }
-            return queue.get().size() > 0 ? queue.get().get(0) : -1;
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            System.exit(-1);
-            return -1;
-        }
+        return queue.get().size() > 0 ? queue.get().get(0) : -1;
     }
 
     public void addToQueue(int carIndex) {

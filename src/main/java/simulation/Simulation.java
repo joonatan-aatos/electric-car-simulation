@@ -36,7 +36,7 @@ public class Simulation implements Runnable {
     }
 
     public void start() {
-        logger.info(String.format("[%s]: Starting...", name));
+        logger.config(String.format("[%s]: Starting...", name));
 
         seconds = 0;
 

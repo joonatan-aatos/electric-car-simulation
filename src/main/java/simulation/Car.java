@@ -35,14 +35,14 @@ public class Car {
 
     public enum State {
         OnHighway(0),
-        OnWayToCharger(1),
-        OnWayFromCharger(2),
-        Waiting(3),
-        DestinationReached(4),
-        BatteryDepleted(5),
+        OnWayToHighway(1),
+        OnWayFromHighway(2),
+        OnWayToCharger(3),
+        OnWayFromCharger(4),
         Charging(6),
-        OnWayToHighway(7),
-        OnWayFromHighway(8);
+        Waiting(5),
+        BatteryDepleted(7),
+        DestinationReached(8);
 
         public final int index;
 

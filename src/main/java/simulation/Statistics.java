@@ -29,12 +29,18 @@ public class Statistics {
     private final long[] stateStatistics; // seconds
     private final long totalTime; // seconds
     private ArrayList<CarStatistics> carStatistics;
+    private ArrayList<int[][]> stateStatisticsOverTime;
+    private ArrayList<int[]> globalStateStatisticsOverTime;
+    private final long timeStep;
 
     public Statistics (Simulation simulation) {
         trafficStatistics = new int[6];
         stateStatistics = new long[9];
         carStatistics = new ArrayList<>();
         totalTime = simulation.getPassedSeconds();
+        timeStep = simulation.getTimeStep();
+        stateStatisticsOverTime = simulation.getStateStatisticsOverTime();
+        globalStateStatisticsOverTime = simulation.getGlobalStateStatisticsOverTime();
 
         ArrayList<Car> cars = simulation.getCars();
         totalCars = cars.size();
@@ -73,34 +79,49 @@ public class Statistics {
 
     public String toCSV() {
         StringBuilder s = new StringBuilder();
-        s.append("Total cars: ;").append(totalCars).append("\n");
-        s.append("Total time (s): ;").append(totalTime).append("\n\n");
+        s.append("Autojen lukumäärä: ;").append(totalCars).append("\n");
+        s.append("Kulunut aika (s): ;").append(totalTime).append("\n\n");
 
         // State statistics
         long totalStateTime = LongStream.of(stateStatistics).sum() - stateStatistics[4];
         Car.State[] states = Car.State.values();
-        s.append("Average state statistics:\n");
+        s.append("Keskimääräinen auton tila:\n");
 
-        s.append("State;Time (min/car);Percentage\n");
+        s.append("Tila;Aika (min/auto);Prosenttiosuus\n");
         for (int i = 0; i < states.length; i++) {
             if (i == 4)
                 continue;
             s.append(states[i].toString()).append(";").append((double) stateStatistics[i] / (double) (totalCars*60L) + ";").append((double) stateStatistics[i] / (double) totalStateTime * 100d + "").append("\n");
         }
         s.append("\n\n");
-        s.append(String.format("Total time driving; %.0f; min/car\n", (double) totalStateTime / (double) (totalCars*60L)));
+        s.append(String.format("Ajamiseen kulunut aika; %.0f; min/auto\n", (double) totalStateTime / (double) (totalCars*60L)));
 
 
         // Traffic statistics
         int totalTraffic = Arrays.stream(trafficStatistics).sum();
-        s.append("\nTraffic statics:\n");
+        s.append("\nLiikennetilastot:\n");
         s.append("HeLa;").append(trafficStatistics[0]).append(String.format(";%.1f", (double) trafficStatistics[0] / (double) totalTraffic * 100d)).append("\n");
         s.append("LaJy;").append(trafficStatistics[1]).append(String.format(";%.1f", (double) trafficStatistics[1] / (double) totalTraffic * 100d)).append("\n");
         s.append("JyOu;").append(trafficStatistics[2]).append(String.format(";%.1f", (double) trafficStatistics[2] / (double) totalTraffic * 100d)).append("\n");
         s.append("OuKe;").append(trafficStatistics[3]).append(String.format(";%.1f", (double) trafficStatistics[3] / (double) totalTraffic * 100d)).append("\n");
         s.append("KeRo;").append(trafficStatistics[4]).append(String.format(";%.1f", (double) trafficStatistics[4] / (double) totalTraffic * 100d)).append("\n");
         s.append("RoUt;").append(trafficStatistics[5]).append(String.format(";%.1f", (double) trafficStatistics[5] / (double) totalTraffic * 100d)).append("\n");
-        s.append("\n");
+        s.append("\n\n");
+
+
+        // State stats over time
+        s.append("Autojen tila joka ajanhetkeltä:\n");
+        s.append("Aika (min);Valtatiellä;Matkalla valtatielle;Matkalla valtatieltä;Matkalla laturille;Matkalla laturilta;Latautumassa;Odottamassa;Akku loppunut;Perillä;Yhteensä\n");
+        for (int i = 0; i < globalStateStatisticsOverTime.size(); i+=30) {
+            s.append(i/6);
+            int sum = 0;
+            for (int carCount : globalStateStatisticsOverTime.get(i)) {
+                s.append(";").append(carCount);
+                sum += carCount;
+            }
+            s.append(";").append(sum).append("\n");
+        }
+
         return s.toString();
     }
 

@@ -9,7 +9,7 @@ public class Simulation implements Runnable {
 
     ArrayList<Car> cars;
     private long seconds;
-    private final long TIME_STEP = 10; // simulationSeconds / realSeconds
+    private final long TIME_STEP = 10; // seconds
     private int tps;
     private final int NORM_DIST_MEAN;
     private final int NORM_DIST_STANDARD_DEVIATION;
@@ -17,6 +17,8 @@ public class Simulation implements Runnable {
     private final boolean shouldWait;
     private final Routes routes;
     private final String name;
+    private final ArrayList<int[][]> stateStatisticsOverTime;
+    private final ArrayList<int[]> globalStateStatisticsOverTime;
 
     private double cumulativeDistributionCounter = 0;
 
@@ -29,6 +31,8 @@ public class Simulation implements Runnable {
         NORM_DIST_MEAN = mean;
         tps = 100;
         shouldWait = shouldWait_;
+        stateStatisticsOverTime = new ArrayList<>();
+        globalStateStatisticsOverTime = new ArrayList<>();
     }
 
     private void createCars() {
@@ -51,9 +55,34 @@ public class Simulation implements Runnable {
         boolean carsCreatedLogged = false;
 
         while (!allCarsHaveReachedTheirDestination() || seconds < NORM_DIST_MEAN) {
+
+            int[] globalStateStatistics = new int[Car.State.values().length];
+            int[][] stateStatistics = new int[routes.routeKeys.size()][Car.State.values().length];
+            for (int i = 0; i < stateStatistics.length; i++) {
+                for (int j = 0; j < stateStatistics[0].length; j++) {
+                    stateStatistics[i][j] = 0;
+                }
+            }
             for (Car car : cars) {
                 car.tick(TIME_STEP);
+
+                // Collecting stats
+                globalStateStatistics[car.getState().index]++;
+                if (car.getState() != Car.State.DestinationReached) {
+                    ArrayList<Route> rootRoutes = car.getRoute().getRootRoutes();
+                    double drivenDistance = car.getDrivenDistance();
+                    for (Route rootRoute : rootRoutes) {
+                        drivenDistance -= rootRoute.getLength();
+                        if (drivenDistance < 0) {
+                            int index = Math.min(rootRoute.getStartPoint().index, rootRoute.getEndPoint().index);
+                            stateStatistics[index][car.getState().index]++;
+                            break;
+                        }
+                    }
+                }
             }
+            stateStatisticsOverTime.add(stateStatistics);
+            globalStateStatisticsOverTime.add(globalStateStatistics);
 
             cumulativeDistributionCounter += distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP;
             while (cumulativeDistributionCounter >= 1) {
@@ -76,22 +105,6 @@ public class Simulation implements Runnable {
             if (!carsCreatedLogged && cars.size() == TOTAL_CARS-1) {
                 logger.config(String.format("[%s]: All cars created", name));
                 carsCreatedLogged = true;
-            }
-            // Car state
-            int[] stateCount = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-            for (Car car : cars) {
-                stateCount[car.getState().index]++;
-            }
-            if (seconds % 3600 == 0) {
-                logger.config(String.format(
-                        "[%s]: Driving: %d;  Charging: %d;  Waiting: %d;  At destination: %d;  Battery depleted: %d",
-                        name,
-                        stateCount[Car.State.OnHighway.index],
-                        stateCount[Car.State.Charging.index],
-                        stateCount[Car.State.Waiting.index],
-                        stateCount[Car.State.DestinationReached.index],
-                        stateCount[Car.State.BatteryDepleted.index]
-                ));
             }
 
             seconds += TIME_STEP;
@@ -130,6 +143,10 @@ public class Simulation implements Runnable {
         return tps;
     }
 
+    public long getTimeStep() {
+        return TIME_STEP;
+    }
+
     public ArrayList<Car> getCars() {
         return cars;
     }
@@ -140,6 +157,14 @@ public class Simulation implements Runnable {
 
     public String getName() {
         return name;
+    }
+
+    public ArrayList<int[][]> getStateStatisticsOverTime() {
+        return stateStatisticsOverTime;
+    }
+
+    public ArrayList<int[]> getGlobalStateStatisticsOverTime() {
+        return globalStateStatisticsOverTime;
     }
 
     @Override

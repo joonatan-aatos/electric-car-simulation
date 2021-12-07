@@ -107,6 +107,7 @@ public class CarSimulation {
                     printState();
                 } catch (ConcurrentModificationException | NullPointerException | ArrayIndexOutOfBoundsException e) {
                     logger.warning("Exception caught: "+e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
             }
         }

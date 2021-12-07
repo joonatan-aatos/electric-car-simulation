@@ -5,7 +5,6 @@ import simulation.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Visualizer {
 
@@ -227,9 +226,9 @@ public class Visualizer {
                     } else if (car.getState() == Car.State.DestinationReached) {
                         g.setColor(new Color(255, 255, 255));
                     } else {
-                        double batteryPercentage = car.getBatteryLife() / car.getCarType().capacity;
-                        int red = batteryPercentage > 0.5 ? 255 - (int) (car.getBatteryLife() / car.getCarType().capacity / 2 * 255) : 255;
-                        int green = batteryPercentage > 0.5 ? 255 : (int) (car.getBatteryLife() / car.getCarType().capacity * 2 * 255);
+                        double batteryPercentage = car.getBattery() / car.getCarType().capacity;
+                        int red = batteryPercentage > 0.5 ? 255 - (int) (car.getBattery() / car.getCarType().capacity / 2 * 255) : 255;
+                        int green = batteryPercentage > 0.5 ? 255 : (int) (car.getBattery() / car.getCarType().capacity * 2 * 255);
                         g.setColor(new Color(red, green, 0, CAR_OPACITY));
                     }
                     break;

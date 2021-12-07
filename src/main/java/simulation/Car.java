@@ -20,7 +20,7 @@ public class Car {
     private double hunger; // In seconds since last eaten
     private double timesShopped;
     private double timeSpentCharging;
-    private double batteryLife;
+    private double battery;
     private double drivenDistance;
     private double distanceFromHighway;
     private double drivingSpeed;
@@ -54,7 +54,7 @@ public class Car {
         carType = carType_;
         index = index_;
 
-        batteryLife = carType.capacity;
+        battery = carType.capacity;
 
         drivenDistance = 0;
         drivingSpeed = SPEED_ON_HIGHWAY;
@@ -96,7 +96,7 @@ public class Car {
                 driveFromHighway();
                 break;
         }
-        if (batteryLife <= 0 && state != State.BatteryDepleted) {
+        if (battery <= 0 && state != State.BatteryDepleted) {
             logger.severe(String.format("%s: %s", this.toString(), "Battery depleted"));
             state = State.BatteryDepleted;
         }
@@ -106,7 +106,7 @@ public class Car {
     public void driveToHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway -= deltaDistance;
-        batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.drivingEfficiency / 100;
 
         if (distanceFromHighway <= 0) {
             distanceFromHighway = 0;
@@ -117,7 +117,7 @@ public class Car {
     public void driveFromHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway += deltaDistance;
-        batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.drivingEfficiency / 100;
 
         if (distanceFromHighway >= destinationDistanceFromEndPoint) {
             state = State.DestinationReached;
@@ -163,26 +163,26 @@ public class Car {
 
     public void charge() {
         timeSpentCharging += timeStep;
-        if (batteryLife >= carType.capacity) {
+        if (battery >= carType.capacity) {
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood() && timeSpentCharging < EATING_DURATION ) {
                 return;
             }
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood()) {
                 hunger = 0;
             }
-            batteryLife = carType.capacity;
+            battery = carType.capacity;
             currentCharger.setInUse(false);
             currentCharger = null;
             state = State.OnWayFromCharger;
         } else {
-            batteryLife += Math.min(carType.maxChargingPowerAC, currentCharger.getPower()) * (timeStep / 3600d);
+            battery += Math.min(carType.maxChargingPowerAC, currentCharger.getPower()) * (timeStep / 3600d);
         }
     }
 
     public void driveToStation() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway += deltaDistance;
-        batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.drivingEfficiency / 100;
 
         ChargingStation station = route.getChargingStations().get(currentChargingStationIndex);
         if (distanceFromHighway >= station.getDistanceFromHighway()) {
@@ -214,7 +214,7 @@ public class Car {
     public void driveFromStation() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway -= deltaDistance;
-        batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.drivingEfficiency / 100;
 
         if (distanceFromHighway <= 0) {
             if (nextChargingStationIndex != -1) {
@@ -234,7 +234,7 @@ public class Car {
     public void driveOnHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         drivenDistance += deltaDistance;
-        batteryLife -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.drivingEfficiency / 100;
 
         if (drivenDistance >= route.getLength()) {
             state = State.OnWayFromHighway;
@@ -262,8 +262,8 @@ public class Car {
      */
     private int calculateNextChargingStationIndex() {
 
-        double optimalDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
-        double maximumDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
+        double optimalDistance = battery / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
+        double maximumDistance = battery / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
 
         canReachDestination = maximumDistance > route.getLength() + destinationDistanceFromEndPoint;
         if (canReachDestination) {
@@ -361,7 +361,7 @@ public class Car {
                 nextChargingStationDistance - currentChargingStationDistance +
                 currentChargingStation.getDistanceFromHighway();
 
-        double maximumDistance = batteryLife / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD);
+        double maximumDistance = battery / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD);
 
         return maximumDistance > distanceToNextChargingStation + 1;
     }
@@ -392,8 +392,8 @@ public class Car {
         return state;
     }
 
-    public double getBatteryLife() {
-        return batteryLife;
+    public double getBattery() {
+        return battery;
     }
 
     public long[] getStateTime() {
@@ -402,6 +402,6 @@ public class Car {
 
     @Override
     public String toString() {
-        return String.format("Car %d (%s %.1f%%)", index, state.toString(), batteryLife/carType.capacity*100);
+        return String.format("Car %d (%s %.1f%%)", index, state.toString(), battery /carType.capacity*100);
     }
 }

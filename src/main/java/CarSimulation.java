@@ -16,14 +16,20 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 1;
+    private static final int REPEAT_COUNT = 10;
     private static final int MAX_CAR_COUNT = 2000;
-    private static final int MIN_CAR_COUNT = 2000;
-    private static final int CAR_COUNT_CHANGE = 1000;
+    private static final int MIN_CAR_COUNT = 100;
+    private static final int CAR_COUNT_CHANGE = 100;
+    private static boolean showUI = false;
+    private static boolean EXPORT_FILES = false;
 
     private static final int THREAD_COUNT = 8;
+    private static volatile int simulationsRan = 0;
     private static final ArrayList<Thread> threads = new ArrayList<>();
     private static final ArrayList<Simulation> simulations = new ArrayList<>();
+    private static long simulationStartTime;
+    private static long simulationEndTime;
+    private static int simulationCount;
 
     public static void main(String[] args) throws InterruptedException {
         boolean showUI = false;
@@ -56,22 +62,29 @@ public class CarSimulation {
                     simulations.add(new Simulation(String.format("r%d-c%d", i+1, carCount), routes, carCount, 3600, 14400, false));
                 }
             }
-
-            final int simulationCount = simulations.size();
-            logger.info("Total simulation count: " + simulationCount);
+            simulationCount = simulations.size();
+            System.out.println("Total simulation count: " + simulationCount);
+            printState();
+            simulationStartTime = System.currentTimeMillis();
 
             for (int i = 0; i < THREAD_COUNT; i++) {
                 Thread thread = new Thread(new SimulationThread(simulations.subList(i*simulationCount/THREAD_COUNT, (i+1)*simulationCount/THREAD_COUNT)));
-                thread.start();
                 threads.add(thread);
+                thread.start();
             }
+            Thread.sleep(100);
+            simulations.clear();
         }
 
         for (Thread thread : threads) {
             thread.join();
         }
 
-        logger.info("Exiting Car Simulation...");
+        simulationEndTime = System.currentTimeMillis();
+        long totalTime = simulationEndTime - simulationStartTime;
+
+        System.out.printf("\nProcess finished in %d minutes and %d seconds.\n", (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60);
+        logger.info(String.format("Ran %d simulations in %d minutes and %d seconds.", simulationCount, (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60));
     }
 
     private static class SimulationThread implements Runnable {
@@ -87,9 +100,11 @@ public class CarSimulation {
                 try {
                     Simulation simulation = localSimulations.get().remove(0);
                     simulation.start();
+                    simulationsRan++;
                     // Export simulation statistics
                     Statistics statistics = new Statistics(simulation);
                     statistics.export(String.format("%s-statistics.csv", simulation.getName()));
+                    printState();
                 } catch (ConcurrentModificationException | NullPointerException | ArrayIndexOutOfBoundsException e) {
                     logger.warning("Exception caught: "+e.getLocalizedMessage());
                 }
@@ -105,6 +120,31 @@ public class CarSimulation {
         }
     }
 
+    private static void printState() {
+        double progress = (double) simulationsRan/simulationCount;
+        int barLength = 50;
+        StringBuilder s = new StringBuilder();
+        s.append("\rProgress: [");
+        for (int i = 0; i < barLength; i++) {
+            if (i <= progress*barLength)
+                s.append("|");
+            else
+                s.append(" ");
+        }
+        s.append(String.format("] %.1f%%   ", progress*100));
+
+        if (simulationsRan != 0) {
+            double simulatingRate = (double) simulationsRan / (System.currentTimeMillis() - simulationStartTime);
+            double timeLeft = (simulationCount - simulationsRan) / simulatingRate;
+            if (timeLeft > 60000)
+                s.append(String.format("(%d minutes and %d seconds left)", (int) ((timeLeft / (1000*60)) % 60), (int) (timeLeft / 1000) % 60));
+            else
+                s.append(String.format("(%d seconds left)", (int) (timeLeft / 1000) % 60));
+        }
+
+        System.out.print(s);
+    }
+
     private static void configureLogger() {
 
         final Logger logger = Logger.getGlobal();
@@ -112,7 +152,7 @@ public class CarSimulation {
         logger.setUseParentHandlers(false);
 
         Handler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.INFO);
+        consoleHandler.setLevel(Level.OFF);
         consoleHandler.setFormatter(new CustomFormatter());
 
         Handler fileHandler = null;
@@ -121,7 +161,7 @@ public class CarSimulation {
         } catch (IOException e) {
             System.out.println("Failed to create file handler for logger");
         }
-        fileHandler.setLevel(Level.ALL);
+        fileHandler.setLevel(Level.OFF);
 
         logger.addHandler(consoleHandler);
         logger.addHandler(fileHandler);

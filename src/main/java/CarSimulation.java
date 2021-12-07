@@ -16,9 +16,9 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 10;
-    private static final int MAX_CAR_COUNT = 2000;
-    private static final int MIN_CAR_COUNT = 100;
+    private static final int REPEAT_COUNT = 1;
+    private static final int MAX_CAR_COUNT = 500;
+    private static final int MIN_CAR_COUNT = 500;
     private static final int CAR_COUNT_CHANGE = 1;
     private static boolean showUI = false;
     private static boolean EXPORT_FILES = false;

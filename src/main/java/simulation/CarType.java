@@ -94,7 +94,7 @@ public enum CarType {
     private final double DEFAULT_DRIVING_EFFICIENCY = 14; // kWh / 100km
     public final int amount; // count
     public final int capacity; // kWh
-    public final int maxChargingPowerAC; // KW
+    public final int maxChargingPowerAC; // kW
     public final int maxChargingPowerDC; // kW
     public final double drivingEfficiency; // kWh / 100km
     public final ArrayList<ChargingStation.ChargerType> supportedChargers;

@@ -175,7 +175,25 @@ public class Car {
             currentCharger = null;
             state = State.OnWayFromCharger;
         } else {
-            battery += Math.min(carType.maxChargingPowerAC, currentCharger.getPower()) * (timeStep / 3600d);
+            // TODO: Check if car is using AC or DC
+            // 0% - 5%
+            if (battery / carType.capacity < 0.05) {
+                double maxChargingPower = Math.min(carType.maxChargingPowerAC, currentCharger.getPower());
+                // y = k (x - x0) + y0
+                double power = (0.6 * maxChargingPower / (0.05 * carType.capacity) * battery + 0.4 * maxChargingPower);
+                battery += power * (timeStep / 3600d);
+            }
+            // 5% - 25%
+            else if (battery / carType.capacity < 0.25) {
+                battery += Math.min(carType.maxChargingPowerAC, currentCharger.getPower()) * (timeStep / 3600d);
+            }
+            // 25% - 100%
+            else {
+                double maxChargingPower = Math.min(carType.maxChargingPowerAC, currentCharger.getPower());
+                // y = k (x - x0) + y0
+                double power = (-0.9 * maxChargingPower / (0.75 * carType.capacity) * (battery - 0.25 * carType.capacity) + maxChargingPower);
+                battery += power * (timeStep / 3600d);
+            }
         }
     }
 

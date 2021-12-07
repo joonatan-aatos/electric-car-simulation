@@ -1,6 +1,5 @@
 package simulation;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Car {
@@ -176,7 +175,7 @@ public class Car {
             currentCharger = null;
             state = State.OnWayFromCharger;
         } else {
-            batteryLife += Math.min(carType.chargingEfficiency, currentCharger.getPower()) * (timeStep / 3600d);
+            batteryLife += Math.min(carType.maxChargingPowerAC, currentCharger.getPower()) * (timeStep / 3600d);
         }
     }
 

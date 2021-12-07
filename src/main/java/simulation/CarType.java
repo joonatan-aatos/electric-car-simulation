@@ -1,5 +1,7 @@
 package simulation;
 
+import java.util.ArrayList;
+
 public enum CarType {
     AUDI_E(301, -1, -1, -1),
     BMWI_I3S(29, -1, -1, -1),
@@ -90,15 +92,19 @@ public enum CarType {
     private final int DEFAULT_CAPACITY = 25; // kWh
     private final int DEFAULT_CHARGING_EFFICIENCY = Integer.MAX_VALUE; // kW
     private final double DEFAULT_DRIVING_EFFICIENCY = 14; // kWh / 100km
-    public final int amount;
-    public final int capacity;
-    public final int chargingEfficiency;
-    public final double drivingEfficiency;
+    public final int amount; // count
+    public final int capacity; // kWh
+    public final int maxChargingPowerAC; // KW
+    public final int maxChargingPowerDC; // kW
+    public final double drivingEfficiency; // kWh / 100km
+    public final ArrayList<ChargingStation.ChargerType> supportedChargers;
 
     private CarType(int amount_, int capacity_, int averageChargingEfficiency_, double drivingEfficiency_) {
         amount = amount_;
         capacity = capacity_ == -1 ? DEFAULT_CAPACITY : capacity_;
-        chargingEfficiency = averageChargingEfficiency_ == -1 ? DEFAULT_CHARGING_EFFICIENCY : averageChargingEfficiency_;
+        maxChargingPowerAC = averageChargingEfficiency_ == -1 ? DEFAULT_CHARGING_EFFICIENCY : averageChargingEfficiency_;
+        maxChargingPowerDC = maxChargingPowerAC;
         drivingEfficiency = drivingEfficiency_ == -1 ? DEFAULT_DRIVING_EFFICIENCY : drivingEfficiency_;
+        supportedChargers = new ArrayList<>();
     }
 }

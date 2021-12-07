@@ -19,7 +19,7 @@ public class CarSimulation {
     private static final int REPEAT_COUNT = 10;
     private static final int MAX_CAR_COUNT = 2000;
     private static final int MIN_CAR_COUNT = 100;
-    private static final int CAR_COUNT_CHANGE = 100;
+    private static final int CAR_COUNT_CHANGE = 1;
     private static boolean showUI = false;
     private static boolean EXPORT_FILES = false;
 
@@ -152,7 +152,7 @@ public class CarSimulation {
         logger.setUseParentHandlers(false);
 
         Handler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.OFF);
+        consoleHandler.setLevel(Level.WARNING);
         consoleHandler.setFormatter(new CustomFormatter());
 
         Handler fileHandler = null;
@@ -161,7 +161,7 @@ public class CarSimulation {
         } catch (IOException e) {
             System.out.println("Failed to create file handler for logger");
         }
-        fileHandler.setLevel(Level.OFF);
+        fileHandler.setLevel(Level.INFO);
 
         logger.addHandler(consoleHandler);
         logger.addHandler(fileHandler);

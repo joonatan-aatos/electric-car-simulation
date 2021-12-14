@@ -58,7 +58,7 @@ public class RoadData {
                         type = ChargingStation.ChargerType.CCS;
                         break;
                     case ("CCS (HPC)"):
-                        type = ChargingStation.ChargerType.CCS_HPC;
+                        type = ChargingStation.ChargerType.CCS;
                     case ("SuperCharger"):
                         type = ChargingStation.ChargerType.Tesla;
                         break;

@@ -86,7 +86,7 @@ public class Simulation implements Runnable {
 
             cumulativeDistributionCounter += distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP;
             while (cumulativeDistributionCounter >= 1) {
-                Car car = new Car(CarType.TESLAMOTORS_MODEL3, cars.size());
+                Car car = new Car(CarType.TESLA_MODEL_3, cars.size());
                 car.setRoute(routes.generateRandomRoute());
                 cars.add(car);
                 cumulativeDistributionCounter -= 1;

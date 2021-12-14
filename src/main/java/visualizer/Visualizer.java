@@ -226,9 +226,9 @@ public class Visualizer {
                     } else if (car.getState() == Car.State.DestinationReached) {
                         g.setColor(new Color(255, 255, 255));
                     } else {
-                        double batteryPercentage = car.getBattery() / car.getCarType().capacity;
-                        int red = batteryPercentage > 0.5 ? 255 - (int) (car.getBattery() / car.getCarType().capacity / 2 * 255) : 255;
-                        int green = batteryPercentage > 0.5 ? 255 : (int) (car.getBattery() / car.getCarType().capacity * 2 * 255);
+                        double batteryPercentage = car.getBattery() / car.getCarType().getCapacity();
+                        int red = batteryPercentage > 0.5 ? 255 - (int) (car.getBattery() / car.getCarType().getCapacity() / 2 * 255) : 255;
+                        int green = batteryPercentage > 0.5 ? 255 : (int) (car.getBattery() / car.getCarType().getCapacity() * 2 * 255);
                         g.setColor(new Color(red, green, 0, CAR_OPACITY));
                     }
                     break;

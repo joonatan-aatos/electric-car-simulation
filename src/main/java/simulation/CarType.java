@@ -1,110 +1,100 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public enum CarType {
-    AUDI_E(301, -1, -1, -1),
-    BMWI_I3S(29, -1, -1, -1),
-    BMWI_I3(215, -1, -1, -1),
-    BMW_I3S(5, -1, -1, -1),
-    BMW_I3(38, -1, -1, -1),
-    BMW_Maarittelematon(1, -1, -1, -1),
-    CHEVROLET_BOLT(3, -1, -1, -1),
-    CITROEN_2CV(1, -1, -1, -1),
-    CITROEN_AX(1, -1, -1, -1),
-    CITROEN_BERLINGO(2, -1, -1, -1),
-    CITROEN_C_ZERO(13, -1, -1, -1),
-    CITROEN_SAXO(2, -1, -1, -1),
-    CITROEN_XSARA(1, -1, -1, -1),
-    DS_3CROSSBACK(7, -1, -1, -1),
-    FIAT_500E(47, -1, -1, -1),
-    FIAT_500(24, -1, -1, -1),
-    FIAT_DOBLO(1, -1, -1, -1),
-    FIAT_Maarittelematon(1, -1, -1, -1),
-    FORD_CNG_TECHNIK_FOCUS(3, -1, -1, -1),
-    FORD_FOCUS(2, -1, -1, -1),
-    FORD_MUSTANG(2, -1, -1, -1),
-    HONDA_E(18, -1, -1, -1),
-    HYUNDAI_IONIQ(465, -1, -1, -1),
-    HYUNDAI_KONA(565, -1, -1, -1),
-    JAGUAR_I_PACE(164, -1, -1, -1),
-    KIA_NIRO(183, -1, -1, -1),
-    KIA_SOUL(62, -1, -1, -1),
-    LandRover_I_PACE(2, -1, -1, -1),
-    MAZDA_MX_3(26, -1, -1, -1),
-    MERCEDES_BENZ_240GD(1, -1, -1, -1),
-    MERCEDES_BENZ_250E(1, -1, -1, -1),
-    MERCEDES_BENZ_B200(2, -1, -1, -1),
-    MERCEDES_BENZ_B250E(3, -1, -1, -1),
-    MERCEDES_BENZ_B250(45, -1, -1, -1),
-    MERCEDES_BENZ_ELECTRIC(40, -1, -1, -1),
-    MERCEDES_BENZ_EQC400(127, -1, -1, -1),
-    MERCEDES_BENZ_V_KLASSE(16, -1, -1, -1),
-    MERCEDES_BENZ_VITO(5, -1, -1, -1),
-    MERCEDES_BENZ_Maarittelematon(1, -1, -1, -1),
-    MICRO_VETT___(1, -1, -1, -1),
-    MICRO_VETT_Maarittelematon(1, -1, -1, -1),
-    MINI_COOPERSE(62, -1, -1, -1),
-    MITSUBISHI_I_MIEV(14, -1, -1, -1),
-    MITSUBISHI_MINICAB(1, -1, -1, -1),
-    NISSAN_E_NV200(37, -1, -1, -1),
-    NISSAN_LEAF(1213, -1, -1, -1),
-    OMAVALMISTE_ELECTRIC(1, -1, -1, -1),
-    OPEL_AMPERA(5, -1, -1, -1),
-    OPEL_CORSA(43, -1, -1, -1),
-    PEUGEOT_106(3, -1, -1, -1),
-    PEUGEOT_2008(39, -1, -1, -1),
-    PEUGEOT_208(31, -1, -1, -1),
-    PEUGEOT_ION(11, -1, -1, -1),
-    POLESTAR_2(2, -1, -1, -1),
-    PORSCHE_TAYCAN(124, -1, -1, -1),
-    RENAULT_FLUENCE(2, -1, -1, -1),
-    RENAULT_TWINGO(1, -1, -1, -1),
-    RENAULT_ZOE(292, -1, -1, -1),
-    SAAB_99(1, -1, -1, -1),
-    SEAT_MII(271, -1, -1, -1),
-    SKODA_CITIGO(149, -1, -1, -1),
-    SMART_EQ(15, -1, -1, -1),
-    SMART_FORFOUR(1, -1, -1, -1),
-    SMART_FORTWO(3, -1, -1, -1),
-    TESLAMOTORS_85D(2, -1, -1, -1),
-    TESLAMOTORS_MODEL3(1541, -1, -1, -1),
-    TESLAMOTORS_MODELS(1440, -1, -1, -1),
-    TESLAMOTORS_MODELX(423, -1, -1, -1),
-    TESLAMOTORS_P85D(2, -1, -1, -1),
-    TESLAMOTORS_S85(6, -1, -1, -1),
-    TESLAMOTORS_TESLA(1, -1, -1, -1),
-    TESLAMOTORS_Maarittelematon(6, -1, -1, -1),
-    THINK_CITY(2, -1, -1, -1),
-    THINK_TH_NK(9, -1, -1, -1),
-    TOYOTA_COROLLA(2, -1, -1, -1),
-    TOYOTA_PREVIA(1, -1, -1, -1),
-    TUNTEMATON_THINK(2, -1, -1, -1),
-    VOLKSWAGEN_2000(1, -1, -1, -1),
-    VOLKSWAGEN_E_GOLF(1, -1, -1, -1),
-    VOLKSWAGEN_EGOLF(2, -1, -1, -1),
-    VOLKSWAGEN_GOLF(487, -1, -1, -1),
-    VOLKSWAGEN_ID_3(496, -1, -1, -1),
-    VOLKSWAGEN_UP(371, -1, -1, -1),
-    VOLVO_XC40(154, -1, -1, -1),
-    GAS(-1, -1, -1, -1);
+    AUDI_E(301, 71.0, 14.7, 11.0, 120.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    BMW_I3S(29, 42.2, 15.8, 11.0, 50.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    BMW_I3(253, 42.2, 15.2, 11.0, 50.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    CITROEN_C_ZERO(13, 16.0, 12.4, 3.7, 46.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),
+    FIAT_500E(71, 42.0, 13.9, 11.0, 85.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    HONDA_E(18, 35.5, 17.1, 6.6, 56.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    HYUNDAI_IONIQ(465, 58.0, 16.7, 11.0, 220.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    HYUNDAI_KONA(565, 42.0, 13.7, 7.2, 50.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    JAGUAR_I_PACE(164, 90.0, 22.0, 11.0, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    KIA_NIRO(183, 8.9, 21.3, 3.3, 0.0, new ArrayList<String>(List.of("Type2"))),
+    KIA_SOUL(62, 33.0, 14.3, 6.6, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),
+    MAZDA_MX_3(26, 35.5, 19.0, 6.6, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    MERCEDES_B250(45, 31.0, 21.5, 9.6, 0.0, new ArrayList<String>(List.of("Type2"))),
+    MERCEDES_ELECTRIC(40, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
+    MERCEDES_EQC(127, 85.0, 22.1, 7.4, 110.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    MERCEDES_V_KLASSE(16, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
+    MINI_COOPERSE(62, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
+    MITSUBISHI_I_MIEV(14, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
+    NISSAN_E_NV200(37, 40.0, 25.8, 6.6, 46.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),
+    NISSAN_LEAF(1213, 40.0, 20.5, 3.6, 50.0, new ArrayList<String>(List.of("Type2"))),
+    OPEL_CORSA(43, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
+    PEUGEOT_E_2008(39, 50.0, 16.0, 7.4, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    PEUGEOT_E_208(31, 50.0, 16.2, 7.4, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    PEUGEOT_ION(11, 16.0, 12.4, 3.7, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),
+    PORSCHE_TAYCAN(124, 79.2, 20.8, 11.0, 225.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    RENAULT_ZOE(292, 41.0, 15.5, 22.0, 0.0, new ArrayList<String>(List.of("Type2"))),
+    SEAT_MII(271, 36.8, 14.3, 7.2, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    SKODA_CITIGO(149, 36.8, 14.3, 7.2, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    SMART_EQ(15, 17.6, 16.5, 22.0, 0.0, new ArrayList<String>(List.of("Type2"))),
+    TESLA_MODEL_3(1541, 68.5, 15.2, 11.0, 210.0, new ArrayList<String>(Arrays.asList("Type2", "Tesla"))),
+    TESLA_MODEL_S(1440, 87.5, 19.1, 16.5, 150.0, new ArrayList<String>(Arrays.asList("Type2", "Tesla"))),
+    TESLA_MODEL_X(423, 87.5, 22.5, 16.5, 150.0, new ArrayList<String>(Arrays.asList("Type2", "Tesla"))),
+    VOLKSWAGEN_E_GOLF(487, 35.8, 15.2, 7.2, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    VOLKSWAGEN_ID_3(496, 65.0, 14.6, 11.0, 87.5, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    VOLKSWAGEN_E_UP1(371, 36.8, 14.3, 7.2, 50.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    VOLVO_XC40(154, 10.7, 25.2, 3.7, 0.0, new ArrayList<String>(List.of("Type2")));
 
-    private final int DEFAULT_CAPACITY = 25; // kWh
-    private final int DEFAULT_CHARGING_EFFICIENCY = Integer.MAX_VALUE; // kW
-    private final double DEFAULT_DRIVING_EFFICIENCY = 14; // kWh / 100km
-    public final int amount; // count
-    public final int capacity; // kWh
-    public final int maxChargingPowerAC; // kW
-    public final int maxChargingPowerDC; // kW
-    public final double drivingEfficiency; // kWh / 100km
-    public final ArrayList<ChargingStation.ChargerType> supportedChargers;
+    private int amount; // count
+    private double capacity; // kWh
+    private double maxChargingPowerAC; // kW
+    private double maxChargingPowerDC; // kW
+    private double drivingEfficiency; // kWh / 100km
+    private ArrayList<ChargingStation.ChargerType> supportedChargers;
 
-    private CarType(int amount_, int capacity_, int averageChargingEfficiency_, double drivingEfficiency_) {
+    private CarType(int amount_, double capacity_, double drivingEfficiency_, double maxChargingPowerAC_, double maxChargingPowerDC_, ArrayList<String> supportedChargers_) {
         amount = amount_;
-        capacity = capacity_ == -1 ? DEFAULT_CAPACITY : capacity_;
-        maxChargingPowerAC = averageChargingEfficiency_ == -1 ? DEFAULT_CHARGING_EFFICIENCY : averageChargingEfficiency_;
-        maxChargingPowerDC = maxChargingPowerAC;
-        drivingEfficiency = drivingEfficiency_ == -1 ? DEFAULT_DRIVING_EFFICIENCY : drivingEfficiency_;
+        capacity = capacity_;
+        maxChargingPowerAC = maxChargingPowerAC_;
+        maxChargingPowerDC = maxChargingPowerDC_;
+        drivingEfficiency = drivingEfficiency_;
         supportedChargers = new ArrayList<>();
+        for (String charger : supportedChargers_) {
+            switch (charger) {
+                case "Type2":
+                    supportedChargers.add(ChargingStation.ChargerType.Type2);
+                    break;
+                case "CCS":
+                    supportedChargers.add(ChargingStation.ChargerType.CCS);
+                    break;
+                case "CHAdeMO":
+                    supportedChargers.add(ChargingStation.ChargerType.CHAdeMO);
+                    break;
+                case "Tesla":
+                    supportedChargers.add(ChargingStation.ChargerType.Tesla);
+                    break;
+            }
+        }
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public double getCapacity() {
+        return capacity;
+    }
+
+    public double getMaxChargingPowerAC() {
+        return maxChargingPowerAC;
+    }
+
+    public double getMaxChargingPowerDC() {
+        return maxChargingPowerDC;
+    }
+
+    public double getDrivingEfficiency() {
+        return drivingEfficiency;
+    }
+
+    public ArrayList<ChargingStation.ChargerType> getSupportedChargers() {
+        return supportedChargers;
     }
 }

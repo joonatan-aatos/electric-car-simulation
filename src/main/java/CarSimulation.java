@@ -32,7 +32,7 @@ public class CarSimulation {
     private static int simulationCount;
 
     public static void main(String[] args) throws InterruptedException {
-        boolean showUI = false;
+        boolean showUI = true;
         File dir = new File("./output");
         if (!dir.mkdirs()) {
             purgeDirectory(dir);

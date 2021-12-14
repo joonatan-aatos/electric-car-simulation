@@ -54,7 +54,7 @@ public class Car {
         carType = carType_;
         index = index_;
 
-        battery = carType.capacity;
+        battery = carType.getCapacity();
 
         drivenDistance = 0;
         drivingSpeed = SPEED_ON_HIGHWAY;
@@ -106,7 +106,7 @@ public class Car {
     public void driveToHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway -= deltaDistance;
-        battery -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
 
         if (distanceFromHighway <= 0) {
             distanceFromHighway = 0;
@@ -117,7 +117,7 @@ public class Car {
     public void driveFromHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway += deltaDistance;
-        battery -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
 
         if (distanceFromHighway >= destinationDistanceFromEndPoint) {
             state = State.DestinationReached;
@@ -163,35 +163,35 @@ public class Car {
 
     public void charge() {
         timeSpentCharging += timeStep;
-        if (battery >= carType.capacity) {
+        if (battery >= carType.getCapacity()) {
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood() && timeSpentCharging < EATING_DURATION ) {
                 return;
             }
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood()) {
                 hunger = 0;
             }
-            battery = carType.capacity;
+            battery = carType.getCapacity();
             currentCharger.setInUse(false);
             currentCharger = null;
             state = State.OnWayFromCharger;
         } else {
             // TODO: Check if car is using AC or DC
             // 0% - 5%
-            if (battery / carType.capacity < 0.05) {
-                double maxChargingPower = Math.min(carType.maxChargingPowerAC, currentCharger.getPower());
+            if (battery / carType.getCapacity() < 0.05) {
+                double maxChargingPower = Math.min(carType.getMaxChargingPowerAC(), currentCharger.getPower());
                 // y = k (x - x0) + y0
-                double power = (0.6 * maxChargingPower / (0.05 * carType.capacity) * battery + 0.4 * maxChargingPower);
+                double power = (0.6 * maxChargingPower / (0.05 * carType.getCapacity()) * battery + 0.4 * maxChargingPower);
                 battery += power * (timeStep / 3600d);
             }
             // 5% - 25%
-            else if (battery / carType.capacity < 0.25) {
-                battery += Math.min(carType.maxChargingPowerAC, currentCharger.getPower()) * (timeStep / 3600d);
+            else if (battery / carType.getCapacity() < 0.25) {
+                battery += Math.min(carType.getMaxChargingPowerAC(), currentCharger.getPower()) * (timeStep / 3600d);
             }
             // 25% - 100%
             else {
-                double maxChargingPower = Math.min(carType.maxChargingPowerAC, currentCharger.getPower());
+                double maxChargingPower = Math.min(carType.getMaxChargingPowerAC(), currentCharger.getPower());
                 // y = k (x - x0) + y0
-                double power = (-0.9 * maxChargingPower / (0.75 * carType.capacity) * (battery - 0.25 * carType.capacity) + maxChargingPower);
+                double power = (-0.9 * maxChargingPower / (0.75 * carType.getCapacity()) * (battery - 0.25 * carType.getCapacity()) + maxChargingPower);
                 battery += power * (timeStep / 3600d);
             }
         }
@@ -200,7 +200,7 @@ public class Car {
     public void driveToStation() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway += deltaDistance;
-        battery -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
 
         ChargingStation station = route.getChargingStations().get(currentChargingStationIndex);
         if (distanceFromHighway >= station.getDistanceFromHighway()) {
@@ -232,7 +232,7 @@ public class Car {
     public void driveFromStation() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway -= deltaDistance;
-        battery -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
 
         if (distanceFromHighway <= 0) {
             if (nextChargingStationIndex != -1) {
@@ -252,7 +252,7 @@ public class Car {
     public void driveOnHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         drivenDistance += deltaDistance;
-        battery -= deltaDistance * carType.drivingEfficiency / 100;
+        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
 
         if (drivenDistance >= route.getLength()) {
             state = State.OnWayFromHighway;
@@ -280,8 +280,8 @@ public class Car {
      */
     private int calculateNextChargingStationIndex() {
 
-        double optimalDistance = battery / carType.drivingEfficiency * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
-        double maximumDistance = battery / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
+        double optimalDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
+        double maximumDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
 
         canReachDestination = maximumDistance > route.getLength() + destinationDistanceFromEndPoint;
         if (canReachDestination) {
@@ -379,7 +379,7 @@ public class Car {
                 nextChargingStationDistance - currentChargingStationDistance +
                 currentChargingStation.getDistanceFromHighway();
 
-        double maximumDistance = battery / carType.drivingEfficiency * 100 * (1 - DESTINATION_BATTERY_THRESHOLD);
+        double maximumDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - DESTINATION_BATTERY_THRESHOLD);
 
         return maximumDistance > distanceToNextChargingStation + 1;
     }
@@ -420,6 +420,6 @@ public class Car {
 
     @Override
     public String toString() {
-        return String.format("Car %d (%s %.1f%%)", index, state.toString(), battery /carType.capacity*100);
+        return String.format("Car %d (%s %.1f%%)", index, state.toString(), battery /carType.getCapacity()*100);
     }
 }

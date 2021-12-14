@@ -9,7 +9,6 @@ public class ChargingStation {
     public enum ChargerType {
         Type2,
         CCS,
-        CCS_HPC,
         Tesla,
         CHAdeMO,
         Tyomaapistoke

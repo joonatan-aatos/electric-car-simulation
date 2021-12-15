@@ -1,6 +1,8 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 public class Simulation implements Runnable {
@@ -8,6 +10,7 @@ public class Simulation implements Runnable {
     private static final Logger logger = Logger.getGlobal();
 
     ArrayList<Car> cars;
+    ArrayList<Car> carsToBeAdded;
     private long seconds;
     private final long TIME_STEP = 10; // seconds
     private int tps;
@@ -25,7 +28,6 @@ public class Simulation implements Runnable {
     public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_) {
         name = name_;
         routes = routes_ != null ? routes_ : new Routes();
-        createCars();
         TOTAL_CARS = carCount;
         NORM_DIST_STANDARD_DEVIATION = standardDeviation;
         NORM_DIST_MEAN = mean;
@@ -33,10 +35,24 @@ public class Simulation implements Runnable {
         shouldWait = shouldWait_;
         stateStatisticsOverTime = new ArrayList<>();
         globalStateStatisticsOverTime = new ArrayList<>();
+        createCars();
     }
 
     private void createCars() {
         cars = new ArrayList<>();
+        carsToBeAdded = new ArrayList<>();
+        int carSum = Arrays.stream(CarType.values()).mapToInt(CarType::getAmount).sum();
+        double carCounter = 0;
+        for (CarType carType : CarType.values()) {
+            carCounter += (double) carType.getAmount() / carSum * TOTAL_CARS;
+            while (carCounter >= 1) {
+                Car car = new Car(carType, carsToBeAdded.size());
+                car.setRoute(routes.generateRandomRoute());
+                carsToBeAdded.add(car);
+                carCounter--;
+            }
+        }
+        Collections.shuffle(carsToBeAdded);
     }
 
     public void start() {
@@ -86,9 +102,7 @@ public class Simulation implements Runnable {
 
             cumulativeDistributionCounter += distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP;
             while (cumulativeDistributionCounter >= 1) {
-                Car car = new Car(CarType.TESLA_MODEL_3, cars.size());
-                car.setRoute(routes.generateRandomRoute());
-                cars.add(car);
+                cars.add(carsToBeAdded.remove(0));
                 cumulativeDistributionCounter -= 1;
             }
 

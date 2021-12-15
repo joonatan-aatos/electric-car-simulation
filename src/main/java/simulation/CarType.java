@@ -18,14 +18,13 @@ public enum CarType {
     KIA_SOUL(62, 33.0, 14.3, 6.6, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),
     MAZDA_MX_3(26, 35.5, 19.0, 6.6, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     MERCEDES_B250(45, 31.0, 21.5, 9.6, 0.0, new ArrayList<String>(List.of("Type2"))),
-    MERCEDES_ELECTRIC(40, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
     MERCEDES_EQC(127, 85.0, 22.1, 7.4, 110.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
-    MERCEDES_V_KLASSE(16, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
-    MINI_COOPERSE(62, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
-    MITSUBISHI_I_MIEV(14, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
+    MERCEDES_EQV(16, 90.0, 28.9, 11.0, 110.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    MINI_COOPER_SE(62, 32.6, 14.9, 11.0, 49.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
+    MITSUBISHI_I_MIEV(14, 16.0, 10.0, 3.6, 50.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))), // https://evcompare.io/cars/mitsubishi/mitsubishi_i-miev/
     NISSAN_E_NV200(37, 40.0, 25.8, 6.6, 46.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),
     NISSAN_LEAF(1213, 40.0, 20.5, 3.6, 50.0, new ArrayList<String>(List.of("Type2"))),
-    OPEL_CORSA(43, 0.0, 0.0, 0.0, 0.0, new ArrayList<String>(List.of())), // No link found
+    OPEL_CORSA(43, 50.0, 15.0, 11.0, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))), // https://evcompare.io/cars/opel/opel-corsa-e/
     PEUGEOT_E_2008(39, 50.0, 16.0, 7.4, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     PEUGEOT_E_208(31, 50.0, 16.2, 7.4, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     PEUGEOT_ION(11, 16.0, 12.4, 3.7, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),

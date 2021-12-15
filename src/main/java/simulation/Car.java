@@ -163,38 +163,43 @@ public class Car {
 
     public void charge() {
         timeSpentCharging += timeStep;
-        if (battery >= carType.getCapacity()) {
+        if (battery >= carType.getCapacity() * 0.8) {
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood() && timeSpentCharging < EATING_DURATION ) {
                 return;
             }
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood()) {
                 hunger = 0;
             }
-            battery = carType.getCapacity();
             currentCharger.setInUse(false);
             currentCharger = null;
             state = State.OnWayFromCharger;
         } else {
-            // TODO: Check if car is using AC or DC
+            double maxChargingPower;
+            if (currentCharger.getType() == ChargingStation.ChargerType.Type2 || currentCharger.getType() == ChargingStation.ChargerType.Tyomaapistoke) {
+                maxChargingPower = Math.min(carType.getMaxChargingPowerAC(), currentCharger.getPower());
+            }
+            else {
+                maxChargingPower = Math.min(carType.getMaxChargingPowerDC(), currentCharger.getPower());
+            }
             // 0% - 5%
             if (battery / carType.getCapacity() < 0.05) {
-                double maxChargingPower = Math.min(carType.getMaxChargingPowerAC(), currentCharger.getPower());
                 // y = k (x - x0) + y0
                 double power = (0.6 * maxChargingPower / (0.05 * carType.getCapacity()) * battery + 0.4 * maxChargingPower);
                 battery += power * (timeStep / 3600d);
             }
             // 5% - 25%
             else if (battery / carType.getCapacity() < 0.25) {
-                battery += Math.min(carType.getMaxChargingPowerAC(), currentCharger.getPower()) * (timeStep / 3600d);
+                battery += Math.min(maxChargingPower, currentCharger.getPower()) * (timeStep / 3600d);
             }
             // 25% - 100%
             else {
-                double maxChargingPower = Math.min(carType.getMaxChargingPowerAC(), currentCharger.getPower());
                 // y = k (x - x0) + y0
                 double power = (-0.9 * maxChargingPower / (0.75 * carType.getCapacity()) * (battery - 0.25 * carType.getCapacity()) + maxChargingPower);
                 battery += power * (timeStep / 3600d);
             }
         }
+        if (battery >= carType.getCapacity())
+            battery = carType.getCapacity();
     }
 
     public void driveToStation() {

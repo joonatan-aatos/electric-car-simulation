@@ -81,9 +81,9 @@ public class ChargingStation {
         chargers.add(new Charger(power, type));
     }
 
-    public Charger getAvailableCharger() {
+    public Charger getAvailableCharger(ArrayList<ChargerType> chargerTypes) {
         for (Charger charger : chargers) {
-            if (!charger.isInUse())
+            if (chargerTypes.contains(charger.getType()) && !charger.isInUse())
                 return charger;
         }
         return null;
@@ -127,6 +127,14 @@ public class ChargingStation {
 
     public boolean isCustomerExclusive() {
         return customerExclusive;
+    }
+
+    public boolean hasChargerType(ArrayList<ChargerType> chargerTypes) {
+        for (Charger charger : chargers) {
+            if (chargerTypes.contains(charger.getType()))
+                return true;
+        }
+        return false;
     }
 
     public void sortChargers() {

@@ -53,6 +53,9 @@ public class CarSimulation {
                 Thread.sleep(10);
             }
             visualizer.draw();
+
+            Statistics statistics = new Statistics(simulation);
+            statistics.export("statistics.csv");
         }
         else {
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
@@ -162,7 +165,7 @@ public class CarSimulation {
         } catch (IOException e) {
             System.out.println("Failed to create file handler for logger");
         }
-        fileHandler.setLevel(Level.INFO);
+        fileHandler.setLevel(Level.ALL);
 
         logger.addHandler(consoleHandler);
         logger.addHandler(fileHandler);

@@ -3,6 +3,7 @@ package simulation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class Simulation implements Runnable {
@@ -43,7 +44,9 @@ public class Simulation implements Runnable {
         carsToBeAdded = new ArrayList<>();
         int carSum = Arrays.stream(CarType.values()).mapToInt(CarType::getAmount).sum();
         double carCounter = 0;
-        for (CarType carType : CarType.values()) {
+        List<CarType> carTypes = Arrays.asList(CarType.values());
+        Collections.shuffle(carTypes);
+        for (CarType carType : carTypes) {
             carCounter += (double) carType.getAmount() / carSum * TOTAL_CARS;
             while (carCounter >= 1) {
                 Car car = new Car(carType, carsToBeAdded.size());

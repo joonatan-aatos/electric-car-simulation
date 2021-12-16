@@ -222,9 +222,9 @@ public class Visualizer {
                 case 0:
                     // By battery
                     if (car.getState() == Car.State.BatteryDepleted) {
-                        g.setColor(new Color(0, 0, 0));
+                        g.setColor(new Color(0, 0, 0, CAR_OPACITY));
                     } else if (car.getState() == Car.State.DestinationReached) {
-                        g.setColor(new Color(255, 255, 255));
+                        g.setColor(new Color(255, 255, 255, CAR_OPACITY));
                     } else {
                         double batteryPercentage = car.getBattery() / car.getCarType().getCapacity();
                         int red = batteryPercentage > 0.5 ? 255 - (int) (car.getBattery() / car.getCarType().getCapacity() / 2 * 255) : 255;
@@ -236,10 +236,10 @@ public class Visualizer {
                     // By state
                     switch (car.getState()) {
                         case BatteryDepleted:
-                            g.setColor(new Color(0, 0, 0));
+                            g.setColor(new Color(0, 0, 0, CAR_OPACITY));
                             break;
                         case DestinationReached:
-                            g.setColor(new Color(255, 255, 255));
+                            g.setColor(new Color(255, 255, 255, CAR_OPACITY));
                             break;
                         case OnHighway:
                             g.setColor(new Color(0, 255, 0, CAR_OPACITY));

@@ -29,8 +29,11 @@ public class Car {
     private boolean continueDriving;
     private ChargingStation.Charger currentCharger;
     private State state;
-    private long[] stateTime;
+    private long[] stateTime;   //  In seconds
     private double destinationDistanceFromEndPoint; // Is never changed, assigned once in setRoute
+
+    private int timesCharged;
+
 
     public enum State {
         OnHighway(0),
@@ -68,6 +71,8 @@ public class Car {
         timesShopped = 0;
         stateTime = new long[9];
         logger.info(String.format("Created car: %s", this.toString()));
+
+        timesCharged = 0;
     }
 
     public void tick(long TIME_STEP) {
@@ -106,7 +111,11 @@ public class Car {
     public void driveToHighway() {
         double deltaDistance = drivingSpeed * (timeStep / 3600d);
         distanceFromHighway -= deltaDistance;
-        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
+
+        if (battery - batteryUsedForDistance(deltaDistance) < 0)
+            battery = 0;
+        else
+            battery -= batteryUsedForDistance(deltaDistance);
 
         if (distanceFromHighway <= 0) {
             distanceFromHighway = 0;
@@ -122,7 +131,11 @@ public class Car {
     public void driveFromHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway += deltaDistance;
-        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
+        if (battery - batteryUsedForDistance(deltaDistance) < 0)
+            battery = 0;
+        else
+            battery -= batteryUsedForDistance(deltaDistance);
+
 
         if (distanceFromHighway >= destinationDistanceFromEndPoint) {
             state = State.DestinationReached;
@@ -139,6 +152,7 @@ public class Car {
             route.getChargingStations().get(currentChargingStationIndex).removeFromQueue(index);
             currentCharger = availableCharger;
             state = State.Charging;
+            timesCharged++;
         }
         else {
             // Calculate whether it is best to go to the next charging station
@@ -224,7 +238,11 @@ public class Car {
     public void driveToStation() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway += deltaDistance;
-        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
+        if (battery - batteryUsedForDistance(deltaDistance) < 0)
+            battery = 0;
+        else
+            battery -= batteryUsedForDistance(deltaDistance);
+
 
         ChargingStation station = route.getChargingStations().get(currentChargingStationIndex);
         if (distanceFromHighway >= station.getDistanceFromHighway()) {
@@ -248,6 +266,7 @@ public class Car {
                                 route.getChargingStations().get(currentChargingStationIndex).toString())
                 );
                 state = State.Charging;
+                timesCharged++;
             }
         }
     }
@@ -255,7 +274,11 @@ public class Car {
     public void driveFromStation() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         distanceFromHighway -= deltaDistance;
-        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
+        if (battery - batteryUsedForDistance(deltaDistance) < 0)
+            battery = 0;
+        else
+            battery -= batteryUsedForDistance(deltaDistance);
+
 
         if (distanceFromHighway <= 0) {
             // Check if car has left the previous charging station without getting to charge
@@ -280,7 +303,11 @@ public class Car {
     public void driveOnHighway() {
         double deltaDistance = drivingSpeed * (timeStep /3600d);
         drivenDistance += deltaDistance;
-        battery -= deltaDistance * carType.getDrivingEfficiency() / 100;
+        if (battery - batteryUsedForDistance(deltaDistance) < 0)
+            battery = 0;
+        else
+            battery -= batteryUsedForDistance(deltaDistance);
+
 
         if (drivenDistance >= route.getLength()) {
             state = State.OnWayFromHighway;
@@ -401,6 +428,10 @@ public class Car {
         return maximumDistance > distanceToNextChargingStation + 1;
     }
 
+    public double batteryUsedForDistance(double deltaDistance) {
+        return deltaDistance * carType.getDrivingEfficiency() / 100;
+    }
+
     public double getDistanceFromHighway() {
         return distanceFromHighway;
     }
@@ -434,6 +465,10 @@ public class Car {
 
     public long[] getStateTime() {
         return stateTime;
+    }
+
+    public int getTimesCharged() {
+        return timesCharged;
     }
 
     @Override

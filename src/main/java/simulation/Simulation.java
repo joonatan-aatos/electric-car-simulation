@@ -1,12 +1,12 @@
 package simulation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
 import java.util.logging.Logger;
 
 public class Simulation implements Runnable {
+
+
 
     private static final Logger logger = Logger.getGlobal();
 
@@ -36,6 +36,7 @@ public class Simulation implements Runnable {
         shouldWait = shouldWait_;
         stateStatisticsOverTime = new ArrayList<>();
         globalStateStatisticsOverTime = new ArrayList<>();
+
         createCars();
     }
 
@@ -126,7 +127,7 @@ public class Simulation implements Runnable {
 
             seconds += TIME_STEP;
 
-            if (seconds > 720000) {
+            if (seconds > 3600000) {
                 logger.severe(String.format("[%s]: Simulation stopped by force", name));
                 break;
             }

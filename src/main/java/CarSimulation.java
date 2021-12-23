@@ -17,13 +17,13 @@ public class CarSimulation {
     private static final Logger logger = Logger.getGlobal();
 
     private static final int REPEAT_COUNT = 1;
-    private static final int MAX_CAR_COUNT = 500;
-    private static final int MIN_CAR_COUNT = 500;
+    private static final int MAX_CAR_COUNT = 1000;
+    private static final int MIN_CAR_COUNT = 1000;
     private static final int CAR_COUNT_CHANGE = 1;
     private static boolean showUI = false;
     private static boolean EXPORT_FILES = false;
 
-    private static final int THREAD_COUNT = 8;
+    private static final int THREAD_COUNT = 1;
     private static volatile int simulationsRan = 0;
     private static final ArrayList<Thread> threads = new ArrayList<>();
     private static final ArrayList<Simulation> simulations = new ArrayList<>();
@@ -32,7 +32,6 @@ public class CarSimulation {
     private static int simulationCount;
 
     public static void main(String[] args) throws InterruptedException {
-        boolean showUI = true;
         File dir = new File("./output");
         if (!dir.mkdirs()) {
             purgeDirectory(dir);
@@ -55,7 +54,7 @@ public class CarSimulation {
             visualizer.draw();
 
             Statistics statistics = new Statistics(simulation);
-            statistics.export("statistics.csv");
+            statistics.export(simulation.getName());
         }
         else {
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
@@ -106,7 +105,7 @@ public class CarSimulation {
                     simulationsRan++;
                     // Export simulation statistics
                     Statistics statistics = new Statistics(simulation);
-                    statistics.export(String.format("%s-statistics.csv", simulation.getName()));
+                    statistics.export(simulation.getName());
                     printState();
                 } catch (ConcurrentModificationException | NullPointerException | ArrayIndexOutOfBoundsException e) {
                     logger.warning("Exception caught: "+e.getLocalizedMessage());

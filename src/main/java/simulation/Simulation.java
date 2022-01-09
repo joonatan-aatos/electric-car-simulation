@@ -26,7 +26,7 @@ public class Simulation implements Runnable {
 
     private double cumulativeDistributionCounter = 0;
 
-    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_) {
+    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter) {
         name = name_;
         routes = routes_ != null ? routes_ : new Routes();
         TOTAL_CARS = carCount;
@@ -36,8 +36,16 @@ public class Simulation implements Runnable {
         shouldWait = shouldWait_;
         stateStatisticsOverTime = new ArrayList<>();
         globalStateStatisticsOverTime = new ArrayList<>();
+        if (isWinter)
+            setWinter();
 
         createCars();
+    }
+
+    private void setWinter() {
+        for (CarType carType : CarType.values()) {
+            carType.itIsWinter();
+        }
     }
 
     private void createCars() {

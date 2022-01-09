@@ -47,6 +47,8 @@ public enum CarType {
     private double maxChargingPowerDC; // kW
     private double drivingEfficiency; // kWh / 100km
     private ArrayList<ChargingStation.ChargerType> supportedChargers;
+    private double winterChargingCoefficient = 0.5;
+    private double winterDrivingCoefficient = 0.5;
 
     private CarType(int amount_, double capacity_, double drivingEfficiency_, double maxChargingPowerAC_, double maxChargingPowerDC_, ArrayList<String> supportedChargers_) {
         amount = amount_;
@@ -71,6 +73,12 @@ public enum CarType {
                     break;
             }
         }
+    }
+
+    public void itIsWinter() {
+        maxChargingPowerAC *= winterChargingCoefficient;
+        maxChargingPowerDC *= winterChargingCoefficient;
+        drivingEfficiency *= winterDrivingCoefficient;
     }
 
     public int getAmount() {

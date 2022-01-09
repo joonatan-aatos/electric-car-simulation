@@ -78,7 +78,7 @@ public enum CarType {
     public void itIsWinter() {
         maxChargingPowerAC *= winterChargingCoefficient;
         maxChargingPowerDC *= winterChargingCoefficient;
-        drivingEfficiency *= winterDrivingCoefficient;
+        drivingEfficiency /= winterDrivingCoefficient;      // Because the greater the value of "drivingEfficiency", the worse the efficiency. What a stupid metric.
     }
 
     public int getAmount() {

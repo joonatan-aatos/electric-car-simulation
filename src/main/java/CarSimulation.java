@@ -42,7 +42,7 @@ public class CarSimulation {
             Routes routes = new Routes();
             routes.generateRoutes();
 
-            Simulation simulation = new Simulation("visualized", routes, 1000, 3600, 14400, true, true);
+            Simulation simulation = new Simulation("visualized", routes, 1000, 3600, 14400, true, false);
             Visualizer visualizer = showUI ? new Visualizer(simulation, routes) : null;
             Thread simulationThread = new Thread(simulation);
             simulationThread.start();

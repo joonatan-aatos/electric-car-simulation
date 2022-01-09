@@ -181,9 +181,21 @@ public class Car {
         }
     }
 
+    public boolean canReachNextPlace(boolean isLastCharger) {
+        if (!isLastCharger) {
+            for (int i = currentChargingStationIndex + 1; i < route.getChargingStations().size(); i++) {
+                if (route.getChargingStations().get(i).hasChargerType(carType.getSupportedChargers()))
+                    return canReachChargingStation(i);
+            }
+        }
+        return canReachDestination();
+    }
+
     public void charge() {
         timeSpentCharging += timeStep;
-        if (battery >= carType.getCapacity() * 0.8) {
+        boolean isLastCharger = currentChargingStationIndex >= route.getChargingStations().size() - 1;
+
+        if ((battery >= carType.getCapacity() * 0.8 && canReachNextPlace(isLastCharger)) || battery >= carType.getCapacity()) {
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood() && timeSpentCharging < EATING_DURATION ) {
                 return;
             }
@@ -389,6 +401,12 @@ public class Car {
                 (chargerPowerCoefficient * chargerCountCoefficient * amenitiesCoefficient) /
                 /*-----------------------------division line-------------------------------*/
                 (lineLengthCoefficient);
+    }
+
+    private boolean canReachDestination() {
+        double maximumDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - DESTINATION_BATTERY_THRESHOLD);
+        double distanceToDestination = distanceFromHighway + (route.getLength() - drivenDistance) + destinationDistanceFromEndPoint;
+        return maximumDistance > distanceToDestination;
     }
 
     private boolean canReachChargingStation(int chargingStationIndex) throws IndexOutOfBoundsException {

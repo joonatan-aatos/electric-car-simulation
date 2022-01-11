@@ -156,7 +156,7 @@ public class Car {
             // Calculate whether it is best to go to the next charging station
             int bestChargingStationIndex = currentChargingStationIndex;
             double bestChargingStationPreferencePoints = calculatePreferencePointsOnCharger(currentChargingStationIndex);
-            for (int i = 1; i <= 3; i++) {
+            for (int i = 1; i <= route.getChargingStations().size(); i++) {
                 if (
                     currentChargingStationIndex + i <= route.getChargingStations().size() - 1 &&
                     route.getChargingStations().get(currentChargingStationIndex + i).hasChargerType(carType.getSupportedChargers()) &&
@@ -167,6 +167,8 @@ public class Car {
                         bestChargingStationIndex = currentChargingStationIndex + i;
                         bestChargingStationPreferencePoints = preferencePoints;
                     }
+                } else if (currentChargingStationIndex + i > route.getChargingStations().size() - 1 || !canReachChargingStation(currentChargingStationIndex + 1)) {
+                    break;
                 }
             }
             if (bestChargingStationIndex != currentChargingStationIndex) {

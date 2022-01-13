@@ -48,7 +48,7 @@ public class Statistics {
 
     private final int totalCars;
     private final int[] trafficStatistics; // count
-    private final long[] stateStatistics; // seconds
+    private final long[][] stateStatistics; // seconds
     private final long totalTime; // seconds
     private ArrayList<CarStatistics> carStatistics;
     private ArrayList<int[][]> stateStatisticsOverTime;
@@ -61,7 +61,7 @@ public class Statistics {
 
     public Statistics (Simulation simulation) {
         trafficStatistics = new int[6];
-        stateStatistics = new long[9];
+        stateStatistics = new long[9][2];
         carStatistics = new ArrayList<>();
         totalTime = simulation.getPassedSeconds();
         timeStep = simulation.getTimeStep();
@@ -76,7 +76,10 @@ public class Statistics {
             carModelStatistics.put(carType, new CarModelStatistics());
         }
 
-        for (Car car : cars) {
+        int[][] stateTimesArray = new int[9][cars.size()];  // Array for median
+        for (int index = 0; index < cars.size(); index++) {
+            Car car = cars.get(index);
+
             carStatistics.add(new CarStatistics(car));
 
             // Traffic statistics
@@ -87,9 +90,14 @@ public class Statistics {
                 trafficStatistics[i]++;
             }
 
-            // State statistics
+            // State statistics (sum)
             for (int i = 0; i < car.getStateTime().length; i++) {
-                stateStatistics[i] += car.getStateTime()[i];
+                stateStatistics[i][0] += car.getStateTime()[i];
+            }
+
+            // State statistics (median)
+            for (int i = 0; i < car.getStateTime().length; i++) {
+                 stateTimesArray[i][index] += car.getStateTime()[i];
             }
 
             //  Model statistics
@@ -106,6 +114,11 @@ public class Statistics {
             }
         }
 
+        // Sorting for median
+        for (int i = 0; i < 9; i++) {
+            Arrays.sort(stateTimesArray[i]);
+            stateStatistics[i][1] = (cars.size()%2==0)? stateTimesArray[i][cars.size()/2] + stateTimesArray[i][cars.size()/2 - 1] / 2 : stateTimesArray[i][(int) (cars.size()/2f)];
+        }
 
         runnableCallbacks = new HashMap<>();
         //  Functions to be run for each car
@@ -178,15 +191,19 @@ public class Statistics {
         s.append("Kulunut aika (s): ;").append(totalTime).append("\n\n");
 
         // State statistics
-        long totalStateTime = LongStream.of(stateStatistics).sum() - stateStatistics[4];
+        long stateStatisticsSum = 0;
+        for (int i = 0; i < 9; i++) {
+            stateStatisticsSum += stateStatistics[i][0];
+        }
+        long totalStateTime = stateStatisticsSum - stateStatistics[4][0];
         Car.State[] states = Car.State.values();
         s.append("Keskimääräinen auton tila:\n");
 
-        s.append("Tila;Aika (min/auto);Prosenttiosuus\n");
+        s.append("Tila;Aika (min/auto);Prosenttiosuus;Mediaaniaika\n");
         for (int i = 0; i < states.length; i++) {
             if (i == Car.State.DestinationReached.index || i == Car.State.BatteryDepleted.index)
                 continue;
-            s.append(states[i].toString()).append(";").append((double) stateStatistics[i] / (double) (totalCars*60L) + ";").append((double) stateStatistics[i] / (double) totalStateTime * 100d + "").append("\n");
+            s.append(states[i].toString()).append(";").append((double) stateStatistics[i][0] / (double) (totalCars*60L) + ";").append((double) stateStatistics[i][0] / (double) totalStateTime * 100d + "").append(";").append(stateStatistics[i][1]).append("\n");
         }
         s.append("\n\n");
         s.append(String.format("Ajamiseen kulunut aika; %.0f; min/auto\n", (double) totalStateTime / (double) (totalCars*60L)));
@@ -227,13 +244,17 @@ public class Statistics {
         s.append("Total time: ").append(totalTime).append(" seconds\n\n");
 
         // State statistics
-        long totalStateTime = LongStream.of(stateStatistics).sum() - stateStatistics[4];
+        long stateStatisticsSum = 0;
+        for (int i = 0; i < 9; i++) {
+            stateStatisticsSum += stateStatistics[i][0];
+        }
+        long totalStateTime = stateStatisticsSum - stateStatistics[4][0];
         Car.State[] states = Car.State.values();
         s.append("Average state statistics:\n");
         for (int i = 0; i < states.length; i++) {
             if (i == 4)
                 continue;
-            s.append(" - ").append(states[i].toString()).append(String.format(": %.0f min/car (%.1f %%)", (double) stateStatistics[i] / (double) (totalCars*60L), (double) stateStatistics[i] / (double) totalStateTime * 100d)).append("\n");
+            s.append(" - ").append(states[i].toString()).append(String.format(": %.0f min/car (%.1f %%)", (double) stateStatistics[i][0] / (double) (totalCars*60L), (double) stateStatistics[i][0] / (double) totalStateTime * 100d)).append("\n");
         }
         s.append(String.format("Total time driving: %.0f min/car\n", (double) totalStateTime / (double) (totalCars*60L)));
         s.append("\n");

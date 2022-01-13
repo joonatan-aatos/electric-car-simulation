@@ -23,6 +23,8 @@ public class Simulation implements Runnable {
     private final String name;
     private final ArrayList<int[][]> stateStatisticsOverTime;
     private final ArrayList<int[]> globalStateStatisticsOverTime;
+    private final ArrayList<int[]> roadStatisticsOverTime;
+    private final ArrayList<int[]> chargerStatisticsOverTime;
 
     private double cumulativeDistributionCounter = 0;
 
@@ -36,6 +38,9 @@ public class Simulation implements Runnable {
         shouldWait = shouldWait_;
         stateStatisticsOverTime = new ArrayList<>();
         globalStateStatisticsOverTime = new ArrayList<>();
+        roadStatisticsOverTime = new ArrayList<>();
+        chargerStatisticsOverTime = new ArrayList<>();
+
         if (isWinter)
             setWinter();
 
@@ -91,6 +96,9 @@ public class Simulation implements Runnable {
                     stateStatistics[i][j] = 0;
                 }
             }
+
+            int[] carsOnRoad = {0, 0, 0, 0, 0, 0};
+
             for (Car car : cars) {
                 car.tick(TIME_STEP);
 
@@ -108,9 +116,36 @@ public class Simulation implements Runnable {
                         }
                     }
                 }
+                // Roads
+                if (car.getState() == Car.State.DestinationReached)
+                    continue;
+                ArrayList<Route> rootRoutes = car.getRoute().getRootRoutes();
+                double drivenDistance = car.getDrivenDistance();
+                for (Route rootRoute : rootRoutes) {
+                    drivenDistance -= rootRoute.getLength();
+                    if (drivenDistance < 0) {
+                        int index = Math.min(rootRoute.getStartPoint().index, rootRoute.getEndPoint().index);
+                        carsOnRoad[index]++;
+                        break;
+                    }
+                }
+            }
+            // More statistics
+            int[] chargersInUse = {0, 0, 0, 0, 0, 0};
+            for (int i = 0; i < routes.routeKeys.size(); i++) {
+                String key = routes.routeKeys.get(i);
+                for (ChargingStation station : routes.routes.get(key).getChargingStations()) {
+                    for (ChargingStation.Charger charger : station.getChargers()) {
+                        if (charger.isInUse()) {
+                            chargersInUse[i]++;
+                        }
+                    }
+                }
             }
             stateStatisticsOverTime.add(stateStatistics);
             globalStateStatisticsOverTime.add(globalStateStatistics);
+            roadStatisticsOverTime.add(carsOnRoad);
+            chargerStatisticsOverTime.add(chargersInUse);
 
             cumulativeDistributionCounter += distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP;
             while (cumulativeDistributionCounter >= 1) {
@@ -191,6 +226,14 @@ public class Simulation implements Runnable {
 
     public ArrayList<int[]> getGlobalStateStatisticsOverTime() {
         return globalStateStatisticsOverTime;
+    }
+
+    public ArrayList<int[]> getRoadStatisticsOverTime() {
+        return roadStatisticsOverTime;
+    }
+
+    public ArrayList<int[]> getChargerStatisticsOverTime() {
+        return chargerStatisticsOverTime;
     }
 
     @Override

@@ -198,7 +198,7 @@ public class Routes {
         final double finalSumOfWeights = sumOfWeights;
         weights = weights.stream().map(weight -> weight / finalSumOfWeights).collect(Collectors.toCollection(ArrayList::new));
 
-        // Select random start point with weights
+        // Select random end point with weights
         int endPointIndex = 0;
         for (double r = Math.random(); endPointIndex < weights.size() - 1; ++endPointIndex) {
             r -= weights.get(endPointIndex);

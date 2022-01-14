@@ -31,7 +31,7 @@ public class Car implements Comparable<Car> {
     private State state;
     private long[] stateTime;   //  In seconds
     private double destinationDistanceFromEndPoint; // Is never changed, assigned once in setRoute
-
+    private int creationTime;
     private int timesCharged;
 
     @Override
@@ -474,6 +474,14 @@ public class Car implements Comparable<Car> {
 
     public int getIndex() {
         return index;
+    }
+
+    public void setCreationTime(int creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public int getCreationTime() {
+        return creationTime;
     }
 
     public int getTimesCharged() {

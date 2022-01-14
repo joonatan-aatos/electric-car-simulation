@@ -168,6 +168,7 @@ public class Statistics {
         }
         carRunnableCallbacks.put("Kokonaisaika (min)", (Car car) -> String.format("%.2f", LongStream.of(car.getStateTime()).sum()/60f));
         carRunnableCallbacks.put("Reitin Pituus (km)", (Car car) -> String.format("%.2f", car.getRoute().getLength()));
+        carRunnableCallbacks.put("Lähtöaika (min)", (Car car) -> String.format("%.2f", car.getCreationTime()/60f));
 
 
     }

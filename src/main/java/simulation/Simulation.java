@@ -149,7 +149,9 @@ public class Simulation implements Runnable {
 
             cumulativeDistributionCounter += distributionProbability()*(double)TOTAL_CARS*(double)TIME_STEP;
             while (cumulativeDistributionCounter >= 1) {
+                carsToBeAdded.get(0).setCreationTime((int) seconds);
                 cars.add(carsToBeAdded.remove(0));
+
                 cumulativeDistributionCounter -= 1;
             }
 

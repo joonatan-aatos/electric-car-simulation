@@ -87,7 +87,7 @@ public class Statistics {
             carModelStatistics.put(carType, new CarModelStatistics());
         }
 
-        int[][] stateTimesArray = new int[9][simulation.getTOTAL_CARS() -1];  // Array for median       NOTICE: The -1 is there, since the real car count is always TOTAL_CARS -1
+        int[][] stateTimesArray = new int[9][simulation.getTOTAL_CARS()];  // Array for median
         for (int index = 0; index < cars.size(); index++) {                       // Car Loop
             Car car = cars.get(index);
 

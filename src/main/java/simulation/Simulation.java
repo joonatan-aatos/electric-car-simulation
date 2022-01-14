@@ -26,7 +26,7 @@ public class Simulation implements Runnable {
     private final ArrayList<int[]> roadStatisticsOverTime;
     private final ArrayList<int[]> chargerStatisticsOverTime;
 
-    private double cumulativeDistributionCounter = 0.01;
+    private double cumulativeDistributionCounter = 0.1;
 
     public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter) {
         name = name_;

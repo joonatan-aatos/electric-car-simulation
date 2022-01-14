@@ -17,8 +17,8 @@ public class CarSimulation {
     private static final Logger logger = Logger.getGlobal();
 
     private static final int REPEAT_COUNT = 1;
-    private static final int MAX_CAR_COUNT = 200;
-    private static final int MIN_CAR_COUNT = 200;
+    private static final int MAX_CAR_COUNT = 10000;
+    private static final int MIN_CAR_COUNT = 10000;
     private static final int CAR_COUNT_CHANGE = 1;
     private static boolean showUI = false;
     private static boolean EXPORT_FILES = false;
@@ -42,7 +42,7 @@ public class CarSimulation {
             Routes routes = new Routes();
             routes.generateRoutes();
 
-            Simulation simulation = new Simulation("visualized", routes, 1000, 3600, 14400, true, true);
+            Simulation simulation = new Simulation("visualized", routes, 500, 3600, 14400, true, false);
             Visualizer visualizer = showUI ? new Visualizer(simulation, routes) : null;
             Thread simulationThread = new Thread(simulation);
             simulationThread.start();

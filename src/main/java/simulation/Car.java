@@ -2,7 +2,7 @@ package simulation;
 
 import java.util.logging.Logger;
 
-public class Car {
+public class Car implements Comparable<Car> {
 
     private static final Logger logger = Logger.getGlobal();
 
@@ -34,14 +34,19 @@ public class Car {
 
     private int timesCharged;
 
+    @Override
+    public int compareTo(Car car) {
+        return this.index - car.index;
+    }
+
     public enum State {
         OnHighway(0),
         OnWayToHighway(1),
         OnWayFromHighway(2),
         OnWayToCharger(3),
         OnWayFromCharger(4),
-        Charging(6),
         Waiting(5),
+        Charging(6),
         BatteryDepleted(7),
         DestinationReached(8);
 
@@ -465,6 +470,10 @@ public class Car {
 
     public long[] getStateTime() {
         return stateTime;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public int getTimesCharged() {

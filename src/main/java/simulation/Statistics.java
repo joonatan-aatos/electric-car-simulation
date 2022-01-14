@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
@@ -45,6 +46,11 @@ public class Statistics {
     private interface CarModelCallback {
         String run(CarModelStatistics carModelStatistics);
     }
+    private interface CarCallback {
+        String run(Car car);
+    }
+
+    private final String[] stateNames = new String[]{"Valtatiellä", "Matkalla valtatielle", "Matkalla valtatieltä", "Matkalla laturille", "Matkalla laturilta", "Odottamassa", "Latautumassa", "Akku loppunut", "Perillä"};
 
     private final int totalCars;
     private final int[] trafficStatistics; // count
@@ -61,7 +67,8 @@ public class Statistics {
 
     private final ArrayList<Car> cars;
     private final HashMap<CarType, CarModelStatistics> carModelStatistics;
-    private final HashMap<String, CarModelCallback> runnableCallbacks;
+    private final HashMap<String, CarModelCallback> carModelRunnableCallbacks;
+    private final HashMap<String, CarCallback> carRunnableCallbacks;
 
     public Statistics (Simulation simulation) {
         trafficStatistics = new int[6];
@@ -75,6 +82,7 @@ public class Statistics {
         chargerStatisticsOverTime = simulation.getChargerStatisticsOverTime();
 
         cars = simulation.getCars();
+        Collections.sort(cars);
         totalCars = cars.size();
 
         carModelStatistics = new HashMap<>();
@@ -126,9 +134,10 @@ public class Statistics {
             stateStatistics[i][1] = (stateTimesArray[i].length%2==0)? stateTimesArray[i][cars.size()/2] + stateTimesArray[i][cars.size()/2 - 1] / 2 : stateTimesArray[i][(int) (cars.size()/2f)];
         }
 
-        runnableCallbacks = new HashMap<>();
+        carModelRunnableCallbacks = new HashMap<>();
+        carRunnableCallbacks = new HashMap<>();
         //  Functions to be run for each car
-        runnableCallbacks.put("Latauskertojen määrä (Latauksien määrä/ 100km)", (CarModelStatistics carModel) -> {
+        carModelRunnableCallbacks.put("Latauskertojen määrä (Latauksien määrä/ 100km)", (CarModelStatistics carModel) -> {
             int sum = 0;
             int i = 0;
             while (i < carModel.timesCharged.size()) {
@@ -137,18 +146,28 @@ public class Statistics {
             }
             return String.format("%.2f", sum/(double)i);
         });
-        runnableCallbacks.put("Kokonaisaika (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
+        carModelRunnableCallbacks.put("Kokonaisaika (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
                 carModel.totalTime / (double) (carModel.amount*60)
         ));
-        runnableCallbacks.put("Aika laturilla (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
+        carModelRunnableCallbacks.put("Aika laturilla (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
                 carModel.totalStateTimes[Car.State.Charging.index] / (double) (carModel.amount*60)
         ));
-        runnableCallbacks.put("Aika odottamassa (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
+        carModelRunnableCallbacks.put("Aika odottamassa (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
                 carModel.totalStateTimes[Car.State.Waiting.index] / (double) (carModel.amount*60)
         ));
-        runnableCallbacks.put("Aika valtatiellä (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
+        carModelRunnableCallbacks.put("Aika valtatiellä (min/auto)", (CarModelStatistics carModel) -> String.format("%.2f",
                 carModel.totalStateTimes[Car.State.OnHighway.index] / (double) (carModel.amount*60)
         ));
+
+
+        for (int i = 0; i < Car.State.values().length; i++) {
+            int index = i;
+            carRunnableCallbacks.put(stateNames[i] + " (min)", (Car car) -> String.format("%.2f",
+                    car.getStateTime()[index]/60f
+            ));
+        }
+        carRunnableCallbacks.put("Kokonaisaika (min)", (Car car) -> String.format("%.2f", LongStream.of(car.getStateTime()).sum()/60f));
+        carRunnableCallbacks.put("Reitin Pituus (km)", (Car car) -> String.format("%.2f", car.getRoute().getLength()));
 
 
     }
@@ -156,9 +175,11 @@ public class Statistics {
     public void export(String simulationName) {
         PrintWriter statisticsPrintWriter = null;
         PrintWriter carModelStatisticsPrintWriter = null;
+        PrintWriter carStatisticsPrintWriter = null;
         try {
             statisticsPrintWriter = new PrintWriter(String.format("output/%s-statistics.csv", simulationName), StandardCharsets.UTF_8);
             carModelStatisticsPrintWriter = new PrintWriter(String.format("output/%s-car_model_statistics.csv", simulationName), StandardCharsets.UTF_8);
+            carStatisticsPrintWriter = new PrintWriter(String.format("output/%s-car_statistics.csv", simulationName), StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
             logger.severe("Failed to export statistics");
@@ -167,24 +188,48 @@ public class Statistics {
 
         statisticsPrintWriter.println(this.statisticsToCSV());
         carModelStatisticsPrintWriter.println(this.carModelStatisticsToCSV());
+        carStatisticsPrintWriter.println(this.carStatisticsToCSV());
 
         statisticsPrintWriter.close();
         carModelStatisticsPrintWriter.close();
+        carStatisticsPrintWriter.close();
     }
 
     public String carModelStatisticsToCSV() {
         StringBuilder s = new StringBuilder();
         s.append("Malli;Määrä;Akun koko (kWh);Max AC teho (kW);Max DC teho (kW);Ajotehokkuus (kWh/100km)");
-        for (String key : runnableCallbacks.keySet()) {
+        for (String key : carModelRunnableCallbacks.keySet()) {
             s.append(";").append(key);
         }
         s.append("\n");
 
         for (CarType carType : CarType.values()) {
             s.append(String.format("%s;%d;%.2f;%.2f;%.2f;%.2f", carType.name(), carModelStatistics.get(carType).amount, carType.getCapacity(), carType.getMaxChargingPowerAC(), carType.getMaxChargingPowerDC(), carType.getDrivingEfficiency()));
-            for (String key : runnableCallbacks.keySet()) {
-                s.append(";").append(runnableCallbacks.get(key).run(carModelStatistics.get(carType)));
+            for (String key : carModelRunnableCallbacks.keySet()) {
+                s.append(";").append(carModelRunnableCallbacks.get(key).run(carModelStatistics.get(carType)));
             }
+            s.append("\n");
+        }
+
+        return s.toString();
+    }
+    public String carStatisticsToCSV() {
+        StringBuilder s = new StringBuilder();
+        s.append("Indeksi;Malli");
+        for (String key : carRunnableCallbacks.keySet()) {
+            s.append(";").append(key);
+        }
+        s.append(";Akun koko (kWh);Max AC teho (kW);Max DC teho (kW);Ajotehokkuus (kWh/100km)");
+        s.append("\n");
+
+        for (Car car : cars) {
+            s.append(String.format("%d;%s", car.getIndex(), car.getCarType().name()));
+            for (String key : carRunnableCallbacks.keySet()) {
+                s.append(";").append(carRunnableCallbacks.get(key).run(car));
+            }
+            s.append(String.format(";%.2f;%.2f;%.2f;%.2f",
+                    car.getCarType().getCapacity(), car.getCarType().getMaxChargingPowerAC(), car.getCarType().getMaxChargingPowerDC(), car.getCarType().getDrivingEfficiency()
+            ));
             s.append("\n");
         }
 

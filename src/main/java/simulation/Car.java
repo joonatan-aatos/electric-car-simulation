@@ -360,8 +360,7 @@ public class Car {
         ChargingStation chargingStation = route.getChargingStations().get(chargingStationIndex);
 
         double distanceCoefficient = 1 +
-                Math.abs(distanceFromStartToChargingStation(chargingStationIndex) - optimalDistance);
-        distanceCoefficient = Math.pow(distanceCoefficient, 2);
+                Math.pow(distanceFromStartToChargingStation(chargingStationIndex) - optimalDistance, 2);
 
         double commonPreferencePoints = calculateCommonPreferencePoints(chargingStation);
 

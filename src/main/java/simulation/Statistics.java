@@ -2,10 +2,7 @@ package simulation;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.LongStream;
 
@@ -68,7 +65,7 @@ public class Statistics {
     private final ArrayList<Car> cars;
     private final HashMap<CarType, CarModelStatistics> carModelStatistics;
     private final HashMap<String, CarModelCallback> carModelRunnableCallbacks;
-    private final HashMap<String, CarCallback> carRunnableCallbacks;
+    private final ArrayList<AbstractMap.SimpleEntry<String, CarCallback>> carRunnableCallbacks;
 
     public Statistics (Simulation simulation) {
         trafficStatistics = new int[6];
@@ -135,7 +132,7 @@ public class Statistics {
         }
 
         carModelRunnableCallbacks = new HashMap<>();
-        carRunnableCallbacks = new HashMap<>();
+        carRunnableCallbacks = new ArrayList<>();
         //  Functions to be run for each car
         carModelRunnableCallbacks.put("Latauskertojen määrä (Latauksien määrä/ 100km)", (CarModelStatistics carModel) -> {
             int sum = 0;
@@ -162,14 +159,13 @@ public class Statistics {
 
         for (int i = 0; i < Car.State.values().length; i++) {
             int index = i;
-            carRunnableCallbacks.put(stateNames[i] + " (min)", (Car car) -> String.format("%.2f",
+            carRunnableCallbacks.add(new AbstractMap.SimpleEntry<>(stateNames[i] + " (min)", (Car car) -> String.format("%.2f",
                     car.getStateTime()[index]/60f
-            ));
+            )));
         }
-        carRunnableCallbacks.put("Kokonaisaika (min)", (Car car) -> String.format("%.2f", LongStream.of(car.getStateTime()).sum()/60f));
-        carRunnableCallbacks.put("Reitin Pituus (km)", (Car car) -> String.format("%.2f", car.getRoute().getLength()));
-        carRunnableCallbacks.put("Lähtöaika (min)", (Car car) -> String.format("%.2f", car.getCreationTime()/60f));
-
+        carRunnableCallbacks.add(new AbstractMap.SimpleEntry<>("Kokonaisaika (min)", (Car car) -> String.format("%.2f", LongStream.of(car.getStateTime()).sum()/60f)));
+        carRunnableCallbacks.add(new AbstractMap.SimpleEntry<>("Reitin Pituus (km)", (Car car) -> String.format("%.2f", car.getRoute().getLength())));
+        carRunnableCallbacks.add(new AbstractMap.SimpleEntry<>("Lähtöaika (min)", (Car car) -> String.format("%.2f", car.getCreationTime()/60f)));
 
     }
 
@@ -217,16 +213,16 @@ public class Statistics {
     public String carStatisticsToCSV() {
         StringBuilder s = new StringBuilder();
         s.append("Indeksi;Malli");
-        for (String key : carRunnableCallbacks.keySet()) {
-            s.append(";").append(key);
+        for (AbstractMap.SimpleEntry<String, CarCallback> pair : carRunnableCallbacks) {
+            s.append(";").append(pair.getKey());
         }
         s.append(";Akun koko (kWh);Max AC teho (kW);Max DC teho (kW);Ajotehokkuus (kWh/100km)");
         s.append("\n");
 
         for (Car car : cars) {
             s.append(String.format("%d;%s", car.getIndex(), car.getCarType().name()));
-            for (String key : carRunnableCallbacks.keySet()) {
-                s.append(";").append(carRunnableCallbacks.get(key).run(car));
+            for (AbstractMap.SimpleEntry<String, CarCallback> pair : carRunnableCallbacks) {
+                s.append(";").append(pair.getValue().run(car));
             }
             s.append(String.format(";%.2f;%.2f;%.2f;%.2f",
                     car.getCarType().getCapacity(), car.getCarType().getMaxChargingPowerAC(), car.getCarType().getMaxChargingPowerDC(), car.getCarType().getDrivingEfficiency()
@@ -251,11 +247,11 @@ public class Statistics {
         Car.State[] states = Car.State.values();
         s.append("Keskimääräinen auton tila:\n");
 
-        s.append("Tila;Aika (min/auto);Prosenttiosuus;Mediaaniaika\n");
+        s.append("Tila;Aika (min/auto);Prosenttiosuus;Mediaaniaika (min)\n");
         for (int i = 0; i < states.length; i++) {
             if (i == Car.State.DestinationReached.index || i == Car.State.BatteryDepleted.index)
                 continue;
-            s.append(states[i].toString()).append(";").append((double) stateStatistics[i][0] / (double) (totalCars*60L) + ";").append((double) stateStatistics[i][0] / (double) totalStateTime * 100d + "").append(";").append(stateStatistics[i][1]).append("\n");
+            s.append(states[i].toString()).append(";").append((double) stateStatistics[i][0] / (double) (totalCars * 60L)).append(";").append((double) stateStatistics[i][0] / (double) totalStateTime * 100d).append(";").append((double) stateStatistics[i][1]/60d).append("\n");
         }
         s.append("\n\n");
         s.append(String.format("Ajamiseen kulunut aika; %.0f; min/auto\n", (double) totalStateTime / (double) (totalCars*60L)));

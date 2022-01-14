@@ -26,7 +26,7 @@ public class Simulation implements Runnable {
     private final ArrayList<int[]> roadStatisticsOverTime;
     private final ArrayList<int[]> chargerStatisticsOverTime;
 
-    private double cumulativeDistributionCounter = 0;
+    private double cumulativeDistributionCounter = 0.01;
 
     public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter) {
         name = name_;
@@ -54,6 +54,7 @@ public class Simulation implements Runnable {
     }
 
     private void createCars() {
+        logger.config(String.format("[%s]: Creating cars...", name));
         cars = new ArrayList<>();
         carsToBeAdded = new ArrayList<>();
         int carSum = Arrays.stream(CarType.values()).mapToInt(CarType::getAmount).sum();
@@ -68,6 +69,11 @@ public class Simulation implements Runnable {
                 carsToBeAdded.add(car);
                 carCounter--;
             }
+        }
+        if (carsToBeAdded.size() == TOTAL_CARS - 1) {
+            Car car = new Car(carTypes.get(carTypes.size() - 1), carsToBeAdded.size());
+            car.setRoute(routes.generateRandomRoute());
+            carsToBeAdded.add(car);
         }
         Collections.shuffle(carsToBeAdded);
     }

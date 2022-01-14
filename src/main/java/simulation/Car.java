@@ -18,7 +18,7 @@ public class Car {
     private long timeStep;
 
     private double hunger; // In seconds since last eaten
-    private double timesShopped;
+    private double timeSinceLastShopped;
     private double timeSpentCharging;
     private double battery;
     private double drivenDistance;
@@ -67,7 +67,7 @@ public class Car {
         continueDriving = false;
         currentCharger = null;
         hunger = 0;
-        timesShopped = 0;
+        timeSinceLastShopped = 0;
         stateTime = new long[9];
         logger.info(String.format("Created car: %s", this.toString()));
 
@@ -88,6 +88,7 @@ public class Car {
     public void tick(long TIME_STEP) {
         timeStep = TIME_STEP;
         hunger += timeStep;
+        timeSinceLastShopped += timeStep;
         switch (state) {
             case OnWayToHighway:
                 driveToHighway();
@@ -204,6 +205,9 @@ public class Car {
             if (route.getChargingStations().get(currentChargingStationIndex).isHasFood()) {
                 hunger = 0;
             }
+            if (route.getChargingStations().get(currentChargingStationIndex).isHasShop()) {
+                timeSinceLastShopped = 0;
+            }
             currentCharger.setInUse(false);
             currentCharger = null;
             state = State.OnWayFromCharger;
@@ -252,9 +256,6 @@ public class Car {
 
         ChargingStation station = route.getChargingStations().get(currentChargingStationIndex);
         if (distanceFromHighway >= station.getDistanceFromHighway()) {
-            if (station.isHasShop()) {
-                timesShopped++;
-            }
             ChargingStation.Charger availableCharger = station.getAvailableCharger(carType.getSupportedChargers());
             if (availableCharger == null) {
                 logger.finer(String.format(
@@ -396,7 +397,7 @@ public class Car {
 
         double amenitiesCoefficient = 2 +
                 (chargingStation.isHasFood() ? 1 : 0) * hunger/3600 +       // Coefficient attains +1 per hour hungry
-                (chargingStation.isHasShop() ? 1 : 0) / Math.pow(2, timesShopped) + //  Shopping number gets multiplied by 1/2 for every time shopped
+                (chargingStation.isHasShop() ? 1 : 0) * timeSinceLastShopped /3600 + //  Shopping number gets multiplied by 1/2 for every time shopped
                 (chargingStation.isCustomerExclusive() ? -1 : 0);
 
         return

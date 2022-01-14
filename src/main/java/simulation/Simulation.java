@@ -87,7 +87,7 @@ public class Simulation implements Runnable {
 
         boolean carsCreatedLogged = false;
 
-        while (!allCarsHaveReachedTheirDestination() || seconds < NORM_DIST_MEAN) {
+        while (!allCarsHaveReachedTheirDestination() || seconds < NORM_DIST_MEAN + 1) {
 
             int[] globalStateStatistics = new int[Car.State.values().length];
             int[][] stateStatistics = new int[routes.routeKeys.size()][Car.State.values().length];
@@ -234,6 +234,10 @@ public class Simulation implements Runnable {
 
     public ArrayList<int[]> getChargerStatisticsOverTime() {
         return chargerStatisticsOverTime;
+    }
+
+    public int getTOTAL_CARS() {
+        return TOTAL_CARS;
     }
 
     @Override

@@ -53,6 +53,10 @@ public class Statistics {
     private ArrayList<CarStatistics> carStatistics;
     private ArrayList<int[][]> stateStatisticsOverTime;
     private ArrayList<int[]> globalStateStatisticsOverTime;
+    private ArrayList<int[]> roadStatisticsOverTime;
+    private ArrayList<int[]> chargerStatisticsOverTime;
+
+
     private final long timeStep;
 
     private final ArrayList<Car> cars;
@@ -67,6 +71,8 @@ public class Statistics {
         timeStep = simulation.getTimeStep();
         stateStatisticsOverTime = simulation.getStateStatisticsOverTime();
         globalStateStatisticsOverTime = simulation.getGlobalStateStatisticsOverTime();
+        roadStatisticsOverTime = simulation.getRoadStatisticsOverTime();
+        chargerStatisticsOverTime = simulation.getChargerStatisticsOverTime();
 
         cars = simulation.getCars();
         totalCars = cars.size();
@@ -76,8 +82,8 @@ public class Statistics {
             carModelStatistics.put(carType, new CarModelStatistics());
         }
 
-        int[][] stateTimesArray = new int[9][cars.size()];  // Array for median
-        for (int index = 0; index < cars.size(); index++) {
+        int[][] stateTimesArray = new int[9][simulation.getTOTAL_CARS() -1];  // Array for median       NOTICE: The -1 is there, since the real car count is always TOTAL_CARS -1
+        for (int index = 0; index < cars.size(); index++) {                       // Car Loop
             Car car = cars.get(index);
 
             carStatistics.add(new CarStatistics(car));
@@ -117,7 +123,7 @@ public class Statistics {
         // Sorting for median
         for (int i = 0; i < 9; i++) {
             Arrays.sort(stateTimesArray[i]);
-            stateStatistics[i][1] = (cars.size()%2==0)? stateTimesArray[i][cars.size()/2] + stateTimesArray[i][cars.size()/2 - 1] / 2 : stateTimesArray[i][(int) (cars.size()/2f)];
+            stateStatistics[i][1] = (stateTimesArray[i].length%2==0)? stateTimesArray[i][cars.size()/2] + stateTimesArray[i][cars.size()/2 - 1] / 2 : stateTimesArray[i][(int) (cars.size()/2f)];
         }
 
         runnableCallbacks = new HashMap<>();
@@ -223,7 +229,7 @@ public class Statistics {
 
         // State stats over time
         s.append("Autojen tila joka ajanhetkeltä:\n");
-        s.append("Aika (min);Valtatiellä;Matkalla valtatielle;Matkalla valtatieltä;Matkalla laturille;Matkalla laturilta;Latautumassa;Odottamassa;Akku loppunut;Perillä;Yhteensä\n");
+        s.append("Aika (min);Valtatiellä;Matkalla valtatielle;Matkalla valtatieltä;Matkalla laturille;Matkalla laturilta;Latautumassa;Odottamassa;Akku loppunut;Perillä;Yhteensä;;Tiellä (HeLa);Tiellä (LaJy);Tiellä (JyOu);Tiellä (OuKe);Tiellä (KeRo);Tiellä (RoUt);Latautumassa (HeLa);Latautumassa (LaJy);Latautumassa (JyOu);Latautumassa (OuKe);Latautumassa (KeRo);Latautumassa (RoUt);\n");
         for (int i = 0; i < globalStateStatisticsOverTime.size(); i+=30) {
             s.append(i/6);
             int sum = 0;
@@ -231,7 +237,14 @@ public class Statistics {
                 s.append(";").append(carCount);
                 sum += carCount;
             }
-            s.append(";").append(sum).append("\n");
+            s.append(";").append(sum).append(";");
+            for (int carCount : roadStatisticsOverTime.get(i)) {
+                s.append(";").append(carCount);
+            }
+            for (int carCount : chargerStatisticsOverTime.get(i)) {
+                s.append(";").append(carCount);
+            }
+            s.append("\n");
         }
 
         return s.toString();

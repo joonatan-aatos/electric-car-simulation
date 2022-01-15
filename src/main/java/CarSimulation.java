@@ -16,10 +16,10 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 10;
-    private static final int MAX_CAR_COUNT = 1000;
-    private static final int MIN_CAR_COUNT = 10;
-    private static final int CAR_COUNT_CHANGE = 10;
+    private static final int REPEAT_COUNT = 5;
+    private static final int MAX_CAR_COUNT = 2000;
+    private static final int MIN_CAR_COUNT = 20;
+    private static final int CAR_COUNT_CHANGE = 20;
     private static boolean showUI = false;
 
     private static final int THREAD_COUNT = 8;
@@ -56,16 +56,22 @@ public class CarSimulation {
             statistics.export(simulation.getName());
         }
         else {
+            logger.info("Creating simulations...");
+            System.out.println("Creating simulations...");
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
                 for (int i = 0; i < REPEAT_COUNT; i++) {
                     Routes routes = new Routes();
                     routes.generateRoutes();
                     simulations.add(new Simulation(String.format("r%d-c%d", i+1, carCount), routes, carCount, 3600, 14400, false, false));
+                    printState(simulations.size() / ((((double) MAX_CAR_COUNT - (double) MIN_CAR_COUNT) / (double) CAR_COUNT_CHANGE + 1) * (double) REPEAT_COUNT));
                 }
             }
+            logger.info("Simulations created!");
             simulationCount = simulations.size();
+            System.out.println("\nSimulations created!");
             System.out.println("Total simulation count: " + simulationCount);
-            printState();
+            logger.info("Total simulation count: " + simulationCount);
+            printState((double) simulationsRan/simulationCount);
             simulationStartTime = System.currentTimeMillis();
 
             for (int i = 0; i < THREAD_COUNT; i++) {
@@ -105,7 +111,7 @@ public class CarSimulation {
                     // Export simulation statistics
                     Statistics statistics = new Statistics(simulation);
                     statistics.export(simulation.getName());
-                    printState();
+                    printState((double) simulationsRan/simulationCount);
                 } catch (ConcurrentModificationException | NullPointerException | ArrayIndexOutOfBoundsException e) {
                     logger.warning("Exception caught: "+e.getLocalizedMessage());
                     e.printStackTrace();
@@ -122,8 +128,7 @@ public class CarSimulation {
         }
     }
 
-    private static void printState() {
-        double progress = (double) simulationsRan/simulationCount;
+    private static void printState(double progress) {
         int barLength = 50;
         StringBuilder s = new StringBuilder();
         s.append("\rProgress: [");

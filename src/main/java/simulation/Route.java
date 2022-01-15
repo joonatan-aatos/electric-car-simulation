@@ -19,8 +19,6 @@ public class Route {
      */
     private final ArrayList<Route> rootRoutes;
 
-    private static final Random random = new Random();
-
     public Route(Routes routes_, String name_, double length_, ArrayList<ChargingStation> chargingStations_, EndPoint startPoint_, EndPoint endPoint_) {
         routes = routes_;
         rootRoutes = null;
@@ -157,6 +155,10 @@ public class Route {
 
     public ArrayList<Route> getRootRoutes() {
         return rootRoutes;
+    }
+
+    public Routes getRoutes() {
+        return routes;
     }
 
     @Override

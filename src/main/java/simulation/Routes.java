@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,13 @@ public class Routes {
     public HashMap<String, Double> trafficData = new HashMap<>();
     public ArrayList<String> routeKeys = new ArrayList<>();
     public ArrayList<Double> endPointWeights = new ArrayList<>();
+    public final Random random;
+    public final long seed;
+
+    public Routes(long seed_) {
+        seed = seed_;
+        random = new Random(seed);
+    }
 
     private HashMap<String, Double> readTrafficData(String path) {
 
@@ -162,7 +170,7 @@ public class Routes {
         ArrayList<EndPoint> endPoints = new ArrayList<>(List.of(EndPoint.values()));
         // Select random start point with weights
         int startPointIndex = 0;
-        for (double r = Math.random(); startPointIndex < endPointWeights.size() - 1; ++startPointIndex) {
+        for (double r = random.nextDouble(); startPointIndex < endPointWeights.size() - 1; ++startPointIndex) {
             r -= endPointWeights.get(startPointIndex);
             if (r <= 0.0) break;
         }
@@ -200,7 +208,7 @@ public class Routes {
 
         // Select random end point with weights
         int endPointIndex = 0;
-        for (double r = Math.random(); endPointIndex < weights.size() - 1; ++endPointIndex) {
+        for (double r = random.nextDouble(); endPointIndex < weights.size() - 1; ++endPointIndex) {
             r -= weights.get(endPointIndex);
             if (r <= 0.0) break;
         }
@@ -208,7 +216,7 @@ public class Routes {
 
         // Randomly flip the route
         Route route = generateShortestRoute2(startPoint, endPoint);
-        if (Math.random() > 0.5) {
+        if (random.nextDouble() > 0.5) {
             route = route.getFlippedRoute(this);
         }
         return route;

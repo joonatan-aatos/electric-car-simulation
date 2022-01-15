@@ -455,8 +455,8 @@ public class Car implements Comparable<Car> {
 
     public void setRoute(Route route) {
         this.route = route;
-        distanceFromHighway = Math.random() * route.getStartPoint().maxDistanceFromStartPoint;
-        destinationDistanceFromEndPoint = Math.random() * route.getEndPoint().maxDistanceFromStartPoint;
+        distanceFromHighway = route.getRoutes().random.nextDouble() * route.getStartPoint().maxDistanceFromStartPoint;
+        destinationDistanceFromEndPoint = route.getRoutes().random.nextDouble() * route.getEndPoint().maxDistanceFromStartPoint;
         logger.info(String.format("%s: %s: %s", this.toString(), "Route set", route.getName()));
     }
 

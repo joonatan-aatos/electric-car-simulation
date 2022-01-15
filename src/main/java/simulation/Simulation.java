@@ -26,11 +26,11 @@ public class Simulation implements Runnable {
     private final ArrayList<int[]> roadStatisticsOverTime;
     private final ArrayList<int[]> chargerStatisticsOverTime;
 
-    private double cumulativeDistributionCounter = 0.1;
+    private double cumulativeDistributionCounter = 0.5;
 
     public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter) {
         name = name_;
-        routes = routes_ != null ? routes_ : new Routes();
+        routes = routes_ != null ? routes_ : new Routes(0);
         TOTAL_CARS = carCount;
         NORM_DIST_STANDARD_DEVIATION = standardDeviation;
         NORM_DIST_MEAN = mean;
@@ -60,7 +60,7 @@ public class Simulation implements Runnable {
         int carSum = Arrays.stream(CarType.values()).mapToInt(CarType::getAmount).sum();
         double carCounter = 0;
         List<CarType> carTypes = Arrays.asList(CarType.values());
-        Collections.shuffle(carTypes);
+        Collections.shuffle(carTypes, routes.random);
         for (CarType carType : carTypes) {
             carCounter += (double) carType.getAmount() / carSum * TOTAL_CARS;
             while (carCounter >= 1) {
@@ -75,7 +75,7 @@ public class Simulation implements Runnable {
             car.setRoute(routes.generateRandomRoute());
             carsToBeAdded.add(car);
         }
-        Collections.shuffle(carsToBeAdded);
+        Collections.shuffle(carsToBeAdded, routes.random);
     }
 
     public void start() {

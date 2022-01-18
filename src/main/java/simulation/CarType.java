@@ -14,7 +14,7 @@ public enum CarType {
     HYUNDAI_IONIQ(465, 58.0, 16.7, 11.0, 220.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     HYUNDAI_KONA(565, 42.0, 13.7, 7.2, 50.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     JAGUAR_I_PACE(164, 90.0, 22.0, 11.0, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
-    KIA_NIRO(183, 8.9, 21.3, 3.3, 0.0, new ArrayList<String>(List.of("Type2"))),
+    KIA_NIRO(183, 39.0, 15.2, 7.2, 50.0, new ArrayList<String>(List.of("Type2", "CCS"))),
     KIA_SOUL(62, 33.0, 14.3, 6.6, 100.0, new ArrayList<String>(Arrays.asList("Type2", "CHAdeMO"))),
     MAZDA_MX_3(26, 35.5, 19.0, 6.6, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     MERCEDES_B250(45, 31.0, 21.5, 9.6, 0.0, new ArrayList<String>(List.of("Type2"))),
@@ -39,7 +39,7 @@ public enum CarType {
     VOLKSWAGEN_E_GOLF(487, 35.8, 15.2, 7.2, 40.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     VOLKSWAGEN_ID_3(496, 65.0, 14.6, 11.0, 87.5, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
     VOLKSWAGEN_E_UP1(371, 36.8, 14.3, 7.2, 50.0, new ArrayList<String>(Arrays.asList("Type2", "CCS"))),
-    VOLVO_XC40(154, 10.7, 25.2, 3.7, 0.0, new ArrayList<String>(List.of("Type2")));
+    VOLVO_XC40(154, 78.0, 23.6, 11.0, 150.0, new ArrayList<String>(List.of("Type2","CCS")));
 
     private int amount; // count
     private double capacity; // kWh

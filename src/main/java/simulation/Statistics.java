@@ -57,7 +57,7 @@ public class Statistics {
     private ArrayList<int[][]> stateStatisticsOverTime;
     private ArrayList<int[]> globalStateStatisticsOverTime;
     private ArrayList<int[]> roadStatisticsOverTime;
-    private ArrayList<int[]> chargerStatisticsOverTime;
+    private ArrayList<int[]> waitingStatisticsOverTime;
 
 
     private final long timeStep;
@@ -76,7 +76,7 @@ public class Statistics {
         stateStatisticsOverTime = simulation.getStateStatisticsOverTime();
         globalStateStatisticsOverTime = simulation.getGlobalStateStatisticsOverTime();
         roadStatisticsOverTime = simulation.getRoadStatisticsOverTime();
-        chargerStatisticsOverTime = simulation.getChargerStatisticsOverTime();
+        waitingStatisticsOverTime = simulation.getWaitingStatisticsOverTime();
 
         cars = simulation.getCars();
         Collections.sort(cars);
@@ -95,8 +95,8 @@ public class Statistics {
 
             // Traffic statistics
             Route route = car.getRoute();
-            int startIndex = route.getStartPoint().index;
-            int endIndex = route.getEndPoint().index;
+            int startIndex = Math.min(route.getStartPoint().index, route.getEndPoint().index);
+            int endIndex = Math.max(route.getStartPoint().index, route.getEndPoint().index);
             for (int i = startIndex; i < endIndex; i++) {
                 trafficStatistics[i]++;
             }
@@ -241,9 +241,11 @@ public class Statistics {
         // State statistics
         long stateStatisticsSum = 0;
         for (int i = 0; i < 9; i++) {
+            if (i == Car.State.DestinationReached.index || i == Car.State.BatteryDepleted.index)
+                continue;
             stateStatisticsSum += stateStatistics[i][0];
         }
-        long totalStateTime = stateStatisticsSum - stateStatistics[4][0];
+        long totalStateTime = stateStatisticsSum;
         Car.State[] states = Car.State.values();
         s.append("Keskimääräinen auton tila:\n");
 
@@ -251,7 +253,10 @@ public class Statistics {
         for (int i = 0; i < states.length; i++) {
             if (i == Car.State.DestinationReached.index || i == Car.State.BatteryDepleted.index)
                 continue;
-            s.append(states[i].toString()).append(";").append((double) stateStatistics[i][0] / (double) (totalCars * 60L)).append(";").append((double) stateStatistics[i][0] / (double) totalStateTime * 100d).append(";").append((double) stateStatistics[i][1]/60d).append("\n");
+            s.append(states[i].toString()).append(";")
+                    .append((double) stateStatistics[i][0] / (double) (totalCars * 60L)).append(";")
+                    .append((double) stateStatistics[i][0] / (double) totalStateTime * 100d).append(";")
+                    .append((double) stateStatistics[i][1]/60d).append("\n");
         }
         s.append("\n\n");
         s.append(String.format("Ajamiseen kulunut aika; %.0f; min/auto\n", (double) totalStateTime / (double) (totalCars*60L)));
@@ -259,7 +264,7 @@ public class Statistics {
 
         // Traffic statistics
         int totalTraffic = Arrays.stream(trafficStatistics).sum();
-        s.append("\nLiikennetilastot:\n");
+        s.append("\nLiikennetilastot;Autojen määrä;Autojen määrä (%);\n");
         s.append("HeLa;").append(trafficStatistics[0]).append(String.format(";%.1f", (double) trafficStatistics[0] / (double) totalTraffic * 100d)).append("\n");
         s.append("LaJy;").append(trafficStatistics[1]).append(String.format(";%.1f", (double) trafficStatistics[1] / (double) totalTraffic * 100d)).append("\n");
         s.append("JyOu;").append(trafficStatistics[2]).append(String.format(";%.1f", (double) trafficStatistics[2] / (double) totalTraffic * 100d)).append("\n");
@@ -271,9 +276,9 @@ public class Statistics {
 
         // State stats over time
         s.append("Autojen tila joka ajanhetkeltä:\n");
-        s.append("Aika (min);Valtatiellä;Matkalla valtatielle;Matkalla valtatieltä;Matkalla laturille;Matkalla laturilta;Latautumassa;Odottamassa;Akku loppunut;Perillä;Yhteensä;;Tiellä (HeLa);Tiellä (LaJy);Tiellä (JyOu);Tiellä (OuKe);Tiellä (KeRo);Tiellä (RoUt);Latautumassa (HeLa);Latautumassa (LaJy);Latautumassa (JyOu);Latautumassa (OuKe);Latautumassa (KeRo);Latautumassa (RoUt);\n");
-        for (int i = 0; i < globalStateStatisticsOverTime.size(); i+=30) {
-            s.append(i/6);
+        s.append("Aika (min);Valtatiellä;Matkalla valtatielle;Matkalla valtatieltä;Matkalla laturille;Matkalla laturilta;Odottamassa;Latautumassa;Akku loppunut;Perillä;Yhteensä;;Tiellä (HeLa);Tiellä (LaJy);Tiellä (JyOu);Tiellä (OuKe);Tiellä (KeRo);Tiellä (RoUt);Odottamassa (HeLa);Odottamassa (LaJy);Odottamassa (JyOu);Odottamassa (OuKe);Odottamassa (KeRo);Odottamassa (RoUt);\n");
+        for (int i = 0; i < globalStateStatisticsOverTime.size(); i++) {
+            s.append((double) i/6d);
             int sum = 0;
             for (int carCount : globalStateStatisticsOverTime.get(i)) {
                 s.append(";").append(carCount);
@@ -283,7 +288,7 @@ public class Statistics {
             for (int carCount : roadStatisticsOverTime.get(i)) {
                 s.append(";").append(carCount);
             }
-            for (int carCount : chargerStatisticsOverTime.get(i)) {
+            for (int carCount : waitingStatisticsOverTime.get(i)) {
                 s.append(";").append(carCount);
             }
             s.append("\n");

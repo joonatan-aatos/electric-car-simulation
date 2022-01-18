@@ -13,16 +13,13 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 10;
-    private static final int MAX_CAR_COUNT = 1000;
-    private static final int MIN_CAR_COUNT = 10;
-    private static final int CAR_COUNT_CHANGE = 10;
+    private static final int REPEAT_COUNT = 5;
+    private static final int MAX_CAR_COUNT = 2000;
+    private static final int MIN_CAR_COUNT = 100;
+    private static final int CAR_COUNT_CHANGE = 100;
     private static boolean showUI = false;
 
-    private static final int THREAD_COUNT = 8;
-    private static volatile int simulationsRan = 0;
-    private static final ArrayList<Thread> threads = new ArrayList<>();
-    private static final ArrayList<Simulation> simulations = new ArrayList<>();
+    private static int simulationsRan = 0;
     private static long simulationStartTime;
     private static long simulationEndTime;
     private static int simulationCount;
@@ -36,11 +33,14 @@ public class CarSimulation {
         }
         configureLogger();
 
+        simulationCount = ((MAX_CAR_COUNT-MIN_CAR_COUNT)/CAR_COUNT_CHANGE+1)*REPEAT_COUNT;
+        simulationStartTime = System.currentTimeMillis();
+
         if (showUI) {
             Routes routes = new Routes(random.nextLong());
             routes.generateRoutes();
 
-            Simulation simulation = new Simulation("visualized", routes, 500, 3600, 14400, true, false);
+            Simulation simulation = new Simulation("visualized", routes, MAX_CAR_COUNT, 3600, 14400, true, false);
             Visualizer visualizer = showUI ? new Visualizer(simulation, routes) : null;
             Thread simulationThread = new Thread(simulation);
             simulationThread.start();
@@ -55,68 +55,26 @@ public class CarSimulation {
             statistics.export(simulation.getName());
         }
         else {
-            logger.info("Creating simulations...");
-            System.out.println("Creating simulations...");
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
                 for (int i = 0; i < REPEAT_COUNT; i++) {
                     Routes routes = new Routes(random.nextLong());
                     routes.generateRoutes();
-                    simulations.add(new Simulation(String.format("r%d-c%d", i+1, carCount), routes, carCount, 3600, 14400, false, false));
-                    printState(simulations.size() / ((((double) MAX_CAR_COUNT - (double) MIN_CAR_COUNT) / (double) CAR_COUNT_CHANGE + 1) * (double) REPEAT_COUNT));
-                }
-            }
-            logger.info("Simulations created!");
-            simulationCount = simulations.size();
-            System.out.println("\nSimulations created!");
-            System.out.println("Total simulation count: " + simulationCount);
-            logger.info("Total simulation count: " + simulationCount);
-            printState((double) simulationsRan/simulationCount);
-            simulationStartTime = System.currentTimeMillis();
-
-            for (int i = 0; i < THREAD_COUNT; i++) {
-                Thread thread = new Thread(new SimulationThread(simulations.subList(i*simulationCount/THREAD_COUNT, (i+1)*simulationCount/THREAD_COUNT)));
-                threads.add(thread);
-                thread.start();
-            }
-            Thread.sleep(100);
-            simulations.clear();
-        }
-
-        for (Thread thread : threads) {
-            thread.join();
-        }
-
-        simulationEndTime = System.currentTimeMillis();
-        long totalTime = simulationEndTime - simulationStartTime;
-
-        System.out.printf("\nProcess finished in %d minutes and %d seconds.\n", (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60);
-        logger.info(String.format("Ran %d simulations in %d minutes and %d seconds.", simulationCount, (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60));
-    }
-
-    private static class SimulationThread implements Runnable {
-
-        private final ThreadLocal<List<Simulation>> localSimulations;
-        public SimulationThread (List<Simulation> simulations_) {
-            localSimulations = ThreadLocal.withInitial(() -> new ArrayList<>(simulations_));
-        }
-
-        @Override
-        public void run() {
-            while (localSimulations.get().size() > 0) {
-                try {
-                    Simulation simulation = localSimulations.get().remove(0);
+                    Simulation simulation = new Simulation(String.format("r%d-c%d", i+1, carCount), routes, carCount, 3600, 14400, false, false);
                     simulation.start();
                     simulationsRan++;
                     // Export simulation statistics
                     Statistics statistics = new Statistics(simulation);
                     statistics.export(simulation.getName());
                     printState((double) simulationsRan/simulationCount);
-                } catch (ConcurrentModificationException | NullPointerException | ArrayIndexOutOfBoundsException e) {
-                    logger.warning("Exception caught: "+e.getLocalizedMessage());
-                    e.printStackTrace();
                 }
             }
         }
+
+        simulationEndTime = System.currentTimeMillis();
+        long totalTime = simulationEndTime - simulationStartTime;
+
+        System.out.printf("\nRan %d simulations in %d minutes and %d seconds.\n", simulationCount, (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60);
+        logger.info(String.format("Ran %d simulations in %d minutes and %d seconds.", simulationCount, (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60));
     }
 
     private static void purgeDirectory(File dir) {

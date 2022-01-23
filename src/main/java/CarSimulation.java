@@ -13,10 +13,13 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 5;
-    private static final int MAX_CAR_COUNT = 2000;
-    private static final int MIN_CAR_COUNT = 100;
-    private static final int CAR_COUNT_CHANGE = 100;
+    private static final int REPEAT_COUNT = 3;
+    private static final int MAX_CAR_COUNT = 20000;
+    private static final int MIN_CAR_COUNT = 1000;
+    private static final int CAR_COUNT_CHANGE = 2000;
+    private static final int MIN_STANDARD_DEVIATION = 3600;
+    private static final int MAX_STANDARD_DEVIATION = 3600;
+    private static final int STANDARD_DEVIATION_CHANGE = 900;
     private static boolean showUI = false;
 
     private static int simulationsRan = 0;
@@ -56,16 +59,18 @@ public class CarSimulation {
         }
         else {
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
-                for (int i = 0; i < REPEAT_COUNT; i++) {
-                    Routes routes = new Routes(random.nextLong());
-                    routes.generateRoutes();
-                    Simulation simulation = new Simulation(String.format("r%d-c%d", i+1, carCount), routes, carCount, 3600, 14400, false, false);
-                    simulation.start();
-                    simulationsRan++;
-                    // Export simulation statistics
-                    Statistics statistics = new Statistics(simulation);
-                    statistics.export(simulation.getName());
-                    printState((double) simulationsRan/simulationCount);
+                for (int standardDeviation = MIN_STANDARD_DEVIATION; standardDeviation <= MAX_STANDARD_DEVIATION; standardDeviation += STANDARD_DEVIATION_CHANGE) {
+                    for (int i = 0; i < REPEAT_COUNT; i++) {
+                        Routes routes = new Routes(random.nextLong());
+                        routes.generateRoutes();
+                        Simulation simulation = new Simulation(String.format("r%d-c%d-s%d", i+1, carCount, standardDeviation), routes, carCount, standardDeviation, 4 * standardDeviation, false, false);
+                        simulation.start();
+                        simulationsRan++;
+                        // Export simulation statistics
+                        Statistics statistics = new Statistics(simulation);
+                        statistics.export(simulation.getName());
+                        printState((double) simulationsRan/simulationCount);
+                    }
                 }
             }
         }
@@ -98,12 +103,15 @@ public class CarSimulation {
         s.append(String.format("] %.1f%%   ", progress*100));
 
         if (simulationsRan != 0) {
+            /*
             double simulatingRate = (double) simulationsRan / (System.currentTimeMillis() - simulationStartTime);
             double timeLeft = (simulationCount - simulationsRan) / simulatingRate;
             if (timeLeft > 60000)
                 s.append(String.format("(%d minutes and %d seconds left)", (int) ((timeLeft / (1000*60)) % 60), (int) (timeLeft / 1000) % 60));
             else
                 s.append(String.format("(%d seconds left)", (int) (timeLeft / 1000) % 60));
+             */
+            s.append(String.format("(%d simulations remaining)", simulationCount-simulationsRan));
         }
 
         System.out.print(s);

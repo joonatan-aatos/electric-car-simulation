@@ -246,8 +246,12 @@ public class Simulation implements Runnable {
         return waitingStatisticsOverTime;
     }
 
-    public int getTOTAL_CARS() {
+    public int getTotalCars() {
         return TOTAL_CARS;
+    }
+
+    public int getStandardDeviation() {
+        return NORM_DIST_STANDARD_DEVIATION;
     }
 
     @Override

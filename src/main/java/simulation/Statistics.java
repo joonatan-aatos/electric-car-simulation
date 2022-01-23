@@ -50,6 +50,7 @@ public class Statistics {
     private final String[] stateNames = new String[]{"Valtatiellä", "Matkalla valtatielle", "Matkalla valtatieltä", "Matkalla laturille", "Matkalla laturilta", "Odottamassa", "Latautumassa", "Akku loppunut", "Perillä"};
 
     private final int totalCars;
+    private final int standardDeviation;
     private final int[] trafficStatistics; // count
     private final long[][] stateStatistics; // seconds
     private final long totalTime; // seconds
@@ -81,13 +82,14 @@ public class Statistics {
         cars = simulation.getCars();
         Collections.sort(cars);
         totalCars = cars.size();
+        standardDeviation = simulation.getStandardDeviation();
 
         carModelStatistics = new HashMap<>();
         for (CarType carType : CarType.values()) {
             carModelStatistics.put(carType, new CarModelStatistics());
         }
 
-        int[][] stateTimesArray = new int[9][simulation.getTOTAL_CARS()];  // Array for median
+        int[][] stateTimesArray = new int[9][simulation.getTotalCars()];  // Array for median
         for (int index = 0; index < cars.size(); index++) {                       // Car Loop
             Car car = cars.get(index);
 
@@ -236,6 +238,7 @@ public class Statistics {
     public String statisticsToCSV() {
         StringBuilder s = new StringBuilder();
         s.append("Autojen lukumäärä: ;").append(totalCars).append("\n");
+        s.append("Keskihajonta: ;").append(standardDeviation).append("\n");
         s.append("Kulunut aika (s): ;").append(totalTime).append("\n\n");
 
         // State statistics

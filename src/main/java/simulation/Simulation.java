@@ -28,9 +28,9 @@ public class Simulation implements Runnable {
 
     private double cumulativeDistributionCounter = 0.5;
 
-    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter) {
+    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter, double drivingEfficiencyCoefficient) {
         name = name_;
-        routes = routes_ != null ? routes_ : new Routes(0);
+        routes = routes_ != null ? routes_ : new Routes(0,1);
         TOTAL_CARS = carCount;
         NORM_DIST_STANDARD_DEVIATION = standardDeviation;
         NORM_DIST_MEAN = mean;
@@ -41,16 +41,12 @@ public class Simulation implements Runnable {
         roadStatisticsOverTime = new ArrayList<>();
         waitingStatisticsOverTime = new ArrayList<>();
 
-        if (isWinter)
-            setWinter();
+        for (CarType carType : CarType.values()) {
+            if (isWinter) carType.itIsWinter();
+            carType.applyDrivingEfficiencyCoefficient(drivingEfficiencyCoefficient);
+        }
 
         createCars();
-    }
-
-    private void setWinter() {
-        for (CarType carType : CarType.values()) {
-            carType.itIsWinter();
-        }
     }
 
     private void createCars() {

@@ -81,6 +81,10 @@ public enum CarType {
         drivingEfficiency /= winterDrivingCoefficient;      // Because the greater the value of "drivingEfficiency", the worse the efficiency. What a stupid metric.
     }
 
+    public void applyDrivingEfficiencyCoefficient(double coefficient){
+        drivingEfficiency*=coefficient;
+    }
+
     public int getAmount() {
         return amount;
     }

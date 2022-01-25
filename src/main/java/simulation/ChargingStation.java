@@ -15,17 +15,17 @@ public class ChargingStation {
     }
 
     public class Charger implements Comparable {
-        private final int power;
+        private final double power;
         private boolean inUse;
         private ChargerType type;
 
-        public Charger(int power_, ChargerType type_) {
+        public Charger(double power_, ChargerType type_) {
             power = power_;
             inUse = false;
             type = type_;
         }
 
-        public int getPower() {
+        public double getPower() {
             return power;
         }
 
@@ -49,7 +49,7 @@ public class ChargingStation {
                 System.out.println("Failed to compare Chargers");
                 System.exit(1);
             }
-            return comparableCharger.power-power;
+            return (int) Math.round(comparableCharger.power-power);
         }
 
         @Override
@@ -77,7 +77,7 @@ public class ChargingStation {
         queue = ThreadLocal.withInitial(ArrayList::new);
     }
 
-    public void addCharger(int power, ChargerType type) {
+    public void addCharger(double power, ChargerType type) {
         chargers.add(new Charger(power, type));
     }
 

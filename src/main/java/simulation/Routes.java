@@ -20,10 +20,12 @@ public class Routes {
     public ArrayList<Double> endPointWeights = new ArrayList<>();
     public final Random random;
     public final long seed;
+    public final double chargingPowerCoefficient;
 
-    public Routes(long seed_) {
+    public Routes(long seed_, double chargingPowerCoefficient_) {
         seed = seed_;
         random = new Random(seed);
+        chargingPowerCoefficient = chargingPowerCoefficient_;
     }
 
     private HashMap<String, Double> readTrafficData(String path) {
@@ -58,7 +60,7 @@ public class Routes {
 
     public void generateRoutes() {
         logger.config("Generating routes...");
-        RoadData heLa = RoadData.readChargingStations("/He-La-latauspisteet.csv");
+        RoadData heLa = RoadData.readChargingStations("/He-La-latauspisteet.csv", chargingPowerCoefficient);
         routes.put(
                 "HeLa",
                 new Route(
@@ -70,7 +72,7 @@ public class Routes {
                         EndPoint.Lahti
                 )
         );
-        RoadData laJy = RoadData.readChargingStations("/La-Jy-latauspisteet.csv");
+        RoadData laJy = RoadData.readChargingStations("/La-Jy-latauspisteet.csv", chargingPowerCoefficient);
         routes.put(
                 "LaJy",
                 new Route(
@@ -82,7 +84,7 @@ public class Routes {
                         EndPoint.Jyvaskyla
                 )
         );
-        RoadData jyOu = RoadData.readChargingStations("/Jy-Ou-latauspisteet.csv");
+        RoadData jyOu = RoadData.readChargingStations("/Jy-Ou-latauspisteet.csv", chargingPowerCoefficient);
         routes.put(
                 "JyOu",
                 new Route(
@@ -94,7 +96,7 @@ public class Routes {
                         EndPoint.Oulu
                 )
         );
-        RoadData ouKe = RoadData.readChargingStations("/Ou-Ke-latauspisteet.csv");
+        RoadData ouKe = RoadData.readChargingStations("/Ou-Ke-latauspisteet.csv", chargingPowerCoefficient);
         routes.put(
                 "OuKe",
                 new Route(
@@ -106,7 +108,7 @@ public class Routes {
                         EndPoint.Kemi
                 )
         );
-        RoadData keRo = RoadData.readChargingStations("/Ke-Ro-latauspisteet.csv");
+        RoadData keRo = RoadData.readChargingStations("/Ke-Ro-latauspisteet.csv", chargingPowerCoefficient);
         routes.put(
                 "KeRo",
                 new Route(
@@ -118,7 +120,7 @@ public class Routes {
                         EndPoint.Rovaniemi
                 )
         );
-        RoadData roUt = RoadData.readChargingStations("/Ro-Ut-latauspisteet.csv");
+        RoadData roUt = RoadData.readChargingStations("/Ro-Ut-latauspisteet.csv", chargingPowerCoefficient);
         routes.put(
                 "RoUt",
                 new Route(

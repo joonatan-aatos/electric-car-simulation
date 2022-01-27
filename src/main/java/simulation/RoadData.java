@@ -19,7 +19,7 @@ public class RoadData {
         return chargingStations;
     }
 
-    public static RoadData readChargingStations(String path) {
+    public static RoadData readChargingStations(String path, double chargingPowerCoefficient) {
         RoadData roadData = new RoadData();
 
         try {
@@ -75,7 +75,7 @@ public class RoadData {
                 assert lastStation != null;
 
                 for (int i = 0; i < Integer.parseInt(data[4]); i++) {
-                    lastStation.addCharger(Integer.parseInt(data[3]), type);
+                    lastStation.addCharger(Integer.parseInt(data[3])*chargingPowerCoefficient, type);
                 }
 
                 lastStation.sortChargers();

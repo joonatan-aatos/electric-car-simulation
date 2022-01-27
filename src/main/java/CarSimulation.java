@@ -14,11 +14,13 @@ public class CarSimulation {
     private static final Logger logger = Logger.getGlobal();
 
     private static final int REPEAT_COUNT = 10;
+    private static final double CHARGING_POWER_COEFFICIENT = 1;
+    private static final double DRIVING_EFFICIENCY_COEFFICIENT = 1;
     private static final int MAX_CAR_COUNT = 1000;
     private static final int MIN_CAR_COUNT = 100;
     private static final int CAR_COUNT_CHANGE = 100;
-    private static final int MIN_STANDARD_DEVIATION = 3600;
-    private static final int MAX_STANDARD_DEVIATION = 3600*48;
+    private static final int MIN_STANDARD_DEVIATION = 7200;
+    private static final int MAX_STANDARD_DEVIATION = 7200;
     private static final int STANDARD_DEVIATION_CHANGE = 3600;
     private static boolean showUI = false;
 
@@ -40,10 +42,10 @@ public class CarSimulation {
         simulationStartTime = System.currentTimeMillis();
 
         if (showUI) {
-            Routes routes = new Routes(random.nextLong());
+            Routes routes = new Routes(random.nextLong(), CHARGING_POWER_COEFFICIENT);
             routes.generateRoutes();
 
-            Simulation simulation = new Simulation("visualized", routes, MAX_CAR_COUNT, 3600, 14400, true, false);
+            Simulation simulation = new Simulation("visualized", routes, MAX_CAR_COUNT, 3600, 14400, true, false, DRIVING_EFFICIENCY_COEFFICIENT);
             Visualizer visualizer = showUI ? new Visualizer(simulation, routes) : null;
             Thread simulationThread = new Thread(simulation);
             simulationThread.start();
@@ -61,9 +63,9 @@ public class CarSimulation {
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
                 for (int standardDeviation = MIN_STANDARD_DEVIATION; standardDeviation <= MAX_STANDARD_DEVIATION; standardDeviation += STANDARD_DEVIATION_CHANGE) {
                     for (int i = 0; i < REPEAT_COUNT; i++) {
-                        Routes routes = new Routes(random.nextLong());
+                        Routes routes = new Routes(random.nextLong(), CHARGING_POWER_COEFFICIENT);
                         routes.generateRoutes();
-                        Simulation simulation = new Simulation(String.format("r%d-c%d-s%d", i+1, carCount, standardDeviation), routes, carCount, standardDeviation, 4 * standardDeviation, false, false);
+                        Simulation simulation = new Simulation(String.format("r%d-c%d-s%d", i+1, carCount, standardDeviation), routes, carCount, standardDeviation, 4 * standardDeviation, false, false, DRIVING_EFFICIENCY_COEFFICIENT);
                         simulation.start();
                         simulationsRan++;
                         // Export simulation statistics

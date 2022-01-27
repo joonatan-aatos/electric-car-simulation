@@ -103,7 +103,7 @@ public enum CarType {
     }
 
     public double getDrivingEfficiency() {
-        return drivingEfficiency*drivingEfficiencyCoefficient;
+        return drivingEfficiency / drivingEfficiencyCoefficient;
     }
 
     public ArrayList<ChargingStation.ChargerType> getSupportedChargers() {

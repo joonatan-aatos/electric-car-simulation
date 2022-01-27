@@ -243,7 +243,7 @@ public class Statistics {
     public String statisticsToCSV() {
         StringBuilder s = new StringBuilder();
         s.append("Autojen lukumäärä: ;").append(totalCars).append(";Latureiden tehon kerroin: ;").append(chargingPowerCoefficient).append("\n");
-        s.append("Keskihajonta: ;").append(standardDeviation).append(";Ajamisen tehokkuuden kerroin: ;").append(drivingEfficiencyCoefficient).append("\n");
+        s.append("Keskihajonta: ;").append(standardDeviation).append(";Ajotehokkuuden kerroin: ;").append(drivingEfficiencyCoefficient).append("\n");
         s.append("Kulunut aika (s): ;").append(totalTime).append(";Talvi: ;").append(winter ? "Kyllä" : "Ei").append("\n\n");
 
         // State statistics

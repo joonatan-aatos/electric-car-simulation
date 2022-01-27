@@ -13,13 +13,13 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 3;
+    private static final int REPEAT_COUNT = 10;
     private static final int MAX_CAR_COUNT = 1000;
     private static final int MIN_CAR_COUNT = 100;
     private static final int CAR_COUNT_CHANGE = 100;
     private static final int MIN_STANDARD_DEVIATION = 3600;
-    private static final int MAX_STANDARD_DEVIATION = 3600;
-    private static final int STANDARD_DEVIATION_CHANGE = 900;
+    private static final int MAX_STANDARD_DEVIATION = 3600*48;
+    private static final int STANDARD_DEVIATION_CHANGE = 3600;
     private static boolean showUI = false;
 
     private static int simulationsRan = 0;
@@ -36,7 +36,7 @@ public class CarSimulation {
         }
         configureLogger();
 
-        simulationCount = ((MAX_CAR_COUNT-MIN_CAR_COUNT)/CAR_COUNT_CHANGE+1)*REPEAT_COUNT;
+        simulationCount = ((MAX_CAR_COUNT-MIN_CAR_COUNT)/CAR_COUNT_CHANGE+1)*((MAX_STANDARD_DEVIATION-MIN_STANDARD_DEVIATION)/STANDARD_DEVIATION_CHANGE+1)*REPEAT_COUNT;
         simulationStartTime = System.currentTimeMillis();
 
         if (showUI) {
@@ -120,7 +120,7 @@ public class CarSimulation {
     private static void configureLogger() {
 
         final Logger logger = Logger.getGlobal();
-        logger.setLevel(Level.ALL);
+        logger.setLevel(Level.WARNING);
         logger.setUseParentHandlers(false);
 
         Handler consoleHandler = new ConsoleHandler();
@@ -133,7 +133,7 @@ public class CarSimulation {
         } catch (IOException e) {
             System.out.println("Failed to create file handler for logger");
         }
-        fileHandler.setLevel(Level.ALL);
+        fileHandler.setLevel(Level.WARNING);
 
         logger.addHandler(consoleHandler);
         logger.addHandler(fileHandler);

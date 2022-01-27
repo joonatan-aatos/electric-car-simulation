@@ -17,6 +17,7 @@ public class Car implements Comparable<Car> {
 
     private long timeStep;
 
+    private double drivingEfficiencyCoefficient;
     private double hunger; // In seconds since last eaten
     private double timeSinceLastShopped;
     private double timeSpentCharging;
@@ -57,7 +58,7 @@ public class Car implements Comparable<Car> {
         }
     };
 
-    public Car(CarType carType_, int index_) {
+    public Car(CarType carType_, int index_, double drivingEfficiencyCoefficient_) {
         carType = carType_;
         index = index_;
 
@@ -66,6 +67,7 @@ public class Car implements Comparable<Car> {
         drivenDistance = 0;
         drivingSpeed = SPEED_ON_HIGHWAY;
         currentChargingStationIndex = -1;
+        drivingEfficiencyCoefficient = drivingEfficiencyCoefficient_;
         nextChargingStationIndex = -1;
         state = State.OnWayToHighway;
         distanceFromHighway = 0;

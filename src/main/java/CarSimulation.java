@@ -1,3 +1,4 @@
+import simulation.CarType;
 import simulation.Routes;
 import simulation.Simulation;
 import simulation.Statistics;
@@ -37,6 +38,11 @@ public class CarSimulation {
     private static final Random random = new Random();
 
     public static void main(String[] args) throws InterruptedException {
+        if (isWinter) {
+            for (CarType carType : CarType.values()) {
+                carType.itIsWinter();
+            }
+        }
         File dir = new File("./output");
         if (!dir.mkdirs()) {
             purgeDirectory(dir);

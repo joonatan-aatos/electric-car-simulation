@@ -49,6 +49,7 @@ public enum CarType {
     private ArrayList<ChargingStation.ChargerType> supportedChargers;
     private double winterChargingCoefficient = 0.5;
     private double winterDrivingCoefficient = 0.5;
+    private static double drivingEfficiencyCoefficient = 1;
 
     private CarType(int amount_, double capacity_, double drivingEfficiency_, double maxChargingPowerAC_, double maxChargingPowerDC_, ArrayList<String> supportedChargers_) {
         amount = amount_;
@@ -81,12 +82,12 @@ public enum CarType {
         drivingEfficiency /= winterDrivingCoefficient;      // Because the greater the value of "drivingEfficiency", the worse the efficiency. What a stupid metric.
     }
 
-    public void applyDrivingEfficiencyCoefficient(double coefficient){
-        drivingEfficiency*=coefficient;
-    }
-
     public int getAmount() {
         return amount;
+    }
+
+    public static void setDrivingEfficiencyCoefficient(double newDrivingEfficiencyCoefficient) {
+        CarType.drivingEfficiencyCoefficient = newDrivingEfficiencyCoefficient;
     }
 
     public double getCapacity() {
@@ -102,7 +103,7 @@ public enum CarType {
     }
 
     public double getDrivingEfficiency() {
-        return drivingEfficiency;
+        return drivingEfficiency*drivingEfficiencyCoefficient;
     }
 
     public ArrayList<ChargingStation.ChargerType> getSupportedChargers() {

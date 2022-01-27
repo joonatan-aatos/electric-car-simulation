@@ -42,11 +42,7 @@ public class Simulation implements Runnable {
         roadStatisticsOverTime = new ArrayList<>();
         waitingStatisticsOverTime = new ArrayList<>();
         drivingEfficiencyCoefficient = drivingEfficiencyCoefficient_;
-
-        for (CarType carType : CarType.values()) {
-            if (isWinter) carType.itIsWinter();
-            carType.applyDrivingEfficiencyCoefficient(drivingEfficiencyCoefficient);
-        }
+        CarType.setDrivingEfficiencyCoefficient(drivingEfficiencyCoefficient);
 
         createCars();
     }
@@ -62,14 +58,14 @@ public class Simulation implements Runnable {
         for (CarType carType : carTypes) {
             carCounter += (double) carType.getAmount() / carSum * TOTAL_CARS;
             while (carCounter >= 1) {
-                Car car = new Car(carType, carsToBeAdded.size());
+                Car car = new Car(carType, carsToBeAdded.size(), drivingEfficiencyCoefficient);
                 car.setRoute(routes.generateRandomRoute());
                 carsToBeAdded.add(car);
                 carCounter--;
             }
         }
         if (carsToBeAdded.size() == TOTAL_CARS - 1) {
-            Car car = new Car(carTypes.get(carTypes.size() - 1), carsToBeAdded.size());
+            Car car = new Car(carTypes.get(carTypes.size() - 1), carsToBeAdded.size(), drivingEfficiencyCoefficient);
             car.setRoute(routes.generateRandomRoute());
             carsToBeAdded.add(car);
         }

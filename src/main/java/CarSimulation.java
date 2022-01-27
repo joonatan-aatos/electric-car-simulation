@@ -26,7 +26,7 @@ public class CarSimulation {
     private static final int MIN_STANDARD_DEVIATION = 3600;
     private static final int MAX_STANDARD_DEVIATION = 129600;
     private static final int STANDARD_DEVIATION_CHANGE = 3600;
-    private static final boolean isWinter = true;
+    private static final boolean isWinter = false;
     private static boolean showUI = false;
 
     private static int simulationsRan = 0;

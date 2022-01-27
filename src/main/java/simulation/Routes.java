@@ -388,4 +388,8 @@ public class Routes {
 
         return new Route(this, rootRoutes, startingPoint);
     }
+
+    public double getChargingPowerCoefficient() {
+        return chargingPowerCoefficient;
+    }
 }

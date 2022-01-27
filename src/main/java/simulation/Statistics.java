@@ -51,6 +51,9 @@ public class Statistics {
 
     private final int totalCars;
     private final int standardDeviation;
+    private final double chargingPowerCoefficient;
+    private final double drivingEfficiencyCoefficient;
+    private final boolean winter;
     private final int[] trafficStatistics; // count
     private final long[][] stateStatistics; // seconds
     private final long totalTime; // seconds
@@ -78,7 +81,9 @@ public class Statistics {
         globalStateStatisticsOverTime = simulation.getGlobalStateStatisticsOverTime();
         roadStatisticsOverTime = simulation.getRoadStatisticsOverTime();
         waitingStatisticsOverTime = simulation.getWaitingStatisticsOverTime();
-
+        chargingPowerCoefficient = simulation.getChargingPowerCoefficient();
+        drivingEfficiencyCoefficient = simulation.getDrivingEfficiencyCoefficient();
+        winter = simulation.isWinter();
         cars = simulation.getCars();
         Collections.sort(cars);
         totalCars = cars.size();
@@ -237,9 +242,9 @@ public class Statistics {
 
     public String statisticsToCSV() {
         StringBuilder s = new StringBuilder();
-        s.append("Autojen lukumäärä: ;").append(totalCars).append("\n");
-        s.append("Keskihajonta: ;").append(standardDeviation).append("\n");
-        s.append("Kulunut aika (s): ;").append(totalTime).append("\n\n");
+        s.append("Autojen lukumäärä: ;").append(totalCars).append(";Latureiden tehon kerroin: ;").append(chargingPowerCoefficient).append("\n");
+        s.append("Keskihajonta: ;").append(standardDeviation).append(";Ajamisen tehokkuuden kerroin: ;").append(drivingEfficiencyCoefficient).append("\n");
+        s.append("Kulunut aika (s): ;").append(totalTime).append(";Talvi: ;").append(winter ? "Kyllä" : "Ei").append("\n\n");
 
         // State statistics
         long stateStatisticsSum = 0;

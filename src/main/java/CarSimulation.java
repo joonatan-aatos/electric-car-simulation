@@ -13,15 +13,20 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 10;
-    private static final double CHARGING_POWER_COEFFICIENT = 1;
-    private static final double DRIVING_EFFICIENCY_COEFFICIENT = 1;
-    private static final int MAX_CAR_COUNT = 1000;
-    private static final int MIN_CAR_COUNT = 100;
-    private static final int CAR_COUNT_CHANGE = 100;
-    private static final int MIN_STANDARD_DEVIATION = 7200;
-    private static final int MAX_STANDARD_DEVIATION = 7200;
+    private static final int REPEAT_COUNT = 30;
+    private static final int MAX_CHARGING_POWER_COEFFICIENT = 100;
+    private static final int MIN_CHARGING_POWER_COEFFICIENT = 100;
+    private static final int CHARGING_POWER_COEFFICIENT_CHANGE = 1;
+    private static final int MAX_DRIVING_EFFICIENCY_COEFFICIENT = 100;
+    private static final int MIN_DRIVING_EFFICIENCY_COEFFICIENT = 100;
+    private static final int DRIVING_EFFICIENCY_COEFFICIENT_CHANGE = 1;
+    private static final int MAX_CAR_COUNT = 2000;
+    private static final int MIN_CAR_COUNT = 50;
+    private static final int CAR_COUNT_CHANGE = 50;
+    private static final int MIN_STANDARD_DEVIATION = 3600;
+    private static final int MAX_STANDARD_DEVIATION = 129600;
     private static final int STANDARD_DEVIATION_CHANGE = 3600;
+    private static final boolean isWinter = true;
     private static boolean showUI = false;
 
     private static int simulationsRan = 0;
@@ -38,14 +43,19 @@ public class CarSimulation {
         }
         configureLogger();
 
-        simulationCount = ((MAX_CAR_COUNT-MIN_CAR_COUNT)/CAR_COUNT_CHANGE+1)*((MAX_STANDARD_DEVIATION-MIN_STANDARD_DEVIATION)/STANDARD_DEVIATION_CHANGE+1)*REPEAT_COUNT;
+        simulationCount =
+                ((MAX_CAR_COUNT-MIN_CAR_COUNT)/CAR_COUNT_CHANGE+1)*
+                ((MAX_STANDARD_DEVIATION-MIN_STANDARD_DEVIATION)/STANDARD_DEVIATION_CHANGE+1)*
+                ((MAX_CHARGING_POWER_COEFFICIENT-MIN_CHARGING_POWER_COEFFICIENT)/CHARGING_POWER_COEFFICIENT_CHANGE+1)*
+                ((MAX_DRIVING_EFFICIENCY_COEFFICIENT-MIN_DRIVING_EFFICIENCY_COEFFICIENT)/DRIVING_EFFICIENCY_COEFFICIENT_CHANGE+1)*
+                REPEAT_COUNT;
         simulationStartTime = System.currentTimeMillis();
 
         if (showUI) {
-            Routes routes = new Routes(random.nextLong(), CHARGING_POWER_COEFFICIENT);
+            Routes routes = new Routes(random.nextLong(), 1);
             routes.generateRoutes();
 
-            Simulation simulation = new Simulation("visualized", routes, MAX_CAR_COUNT, 3600, 14400, true, false, DRIVING_EFFICIENCY_COEFFICIENT);
+            Simulation simulation = new Simulation("visualized", routes, MAX_CAR_COUNT, 3600, 14400, true, false, 1);
             Visualizer visualizer = showUI ? new Visualizer(simulation, routes) : null;
             Thread simulationThread = new Thread(simulation);
             simulationThread.start();
@@ -62,16 +72,20 @@ public class CarSimulation {
         else {
             for (int carCount = MIN_CAR_COUNT; carCount <= MAX_CAR_COUNT; carCount += CAR_COUNT_CHANGE) {
                 for (int standardDeviation = MIN_STANDARD_DEVIATION; standardDeviation <= MAX_STANDARD_DEVIATION; standardDeviation += STANDARD_DEVIATION_CHANGE) {
-                    for (int i = 0; i < REPEAT_COUNT; i++) {
-                        Routes routes = new Routes(random.nextLong(), CHARGING_POWER_COEFFICIENT);
-                        routes.generateRoutes();
-                        Simulation simulation = new Simulation(String.format("r%d-c%d-s%d", i+1, carCount, standardDeviation), routes, carCount, standardDeviation, 4 * standardDeviation, false, false, DRIVING_EFFICIENCY_COEFFICIENT);
-                        simulation.start();
-                        simulationsRan++;
-                        // Export simulation statistics
-                        Statistics statistics = new Statistics(simulation);
-                        statistics.export(simulation.getName());
-                        printState((double) simulationsRan/simulationCount);
+                    for (int chargingPowerCoefficient = MIN_CHARGING_POWER_COEFFICIENT; chargingPowerCoefficient <= MAX_CHARGING_POWER_COEFFICIENT; chargingPowerCoefficient += CHARGING_POWER_COEFFICIENT_CHANGE) {
+                        for (int drivingEfficiencyCoefficient = MIN_DRIVING_EFFICIENCY_COEFFICIENT; drivingEfficiencyCoefficient <= MAX_DRIVING_EFFICIENCY_COEFFICIENT; drivingEfficiencyCoefficient += DRIVING_EFFICIENCY_COEFFICIENT_CHANGE) {
+                            for (int i = 0; i < REPEAT_COUNT; i++) {
+                                Routes routes = new Routes(random.nextLong(), (double) chargingPowerCoefficient / 100d);
+                                routes.generateRoutes();
+                                Simulation simulation = new Simulation(String.format("r%d-c%d-s%d-p%d-e%d-%s", i+1, carCount, standardDeviation, chargingPowerCoefficient, drivingEfficiencyCoefficient, isWinter ? "w" : "s"), routes, carCount, standardDeviation, 4 * standardDeviation, false, isWinter, (double) drivingEfficiencyCoefficient / 100d);
+                                simulation.start();
+                                simulationsRan++;
+                                // Export simulation statistics
+                                Statistics statistics = new Statistics(simulation);
+                                statistics.export(simulation.getName());
+                                printState((double) simulationsRan/simulationCount);
+                            }
+                        }
                     }
                 }
             }

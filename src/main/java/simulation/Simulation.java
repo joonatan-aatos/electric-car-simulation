@@ -6,8 +6,6 @@ import java.util.logging.Logger;
 
 public class Simulation implements Runnable {
 
-
-
     private static final Logger logger = Logger.getGlobal();
 
     ArrayList<Car> cars;
@@ -18,7 +16,9 @@ public class Simulation implements Runnable {
     private final int NORM_DIST_MEAN;
     private final int NORM_DIST_STANDARD_DEVIATION;
     private final int TOTAL_CARS;
+    private final double drivingEfficiencyCoefficient;
     private final boolean shouldWait;
+    private final boolean isWinter;
     private final Routes routes;
     private final String name;
     private final ArrayList<int[][]> stateStatisticsOverTime;
@@ -28,18 +28,20 @@ public class Simulation implements Runnable {
 
     private double cumulativeDistributionCounter = 0.5;
 
-    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter, double drivingEfficiencyCoefficient) {
+    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter_, double drivingEfficiencyCoefficient_) {
         name = name_;
         routes = routes_ != null ? routes_ : new Routes(0,1);
         TOTAL_CARS = carCount;
         NORM_DIST_STANDARD_DEVIATION = standardDeviation;
         NORM_DIST_MEAN = mean;
+        isWinter = isWinter_;
         tps = 100;
         shouldWait = shouldWait_;
         stateStatisticsOverTime = new ArrayList<>();
         globalStateStatisticsOverTime = new ArrayList<>();
         roadStatisticsOverTime = new ArrayList<>();
         waitingStatisticsOverTime = new ArrayList<>();
+        drivingEfficiencyCoefficient = drivingEfficiencyCoefficient_;
 
         for (CarType carType : CarType.values()) {
             if (isWinter) carType.itIsWinter();
@@ -176,9 +178,9 @@ public class Simulation implements Runnable {
 
             seconds += TIME_STEP;
 
-            if (seconds > 3600000) {
+            if (seconds > 36000000) {
                 logger.severe(String.format("[%s]: Simulation stopped by force", name));
-                break;
+                System.exit(1);
             }
         }
 
@@ -248,6 +250,18 @@ public class Simulation implements Runnable {
 
     public int getStandardDeviation() {
         return NORM_DIST_STANDARD_DEVIATION;
+    }
+
+    public double getDrivingEfficiencyCoefficient() {
+        return drivingEfficiencyCoefficient;
+    }
+
+    public double getChargingPowerCoefficient() {
+        return routes.getChargingPowerCoefficient();
+    }
+
+    public boolean isWinter() {
+        return isWinter;
     }
 
     @Override

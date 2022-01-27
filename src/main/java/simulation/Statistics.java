@@ -285,7 +285,7 @@ public class Statistics {
         // State stats over time
         s.append("Autojen tila joka ajanhetkeltä:\n");
         s.append("Aika (min);Valtatiellä;Matkalla valtatielle;Matkalla valtatieltä;Matkalla laturille;Matkalla laturilta;Odottamassa;Latautumassa;Akku loppunut;Perillä;Yhteensä;;Tiellä (HeLa);Tiellä (LaJy);Tiellä (JyOu);Tiellä (OuKe);Tiellä (KeRo);Tiellä (RoUt);Odottamassa (HeLa);Odottamassa (LaJy);Odottamassa (JyOu);Odottamassa (OuKe);Odottamassa (KeRo);Odottamassa (RoUt);\n");
-        for (int i = 0; i < globalStateStatisticsOverTime.size(); i++) {
+        for (int i = 0; i < globalStateStatisticsOverTime.size(); i += 30) {
             s.append((double) i/6d);
             int sum = 0;
             for (int carCount : globalStateStatisticsOverTime.get(i)) {

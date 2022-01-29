@@ -17,6 +17,7 @@ public class Simulation implements Runnable {
     private final int NORM_DIST_STANDARD_DEVIATION;
     private final int TOTAL_CARS;
     private final double drivingEfficiencyCoefficient;
+    private final double chargingPowerCoefficient;
     private final boolean shouldWait;
     private final boolean isWinter;
     private final Routes routes;
@@ -26,9 +27,10 @@ public class Simulation implements Runnable {
     private final ArrayList<int[]> roadStatisticsOverTime;
     private final ArrayList<int[]> waitingStatisticsOverTime;
 
+
     private double cumulativeDistributionCounter = 0.5;
 
-    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter_, double drivingEfficiencyCoefficient_) {
+    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter_, double drivingEfficiencyCoefficient_, double chargingPowerCoefficient_) {
         name = name_;
         routes = routes_ != null ? routes_ : new Routes(0,1);
         TOTAL_CARS = carCount;
@@ -42,7 +44,9 @@ public class Simulation implements Runnable {
         roadStatisticsOverTime = new ArrayList<>();
         waitingStatisticsOverTime = new ArrayList<>();
         drivingEfficiencyCoefficient = drivingEfficiencyCoefficient_;
+        chargingPowerCoefficient = chargingPowerCoefficient_;
         CarType.setDrivingEfficiencyCoefficient(drivingEfficiencyCoefficient);
+        CarType.setChargingPowerCoefficient(chargingPowerCoefficient);
 
         createCars();
     }
@@ -253,7 +257,7 @@ public class Simulation implements Runnable {
     }
 
     public double getChargingPowerCoefficient() {
-        return routes.getChargingPowerCoefficient();
+        return chargingPowerCoefficient;
     }
 
     public boolean isWinter() {

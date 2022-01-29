@@ -50,6 +50,7 @@ public enum CarType {
     private double winterChargingCoefficient = 0.5;
     private double winterDrivingCoefficient = 0.5;
     private static double drivingEfficiencyCoefficient = 1;
+    private static double chargingPowerCoefficient = 1;
 
     private CarType(int amount_, double capacity_, double drivingEfficiency_, double maxChargingPowerAC_, double maxChargingPowerDC_, ArrayList<String> supportedChargers_) {
         amount = amount_;
@@ -90,16 +91,20 @@ public enum CarType {
         CarType.drivingEfficiencyCoefficient = newDrivingEfficiencyCoefficient;
     }
 
+    public static void setChargingPowerCoefficient(double newChargingPowerCoefficient) {
+        CarType.chargingPowerCoefficient = newChargingPowerCoefficient;
+    }
+
     public double getCapacity() {
         return capacity;
     }
 
     public double getMaxChargingPowerAC() {
-        return maxChargingPowerAC;
+        return maxChargingPowerAC * chargingPowerCoefficient;
     }
 
     public double getMaxChargingPowerDC() {
-        return maxChargingPowerDC;
+        return maxChargingPowerDC * chargingPowerCoefficient;
     }
 
     public double getDrivingEfficiency() {

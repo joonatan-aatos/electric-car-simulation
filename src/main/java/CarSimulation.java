@@ -14,22 +14,22 @@ public class CarSimulation {
 
     private static final Logger logger = Logger.getGlobal();
 
-    private static final int REPEAT_COUNT = 30;
-    private static final int MAX_CHARGING_POWER_COEFFICIENT = 200;
+    private static final int REPEAT_COUNT = 50;
+    private static final int MAX_CHARGING_POWER_COEFFICIENT = 100;
     private static final int MIN_CHARGING_POWER_COEFFICIENT = 100;
-    private static final int CHARGING_POWER_COEFFICIENT_CHANGE = 10;
-    private static final int MAX_CHARGER_AMOUNT_COEFFICIENT = 200;
+    private static final int CHARGING_POWER_COEFFICIENT_CHANGE = 1;
+    private static final int MAX_CHARGER_AMOUNT_COEFFICIENT = 100;
     private static final int MIN_CHARGER_AMOUNT_COEFFICIENT = 100;
-    private static final int CHARGER_AMOUNT_COEFFICIENT_CHANGE = 10;
-    private static final int MAX_DRIVING_EFFICIENCY_COEFFICIENT = 200;
+    private static final int CHARGER_AMOUNT_COEFFICIENT_CHANGE = 1;
+    private static final int MAX_DRIVING_EFFICIENCY_COEFFICIENT = 100;
     private static final int MIN_DRIVING_EFFICIENCY_COEFFICIENT = 100;
-    private static final int DRIVING_EFFICIENCY_COEFFICIENT_CHANGE = 10;
-    private static final int MAX_CAR_COUNT = 1000;
-    private static final int MIN_CAR_COUNT = 1000;
-    private static final int CAR_COUNT_CHANGE = 1;
-    private static final int MIN_STANDARD_DEVIATION = 21600;
-    private static final int MAX_STANDARD_DEVIATION = 21600;
-    private static final int STANDARD_DEVIATION_CHANGE = 1;
+    private static final int DRIVING_EFFICIENCY_COEFFICIENT_CHANGE = 1;
+    private static final int MAX_CAR_COUNT = 2000;
+    private static final int MIN_CAR_COUNT = 50;
+    private static final int CAR_COUNT_CHANGE = 50;
+    private static final int MAX_STANDARD_DEVIATION = 129600;
+    private static final int MIN_STANDARD_DEVIATION = 3600;
+    private static final int STANDARD_DEVIATION_CHANGE = 3600;
     private static final boolean isWinter = false;
     private static boolean showUI = false;
 
@@ -106,8 +106,8 @@ public class CarSimulation {
         simulationEndTime = System.currentTimeMillis();
         long totalTime = simulationEndTime - simulationStartTime;
 
-        System.out.printf("\nRan %d simulations in %d minutes and %d seconds.\n", simulationCount, (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60);
-        logger.info(String.format("Ran %d simulations in %d minutes and %d seconds.", simulationCount, (int) ((totalTime / (1000*60)) % 60), (int) (totalTime / 1000) % 60));
+        System.out.printf("\nRan %d simulations in %d minutes and %d seconds.\n", simulationCount, (int) ((totalTime / (1000*60)) / 60), (int) (totalTime / 1000) % 60);
+        logger.info(String.format("Ran %d simulations in %d minutes and %d seconds.", simulationCount, (int) ((totalTime / (1000*60)) / 60), (int) (totalTime / 1000) % 60));
     }
 
     private static void purgeDirectory(File dir) {

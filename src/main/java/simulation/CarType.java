@@ -51,6 +51,9 @@ public enum CarType {
     private double winterDrivingCoefficient = 0.5;
     private static double drivingEfficiencyCoefficient = 1;
     private static double chargingPowerCoefficient = 1;
+    private static double averageChargingPowerAC = -1;
+    private static double averageChargingPowerDC = -1;
+    private static double averageCapacity = -1;
 
     private CarType(int amount_, double capacity_, double drivingEfficiency_, double maxChargingPowerAC_, double maxChargingPowerDC_, ArrayList<String> supportedChargers_) {
         amount = amount_;
@@ -109,6 +112,38 @@ public enum CarType {
 
     public double getDrivingEfficiency() {
         return drivingEfficiency / drivingEfficiencyCoefficient;
+    }
+
+    private static void calculateAverages() {
+        double sumAC = 0, sumDC = 0, sumCapacity = 0;
+        int weightTotal = 0;
+        for (CarType carType : CarType.values()) {
+            sumAC += carType.amount * carType.getMaxChargingPowerAC();
+            sumDC += carType.amount * carType.getMaxChargingPowerDC();
+            sumCapacity += carType.amount * carType.getCapacity();
+            weightTotal += carType.amount;
+        }
+        averageChargingPowerAC = sumAC / weightTotal;
+        averageChargingPowerDC = sumDC / weightTotal;
+        averageCapacity = sumCapacity / weightTotal;
+    }
+
+    public static double getAverageCapacity() {
+        if (averageCapacity == -1)
+            calculateAverages();
+        return averageCapacity;
+    }
+
+    public static double getAverageChargingPowerAC() {
+        if (averageChargingPowerAC == -1)
+            calculateAverages();
+        return averageChargingPowerAC;
+    }
+
+    public static double getAverageChargingPowerDC() {
+        if (averageChargingPowerDC == -1)
+            calculateAverages();
+        return averageChargingPowerDC;
     }
 
     public ArrayList<ChargingStation.ChargerType> getSupportedChargers() {

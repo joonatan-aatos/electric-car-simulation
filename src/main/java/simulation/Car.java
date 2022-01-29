@@ -163,15 +163,15 @@ public class Car implements Comparable<Car> {
         else {
             // Calculate whether it is best to go to the next charging station
             int bestChargingStationIndex = currentChargingStationIndex;
-            double bestChargingStationPreferencePoints = calculatePreferencePointsOnCharger(currentChargingStationIndex);
+            double bestChargingStationPreferencePoints = calculatePreferencePoints(currentChargingStationIndex);
             for (int i = 1; i <= route.getChargingStations().size(); i++) {
                 if (
                     currentChargingStationIndex + i <= route.getChargingStations().size() - 1 &&
                     route.getChargingStations().get(currentChargingStationIndex + i).hasChargerType(carType.getSupportedChargers()) &&
                     canReachChargingStation(currentChargingStationIndex + i))
                 {
-                    double preferencePoints = calculatePreferencePointsOnCharger(currentChargingStationIndex + i);
-                    if (preferencePoints > bestChargingStationPreferencePoints) {
+                    double preferencePoints = calculatePreferencePoints(currentChargingStationIndex + i);
+                    if (preferencePoints < bestChargingStationPreferencePoints) {
                         bestChargingStationIndex = currentChargingStationIndex + i;
                         bestChargingStationPreferencePoints = preferencePoints;
                     }
@@ -335,7 +335,6 @@ public class Car implements Comparable<Car> {
      */
     private int calculateNextChargingStationIndex() {
 
-        double optimalDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
         double maximumDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - DESTINATION_BATTERY_THRESHOLD) + drivenDistance;
 
         if (maximumDistance > route.getLength() + destinationDistanceFromEndPoint) {
@@ -344,7 +343,7 @@ public class Car implements Comparable<Car> {
 
         int previousChargingStationIndex = currentChargingStationIndex;
         int preferredStationIndex = -1;
-        double mostPreferencePoints = 0;
+        double mostPreferencePoints = Double.MAX_VALUE;
 
         for (int i = previousChargingStationIndex + 1; i < route.getChargingStations().size(); i++) {
             if (distanceFromStartToChargingStation(i) > maximumDistance) {
@@ -352,8 +351,8 @@ public class Car implements Comparable<Car> {
             }
             if (!route.getChargingStations().get(i).hasChargerType(carType.getSupportedChargers()))
                 continue;
-            double preferencePoints = calculatePreferencePointsOnHighway(i, optimalDistance);
-            if (preferencePoints > mostPreferencePoints) {
+            double preferencePoints = calculatePreferencePoints(i);
+            if (preferencePoints < mostPreferencePoints) {
                 mostPreferencePoints = preferencePoints;
                 preferredStationIndex = i;
             }
@@ -362,54 +361,32 @@ public class Car implements Comparable<Car> {
         return preferredStationIndex;
     }
 
-    private double calculatePreferencePointsOnHighway(int chargingStationIndex, double optimalDistance) {
+    private double calculatePreferencePoints(int chargingStationIndex) {
 
         ChargingStation chargingStation = route.getChargingStations().get(chargingStationIndex);
 
-        double distanceCoefficient = 1 +
-                Math.pow(distanceFromStartToChargingStation(chargingStationIndex) - optimalDistance, 2);
+        boolean isDC =
+                chargingStation.getChargers().get(0).getType() == ChargingStation.ChargerType.CHAdeMO ||
+                chargingStation.getChargers().get(0).getType() == ChargingStation.ChargerType.CCS ||
+                chargingStation.getChargers().get(0).getType() == ChargingStation.ChargerType.Tesla;
 
-        double commonPreferencePoints = calculateCommonPreferencePoints(chargingStation);
+        double personalChargerPower = Math.min(chargingStation.getChargers().get(0).getPower(), isDC ? carType.getMaxChargingPowerDC() : carType.getMaxChargingPowerAC());
 
-        return
-                (commonPreferencePoints) /
-                /*-----division line-----*/
-                (distanceCoefficient);
-    }
+        double averageChargerPower = Math.min(chargingStation.getChargers().get(0).getPower(), isDC ? CarType.getAverageChargingPowerDC() : CarType.getAverageChargingPowerAC());
 
-    private double calculatePreferencePointsOnCharger(int nextChargingStationIndex) {
+        double estimatedWaitingTime = carType.getCapacity() / personalChargerPower + CarType.getAverageCapacity() / averageChargerPower * chargingStation.getQueueLength() / (2 * chargingStation.getChargers().size());
 
-        ChargingStation currentChargingStation = route.getChargingStations().get(currentChargingStationIndex);
-        ChargingStation nextChargingStation = route.getChargingStations().get(nextChargingStationIndex);
+        double timeTax = 0;
 
-        double chargerDistanceCoefficient = 1 +
-                distanceFromStartToChargingStation(nextChargingStationIndex) -
-                route.getChargingStationDistances().get(currentChargingStationIndex) +
-                currentChargingStation.getDistanceFromHighway();
+        if (hunger > 10800 && !chargingStation.isHasFood() && !chargingStation.isHasShop()) timeTax += 1800;
 
-        double commonPreferencePoints = calculateCommonPreferencePoints(nextChargingStation);
+        double maxDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - DESTINATION_BATTERY_THRESHOLD);
+        double optimalDistance = battery / carType.getDrivingEfficiency() * 100 * (1 - BATTERY_CHARGING_THRESHOLD) + drivenDistance;
+        double distanceToChargingStation = distanceFromStartToChargingStation(chargingStationIndex) - optimalDistance;
 
-        return
-            (commonPreferencePoints) /
-            /*-----division line-----*/
-            (chargerDistanceCoefficient);
-    }
+        timeTax += Math.min(Math.pow(distanceToChargingStation, 2) / Math.pow(maxDistance, 2) * 45000, 4050);
 
-    private double calculateCommonPreferencePoints(ChargingStation chargingStation) {
-
-        double chargerPowerCoefficient = chargingStation.getChargers().get(0).getPower();
-        double chargerCountCoefficient = Math.pow(chargingStation.getChargers().size(), 2);
-        double lineLengthCoefficient = Math.pow(1 + chargingStation.getQueueLength(), 2);
-
-        double amenitiesCoefficient = 2 +
-                (chargingStation.isHasFood() ? 1 : 0) * hunger/3600 +       // Coefficient attains +1 per hour hungry
-                (chargingStation.isHasShop() ? 1 : 0) * timeSinceLastShopped /3600 + //  Shopping number gets multiplied by 1/2 for every time shopped
-                (chargingStation.isCustomerExclusive() ? -1 : 0);
-
-        return
-                (chargerPowerCoefficient * chargerCountCoefficient * amenitiesCoefficient) /
-                /*-----------------------------division line-------------------------------*/
-                (lineLengthCoefficient);
+        return estimatedWaitingTime + timeTax;
     }
 
     private boolean canReachDestination() {

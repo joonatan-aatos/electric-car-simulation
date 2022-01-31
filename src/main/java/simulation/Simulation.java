@@ -16,7 +16,7 @@ public class Simulation implements Runnable {
     private final int NORM_DIST_MEAN;
     private final int NORM_DIST_STANDARD_DEVIATION;
     private final int TOTAL_CARS;
-    private final double drivingEfficiencyCoefficient;
+    private final double batteryCapacityCoefficient;
     private final double chargingPowerCoefficient;
     private final boolean shouldWait;
     private final boolean isWinter;
@@ -30,7 +30,7 @@ public class Simulation implements Runnable {
 
     private double cumulativeDistributionCounter = 0.5;
 
-    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter_, double drivingEfficiencyCoefficient_, double chargingPowerCoefficient_) {
+    public Simulation(String name_, Routes routes_, int carCount, int standardDeviation, int mean, boolean shouldWait_, boolean isWinter_, double batteryCapacityCoefficient_, double chargingPowerCoefficient_) {
         name = name_;
         routes = routes_ != null ? routes_ : new Routes(0,1);
         TOTAL_CARS = carCount;
@@ -43,9 +43,9 @@ public class Simulation implements Runnable {
         globalStateStatisticsOverTime = new ArrayList<>();
         roadStatisticsOverTime = new ArrayList<>();
         waitingStatisticsOverTime = new ArrayList<>();
-        drivingEfficiencyCoefficient = drivingEfficiencyCoefficient_;
+        batteryCapacityCoefficient = batteryCapacityCoefficient_;
         chargingPowerCoefficient = chargingPowerCoefficient_;
-        CarType.setDrivingEfficiencyCoefficient(drivingEfficiencyCoefficient);
+        CarType.setBatteryCapacityCoefficient(batteryCapacityCoefficient);
         CarType.setChargingPowerCoefficient(chargingPowerCoefficient);
 
         createCars();
@@ -62,14 +62,14 @@ public class Simulation implements Runnable {
         for (CarType carType : carTypes) {
             carCounter += (double) carType.getAmount() / carSum * TOTAL_CARS;
             while (carCounter >= 1) {
-                Car car = new Car(carType, carsToBeAdded.size(), drivingEfficiencyCoefficient);
+                Car car = new Car(carType, carsToBeAdded.size(), batteryCapacityCoefficient);
                 car.setRoute(routes.generateRandomRoute());
                 carsToBeAdded.add(car);
                 carCounter--;
             }
         }
         if (carsToBeAdded.size() == TOTAL_CARS - 1) {
-            Car car = new Car(carTypes.get(carTypes.size() - 1), carsToBeAdded.size(), drivingEfficiencyCoefficient);
+            Car car = new Car(carTypes.get(carTypes.size() - 1), carsToBeAdded.size(), batteryCapacityCoefficient);
             car.setRoute(routes.generateRandomRoute());
             carsToBeAdded.add(car);
         }
@@ -252,8 +252,8 @@ public class Simulation implements Runnable {
         return NORM_DIST_STANDARD_DEVIATION;
     }
 
-    public double getDrivingEfficiencyCoefficient() {
-        return drivingEfficiencyCoefficient;
+    public double getBatteryCapacityCoefficient() {
+        return batteryCapacityCoefficient;
     }
 
     public double getChargingPowerCoefficient() {

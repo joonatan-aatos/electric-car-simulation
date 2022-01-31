@@ -49,7 +49,7 @@ public enum CarType {
     private ArrayList<ChargingStation.ChargerType> supportedChargers;
     private double winterChargingCoefficient = 0.5;
     private double winterDrivingCoefficient = 0.5;
-    private static double drivingEfficiencyCoefficient = 1;
+    private static double batteryCapacityCoefficient = 1;
     private static double chargingPowerCoefficient = 1;
     private static double averageChargingPowerAC = -1;
     private static double averageChargingPowerDC = -1;
@@ -90,8 +90,8 @@ public enum CarType {
         return amount;
     }
 
-    public static void setDrivingEfficiencyCoefficient(double newDrivingEfficiencyCoefficient) {
-        CarType.drivingEfficiencyCoefficient = newDrivingEfficiencyCoefficient;
+    public static void setBatteryCapacityCoefficient(double newBatteryCapacityCoefficient) {
+        CarType.batteryCapacityCoefficient = newBatteryCapacityCoefficient;
     }
 
     public static void setChargingPowerCoefficient(double newChargingPowerCoefficient) {
@@ -99,7 +99,7 @@ public enum CarType {
     }
 
     public double getCapacity() {
-        return capacity;
+        return capacity*batteryCapacityCoefficient;
     }
 
     public double getMaxChargingPowerAC() {
@@ -111,7 +111,7 @@ public enum CarType {
     }
 
     public double getDrivingEfficiency() {
-        return drivingEfficiency / drivingEfficiencyCoefficient;
+        return drivingEfficiency;
     }
 
     private static void calculateAverages() {
